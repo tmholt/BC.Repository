@@ -1,0 +1,24 @@
+
+URL for a code
+
+https://accounts.spotify.com/authorize?client_id=9dbd74f7853f499dba524dbaaef5b20d&response_type=code&&show_dialog=true&scope=playlist-modify-public&redirect_uri=http%3a%2f%2fbengalcore.com&state=suckit
+
+
+Curl Request (for a token given a code)
+
+curl -H "Authorization: Basic OWRiZDc0Zjc4NTNmNDk5ZGJhNTI0ZGJhYWVmNWIyMGQ6YjliZDk4ZGFiZmIxNDFiMWIwODc4ZWYxYjMyMjM1OTI=" -d grant_type=authorization_code -d code=AQDeuHGbsl3UzYp_k6-BXKj6Jd4eNz5ZWFTZFsXt9H7EdPelxB4MkeSi5ZfpWK1wZvA69O2BBZmEp8p92F2-j98DpoTvK5g6RchnJA8UYJmgau7Xk9t_pwoOC1mom1IUesPbep82M7o1zkj6FD3r1i1xmHL0haAY5dYN2bsf5GcW6Z_VZmsPTY1aTwSN1r75QawcMkVokW1dKLgKeDZp0p4bmg -d redirect_uri=http%3a%2f%2fbengalcore.com  https://accounts.spotify.com/api/token
+
+Response
+
+{
+"access_token":
+"BQBpbuVd0GUDgP7R2wk_AcIndscjkoiBHUXyFmLTjs6TEwsaAH2TzCf-XpV4z80OL-eIjnhn6TPo9D281iMYtcoYjKOb0cYGwRiXe9-jk70MvQslkv6LC_urKDY3_O2HMW-ZM8M4vwyasEImS0K35tRk3arpHGJvD_NPVcoJZISfRpj1v6njBcJrM_FkYFVRlTWvU"
+
+"token_type":"Bearer",
+"expires_in":3600,
+"refresh_token":"AQA0vEZtrvZEaDjCziAf_46W3SolG2qVHKW-N2uMJaEzBmZwV8wxcnwCbDACbHJPoLqo7jIUY6npicduF6uhiFwt0e0L17pb6CevgJ3dzzCaApbivqVjcK2Z69RHePUFI"
+}
+
+Curl Request (for a token given a refresh token)
+
+curl -H "Authorization: Basic OWRiZDc0Zjc4NTNmNDk5ZGJhNTI0ZGJhYWVmNWIyMGQ6YjliZDk4ZGFiZmIxNDFiMWIwODc4ZWYxYjMyMjM1OTI=" -d grant_type=refresh_token -d refresh_token=AQA0vEZtrvZEaDjCziAf_46W3SolG2qVHKW-N2uMJaEzBmZwV8wxcnwCbDACbHJPoLqo7jIUY6npicduF6uhiFwt0e0L17pb6CevgJ3dzzCaApbivqVjcK2Z69RHePUFI https://accounts.spotify.com/api/token

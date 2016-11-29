@@ -1,0 +1,67 @@
+
+Afterlife
+Arcade Fire
+
+Left My Woman
+The Wild Feathers
+
+Then Came the Morning
+The Lone Bellow
+
+Red Eyes
+The War on Drugs
+
+Paperback Writer
+The Beatles
+
+A-Punk
+Vampire Weekend
+
+Turtles All the Way Down
+Sturgill Simpson
+
+Cigarette Daydreams
+Cage the Elephant
+https://api.spotify.com/v1/search?type=track&limit=1&q=track:Cigarette+Daydreams+artist:Cage+the+Elephant
+
+Spring To Come - Live at Lightning 100
+John Butler Trio
+
+BLACK SUN
+DEATH CAB FOR CUTIE
+
+Stop Your Crying
+Lake Street Dive
+
+Come As You Are
+Nirvana
+
+Young and Golden
+Smooth Hound Smith
+
+Katie Queen of Tennessee - Live at Lightning 100
+The Apache Relay
+
+Buffalo Soldier
+Bob Marley & The Wailers
+
+Shake
+The Head and the Heart
+
+Happy Idiot
+TV on the Radio
+
+Congregation
+Foo Fighters
+
+Fell In Love With a Girl
+The White Stripes
+
+Moneygrabber
+Fitz and the Tantrums
+
+I Don't Want To Change You
+Damien Rice
+
+Pets
+Porno for Pyros
