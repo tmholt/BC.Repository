@@ -1,0 +1,32 @@
+﻿<Window x:Class="SpamFilter.ViewMatchingRulesWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:rad="http://schemas.telerik.com/2008/xaml/presentation" 
+        Title="View Matching Rules" Height="300" Width="500" WindowStartupLocation="CenterOwner">
+	<Window.Resources>
+		<Style x:Key="radGridViewRowStyle" TargetType="rad:GridViewRow">
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding Action}" Value="Keep">
+					<Setter Property="Background" Value="#e8ffe8"/>
+				</DataTrigger>
+				<DataTrigger Binding="{Binding Action}" Value="Delete">
+					<Setter Property="Background" Value="#ffe8e8"/>
+				</DataTrigger>
+				<DataTrigger Binding="{Binding Action}" Value="Undetermined">
+					<Setter Property="Background" Value="#e4eeff"/>
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+	</Window.Resources>
+	<Grid>
+		<rad:RadGridView x:Name="dgFilters" AutoGenerateColumns="False" ShowGroupPanel="False" ShowColumnSortIndexes="False" 
+						 AlternationCount="2" AlternateRowBackground="#e8f2ff" RowStyle="{StaticResource radGridViewRowStyle}"
+						 rad:StyleManager.Theme="Windows8" Grid.Row="3" SelectionMode="Extended" >
+			<rad:RadGridView.Columns>
+				<rad:GridViewDataColumn Header="Field" IsReadOnly="True" Width="*"  DataMemberBinding="{Binding Field}"  IsFilterable="true"/>
+				<rad:GridViewDataColumn Header="Action" IsReadOnly="True" Width="*"  DataMemberBinding="{Binding Action}"  IsFilterable="true"/>
+				<rad:GridViewDataColumn Header="Text" IsReadOnly="True" Width="3*"  DataMemberBinding="{Binding Text}"  IsFilterable="False"/>
+			</rad:RadGridView.Columns>
+		</rad:RadGridView>        
+    </Grid>
+</Window>
