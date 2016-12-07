@@ -96,7 +96,36 @@ namespace PlaylistGenerator {
 				OnlinePlaylistUrl = "http://www.radio1045.com/playlist/",
 				SpotifyPlaylistName = "PHILLY1045",
 				Format = StationPlaylistFormat.IHeartRadio
-			});		
+			});
+
+			maStations.Add(new StationInfo() {
+				Name = "Rolling Stones - Greatest Hits",
+				PlaylistLink = "https://open.spotify.com/user/128103936/playlist/0Y0Q2zBIHq8Ood3XSLCv5D",
+				SpotifyURI = "spotify:user:128103936:playlist:0Y0Q2zBIHq8Ood3XSLCv5D"
+			});
+			maStations.Add(new StationInfo() {
+				Name = "Hard Rock Covers",
+				PlaylistLink = "https://open.spotify.com/user/gash73/playlist/4XSB9v2mJOTbKgAeK5AELc",
+				SpotifyURI = "spotify:user:gash73:playlist:4XSB9v2mJOTbKgAeK5AELc"
+
+			});
+			maStations.Add(new StationInfo() {
+				Name = "Spotify Sessions",
+				PlaylistLink = "https://open.spotify.com/user/spotifysessions/playlist/69enGygSne9ziF6PxQEWHg",
+				SpotifyURI = "spotify:user:spotifysessions:playlist:69enGygSne9ziF6PxQEWHg"
+			});
+			maStations.Add(new StationInfo() {
+				Name = "dope",
+				PlaylistLink = "https://open.spotify.com/user/1213741851/playlist/1XpidGJptJpk2TAOes5pvG",
+				SpotifyURI = "spotify:user:1213741851:playlist:1XpidGJptJpk2TAOes5pvG"
+			});
+			maStations.Add(new StationInfo() {
+				Name = "Left of my dial",
+				PlaylistLink = "https://open.spotify.com/user/corvar/playlist/3GxB0byPkz502cBFpa86kG",
+				SpotifyURI = "spotify:user:corvar:playlist:3GxB0byPkz502cBFpa86kG"
+			});
+
+
 			cboStations.ItemsSource = maStations;
 
 		}
