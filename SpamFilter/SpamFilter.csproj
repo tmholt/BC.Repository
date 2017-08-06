@@ -74,27 +74,27 @@
     </Reference>
     <Reference Include="Telerik.Windows.Controls, Version=2013.3.1701.40, Culture=neutral, PublicKeyToken=d3625f8bf04286d7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Ref\Rad\Telerik.Windows.Controls.dll</HintPath>
+      <HintPath>..\References\Rad\Telerik.Windows.Controls.dll</HintPath>
     </Reference>
     <Reference Include="Telerik.Windows.Controls.Data, Version=2013.3.1701.40, Culture=neutral, PublicKeyToken=d3625f8bf04286d7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Ref\Rad\Telerik.Windows.Controls.Data.dll</HintPath>
+      <HintPath>..\References\Rad\Telerik.Windows.Controls.Data.dll</HintPath>
     </Reference>
     <Reference Include="Telerik.Windows.Controls.GridView, Version=2013.3.1701.40, Culture=neutral, PublicKeyToken=d3625f8bf04286d7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Ref\Rad\Telerik.Windows.Controls.GridView.dll</HintPath>
+      <HintPath>..\References\Rad\Telerik.Windows.Controls.GridView.dll</HintPath>
     </Reference>
     <Reference Include="Telerik.Windows.Controls.Input, Version=2013.3.1701.40, Culture=neutral, PublicKeyToken=d3625f8bf04286d7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Ref\Rad\Telerik.Windows.Controls.Input.dll</HintPath>
+      <HintPath>..\References\Rad\Telerik.Windows.Controls.Input.dll</HintPath>
     </Reference>
     <Reference Include="Telerik.Windows.Controls.Navigation, Version=2013.3.1701.40, Culture=neutral, PublicKeyToken=d3625f8bf04286d7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Ref\Rad\Telerik.Windows.Controls.Navigation.dll</HintPath>
+      <HintPath>..\References\Rad\Telerik.Windows.Controls.Navigation.dll</HintPath>
     </Reference>
     <Reference Include="Telerik.Windows.Data, Version=2013.3.1701.40, Culture=neutral, PublicKeyToken=d3625f8bf04286d7, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>Ref\Rad\Telerik.Windows.Data.dll</HintPath>
+      <HintPath>..\References\Rad\Telerik.Windows.Data.dll</HintPath>
     </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
