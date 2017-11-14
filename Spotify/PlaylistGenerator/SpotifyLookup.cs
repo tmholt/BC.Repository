@@ -25,9 +25,7 @@ namespace PlaylistGenerator {
 		// http://lab.possan.se/playlistcreator-example/
 
 		//const string APP_AUTH_CODE = "AQB3_lcENlV1FuIAv-z-SQUIgZq-BklcqlZwQL1Dn03p4fSu4GEx8QA8ZWrZ3ZNXUvuihcPO1A7Zp2BG1AzPcGXAQaCxdNL87YirPZH-oW5qoC3OztJP9_UZrP1W37Zad3I6RWos90ACxg_gfc96crGLGP0V7wldEJccmfBqq9aMo66R4mPmyh-FTICzYSuRpKxCaqjiH-6KM-FqTKmwoBjPFA";
-		const string STATIC_TOKEN = "BQAQQOoC7uIrca7zBQJgqlv7Vv4OAGgAfXY3r73RvsV4jh9WhjNRK2xYM255KURONyFw0CjTFZaKLUckmDjLWF5eHy8mKESlM1bIv8FAiP7wH2M71-vKbsCB2zp7mv0w2Y0olZdlSUEtx2j5fjDJDFFOeDDkDfNV0tCxcgC74JpmxgwoL7H0MFPwYjEJCBFKepU_R7n4LDZsO6XrwL0qGo0ZbuqM-ChPBDT_AdKzMZKckzPx_Aw";
-
-
+		const string STATIC_TOKEN = "BQAEngVtIpylkkvoznpk6faEC0_zooVIvHAKh9unlXBdXWWAeMT2UM-iR1eGG3EBaYvyCmhNKNrhdasEulSU_7ZylOxzo_7lIHH5H6ILCqVwqsDRBifrYmfyyeJD8G9P7T_eaI69iFTfyEow70lLgPQ9U5aPRG878WDoAt3GW81Hs2tSduMTpQIiJtRyyoXpXh6rb0-8Sz58NT8KDeGSuCL82wxuC_TZng-PT2TsRoOn7qWXHTQ";
 		private Spotify.TokenReposnse mToken = null;
 
 #if false
@@ -167,7 +165,7 @@ namespace PlaylistGenerator {
 			return null;
 		}
 
-		public Spotify.PlaylistSimple GetPlaylist(string userId, 
+		public Spotify.PlaylistSimple GetPlaylistByName(string userId, 
 			string playlistName, 
 			bool getTracks, 
 			out string error) {
@@ -197,7 +195,7 @@ namespace PlaylistGenerator {
 						if ( playlist.Name == playlistName ) {
 
 							if ( getTracks ) {
-								AddTracksToPlaylist(userId, playlist, out error);
+								GetTracksForPlaylist(userId, playlist, out error);
 							}
 
 							return playlist;
@@ -311,7 +309,7 @@ namespace PlaylistGenerator {
 		}
 
 
-		private bool AddTracksToPlaylist(string userId, Spotify.PlaylistSimple playlist, out string error) {
+		public bool GetTracksForPlaylist(string userId, Spotify.PlaylistSimple playlist, out string error) {
 			error = null;
 
 			string TOKEN = GetToken(out error);

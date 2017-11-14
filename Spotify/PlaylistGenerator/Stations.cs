@@ -111,5 +111,12 @@ namespace PlaylistGenerator {
 
 		[DataMember]
 		public StationPlaylistFormat Format { get; set; }
+
+		[DataMember]
+		public string PlaylistLink { get; set; }
+
+		[DataMember]
+		public string SpotifyURI { get; set; }
+
 	}
 }

@@ -198,7 +198,15 @@ namespace SpamFilter {
 				hinfo.ID = index;
 				hinfo.ImageUrl = "Res\\item-unk.png";
 
-				OpenPop.Mime.Header.MessageHeader header = mClient.GetMessageHeaders(index);
+				OpenPop.Mime.Header.MessageHeader header;
+				try { 
+					header = mClient.GetMessageHeaders(index);
+				}
+				catch ( System.Exception ex ) {
+					StatusInfo = "ERROR getting message headers: " + ex.Message;
+					break;
+				}
+
 				hinfo.Size = mClient.GetMessageSize(index);
 				hinfo.Date = header.DateSent;
 

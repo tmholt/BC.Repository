@@ -96,7 +96,41 @@ namespace PlaylistGenerator {
 				OnlinePlaylistUrl = "http://www.radio1045.com/playlist/",
 				SpotifyPlaylistName = "PHILLY1045",
 				Format = StationPlaylistFormat.IHeartRadio
-			});		
+			});
+
+			maStations.Add(new StationInfo() {
+				Name = "Rolling Stones - Greatest Hits",
+				PlaylistLink = "https://open.spotify.com/user/128103936/playlist/0Y0Q2zBIHq8Ood3XSLCv5D",
+				SpotifyURI = "spotify:user:128103936:playlist:0Y0Q2zBIHq8Ood3XSLCv5D"
+			});
+			maStations.Add(new StationInfo() {
+				Name = "Hard Rock Covers",
+				PlaylistLink = "https://open.spotify.com/user/gash73/playlist/4XSB9v2mJOTbKgAeK5AELc",
+				SpotifyURI = "spotify:user:gash73:playlist:4XSB9v2mJOTbKgAeK5AELc"
+
+			});
+			maStations.Add(new StationInfo() {
+				Name = "Spotify Sessions",
+				PlaylistLink = "https://open.spotify.com/user/spotifysessions/playlist/69enGygSne9ziF6PxQEWHg",
+				SpotifyURI = "spotify:user:spotifysessions:playlist:69enGygSne9ziF6PxQEWHg"
+			});
+			maStations.Add(new StationInfo() {
+				Name = "dope",
+				PlaylistLink = "https://open.spotify.com/user/1213741851/playlist/1XpidGJptJpk2TAOes5pvG",
+				SpotifyURI = "spotify:user:1213741851:playlist:1XpidGJptJpk2TAOes5pvG"
+			});
+			maStations.Add(new StationInfo() {
+				Name = "Left of my dial",
+				PlaylistLink = "https://open.spotify.com/user/corvar/playlist/3GxB0byPkz502cBFpa86kG",
+				SpotifyURI = "spotify:user:corvar:playlist:3GxB0byPkz502cBFpa86kG"
+			});
+			maStations.Add(new StationInfo() {
+				Name = "Random",
+				PlaylistLink = "",
+				SpotifyURI = "spotify:user:spotify:playlist:6brdrOKuFPmcIlf3jwgV1n"
+			});
+		
+
 			cboStations.ItemsSource = maStations;
 
 		}
@@ -134,21 +168,42 @@ namespace PlaylistGenerator {
 		private void tbBtnExisting_Click(object sender, RoutedEventArgs e) {
 			var lookup = new SpotifyLookup();
 			string error;
-
-			var user = lookup.GetUserId(out error);
-			if ( user == null ) {
-				SetStatus("Error in user lookup: " + error);
-				return;
-			}
+			Spotify.PlaylistSimple spotifyPlaylist;
 
 			this.Cursor = Cursors.Wait;
 
-			var spotifyPlaylist = lookup.GetPlaylist(user.Id, maStations.Selected.SpotifyPlaylistName, true, out error);
-			if ( spotifyPlaylist == null ) {
-				SetStatus("Error in looking up playlist " + error);
-				this.Cursor = Cursors.Arrow;
-				return;
+			if ( !string.IsNullOrWhiteSpace(maStations.Selected.SpotifyURI) ) {
+				string[] pieces = maStations.Selected.SpotifyURI.Split(':');
+				string userId = pieces[2];
+				string playlistId = pieces[4];
+				spotifyPlaylist = new Spotify.PlaylistSimple();
+				spotifyPlaylist.Id = playlistId;
+				spotifyPlaylist.Name = maStations.Selected.Name;
+				spotifyPlaylist.SpotifyPlaylistUri = maStations.Selected.SpotifyURI;
+				spotifyPlaylist.Href = maStations.Selected.OnlinePlaylistUrl;
+
+				bool added = lookup.GetTracksForPlaylist(userId, spotifyPlaylist, out error);
+				if ( !added ) {
+					SetStatus("Error in track lookup: " + error);
+					return;
+				}
 			}
+			else {
+				var user = lookup.GetUserId(out error);
+				if ( user == null ) {
+					SetStatus("Error in user lookup: " + error);
+					return;
+				}
+
+				spotifyPlaylist = lookup.GetPlaylistByName(user.Id, maStations.Selected.SpotifyPlaylistName, true, out error);
+				if ( spotifyPlaylist == null ) {
+					SetStatus("Error in looking up playlist " + error);
+					this.Cursor = Cursors.Arrow;
+					return;
+				}
+
+			}
+
 
 			maExisting = new List<PlaylistItem>();
 			foreach ( var track in spotifyPlaylist.Tracks ) {
@@ -205,7 +260,7 @@ namespace PlaylistGenerator {
 				return;
 			}
 
-			var spotifyPlaylist = lookup.GetPlaylist(user.Id, maStations.Selected.SpotifyPlaylistName, false, out error);
+			var spotifyPlaylist = lookup.GetPlaylistByName(user.Id, maStations.Selected.SpotifyPlaylistName, false, out error);
 			if ( spotifyPlaylist == null ) {
 				SetStatus("Error in looking up playlist " + error);
 				return;
@@ -259,7 +314,7 @@ namespace PlaylistGenerator {
 
 				// now match and add tempo value
 				foreach ( PlaylistItem item in maExisting ) {
-					var matching = audioList.FirstOrDefault(audio => audio.Id == item.SpotifyTrack.Id);
+					var matching = audioList.FirstOrDefault(audio => audio != null && audio.Id == item.SpotifyTrack.Id);
 					if ( matching != null ) {
 						item.Tempo = matching.Tempo;
 					}
