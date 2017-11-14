@@ -439,7 +439,25 @@ namespace SpamFilter {
 			ReevaluateMessages();
 		}
 
-		private void ctxtmnuFilterBySubjectContaining_Click(object sender, Telerik.Windows.RadRoutedEventArgs e) {
+	    private void ctxtmnuFilterBySenderContaining_Click(object sender, Telerik.Windows.RadRoutedEventArgs e) {
+	        if ( !dgHeaders.SelectedItems.Any() ) return;
+
+	        var hinfo = (MessageHeaderInfo)dgHeaders.SelectedItems.First();
+	        string filtertext = GetInputText("Enter the text you would like to filter senders by.", hinfo.FromName);
+	        if ( string.IsNullOrEmpty(filtertext) ) return;
+
+
+	        var filter = new FilterCriteria() {
+	            Action = FilterAction.Delete,
+	            Field = FilterField.FromNameContains,
+	            Text = filtertext
+	        };
+	        mFilterSet.Add(filter);
+
+	        ReevaluateMessages();
+	    }
+
+        private void ctxtmnuFilterBySubjectContaining_Click(object sender, Telerik.Windows.RadRoutedEventArgs e) {
 			if ( !dgHeaders.SelectedItems.Any() ) return;
 
 			var hinfo = (MessageHeaderInfo)dgHeaders.SelectedItems.First();

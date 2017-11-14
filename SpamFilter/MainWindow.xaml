@@ -88,7 +88,13 @@
 							<Image Source="/Res/item-bad.png" Width="16" Height="16"/>
 						</rad:RadMenuItem.Icon>
 					</rad:RadMenuItem>
-					<rad:RadMenuItem Header="Filter by Subject" Click="ctxtmnuFilterBySubject_Click">
+				    <rad:RadMenuItem Header="Filter by Sender (containing)" Click="ctxtmnuFilterBySenderContaining_Click">
+				        <rad:RadMenuItem.Icon>
+				            <Image Source="/Res/item-bad.png" Width="16" Height="16"/>
+				        </rad:RadMenuItem.Icon>
+				    </rad:RadMenuItem>
+
+                    <rad:RadMenuItem Header="Filter by Subject" Click="ctxtmnuFilterBySubject_Click">
 						<rad:RadMenuItem.Icon>
 							<Image Source="/Res/item-bad.png" Width="16" Height="16"/>
 						</rad:RadMenuItem.Icon>
