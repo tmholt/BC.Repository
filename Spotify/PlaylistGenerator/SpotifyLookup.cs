@@ -25,8 +25,9 @@ namespace PlaylistGenerator {
 		// http://lab.possan.se/playlistcreator-example/
 
 		//const string APP_AUTH_CODE = "AQB3_lcENlV1FuIAv-z-SQUIgZq-BklcqlZwQL1Dn03p4fSu4GEx8QA8ZWrZ3ZNXUvuihcPO1A7Zp2BG1AzPcGXAQaCxdNL87YirPZH-oW5qoC3OztJP9_UZrP1W37Zad3I6RWos90ACxg_gfc96crGLGP0V7wldEJccmfBqq9aMo66R4mPmyh-FTICzYSuRpKxCaqjiH-6KM-FqTKmwoBjPFA";
-		const string STATIC_TOKEN = "BQAEngVtIpylkkvoznpk6faEC0_zooVIvHAKh9unlXBdXWWAeMT2UM-iR1eGG3EBaYvyCmhNKNrhdasEulSU_7ZylOxzo_7lIHH5H6ILCqVwqsDRBifrYmfyyeJD8G9P7T_eaI69iFTfyEow70lLgPQ9U5aPRG878WDoAt3GW81Hs2tSduMTpQIiJtRyyoXpXh6rb0-8Sz58NT8KDeGSuCL82wxuC_TZng-PT2TsRoOn7qWXHTQ";
-		private Spotify.TokenReposnse mToken = null;
+		const string STATIC_TOKEN = "BQB_e1GLVwbhnfcwjBnEssWvG_C3Xd58fp0bSK_8Td4W61yJ90KlHvdrdiNGmP4YSP91057pkOcTqZWAYV4qeTG3enozeTWFuzDwZGeL6zNItlxEd70gCRJhxKWOdLYO--j3TQtSccZ7jXz9Dk8tZ10glc8_6-HV76Iww6ebEh1Q3JlKGXF_gL6bEifpLq5x5Kor2pyWjcRiS3N4rDr3";
+
+        private Spotify.TokenReposnse mToken = null;
 
 #if false
 		public string GetAuthorizationToken() {
@@ -421,17 +422,22 @@ namespace PlaylistGenerator {
 		public bool LookupTrack(PlaylistItem item, out string error) {
 			error = null;
 
-			const string BASE = @"https://api.spotify.com/v1/search?type=track&limit=1&q=";
+            string TOKEN = GetToken(out error);
+            if ( TOKEN == null ) return false;
+
+
+            const string BASE = @"https://api.spotify.com/v1/search?type=track&limit=1&q=";
 			string url = string.Format("{0}track:{1}+artist:{2}",
-				BASE,
-				HttpUtility.UrlEncode(item.Track),
-				HttpUtility.UrlEncode(item.Artist));
+				BASE, HttpUtility.UrlEncode(item.Track), HttpUtility.UrlEncode(item.Artist));
 
 			item.SpotifyRequestUrl = url;
 
 			var request = WebRequest.Create(url) as HttpWebRequest;
+            request.Method = "GET";
+            request.Headers.Add(HttpRequestHeader.Authorization, "Bearer " + TOKEN);
+            request.Accept = "application/json";
 
-			try {
+            try {
 				using ( var response = request.GetResponse() as HttpWebResponse ) {
 					if ( response.StatusCode != HttpStatusCode.OK ) {
 						error = "Bad status returned: " + response.StatusCode;

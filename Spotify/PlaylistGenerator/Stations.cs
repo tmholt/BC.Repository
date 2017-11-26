@@ -56,7 +56,7 @@ namespace PlaylistGenerator {
 		}
 
 		// used when changed *once*
-		public static void Clear() {
+		public static void RemoveStorage() {
 			var store = IsolatedStorageFile.GetStore(
 				IsolatedStorageScope.User|IsolatedStorageScope.Assembly|IsolatedStorageScope.Domain,
 				null, null);

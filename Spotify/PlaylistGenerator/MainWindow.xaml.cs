@@ -35,7 +35,12 @@ namespace PlaylistGenerator {
 				OnlinePlaylistUrl = "http://wrlt.tunegenie.com/",
 				SpotifyPlaylistName = "LIGHTNING"
 			});
-			maStations.Add(new StationInfo() {
+            maStations.Add(new StationInfo() {
+                Name = "Lightning 100-2 Nashville",
+                OnlinePlaylistUrl = "http://wrlt.tunegenie.com/",
+                SpotifyPlaylistName = "LIGHTNING2"
+            });
+            maStations.Add(new StationInfo() {
 				Name = "107.7 The End Seattle",
 				OnlinePlaylistUrl = "http://kndd.tunegenie.com/",
 				SpotifyPlaylistName = "END1077"
