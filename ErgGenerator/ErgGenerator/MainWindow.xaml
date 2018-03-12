@@ -1,0 +1,46 @@
+﻿<Window x:Class="ErgGenerator.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:rad="http://schemas.telerik.com/2008/xaml/presentation" 	
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:local="clr-namespace:ErgGenerator"
+        mc:Ignorable="d" Background="#333"
+        Title="ERG / MRC structured workout generator" Height="350" Width="1000">
+    <Grid>
+        <Button x:Name="button" Content="Button" Padding="8" FontFamily="Segoe UI Light" FontSize="14" Background="#444" Foreground="White"  HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75"/>
+        <TextBox x:Name="textBox"  Padding="8" FontFamily="Segoe UI Light" FontSize="14" Background="#888" Foreground="White"  HorizontalAlignment="Left"  Margin="100,0,0,10" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Bottom" Width="120"/>
+
+        <rad:RadGridView Name="dgIntervals"  rad:StyleManager.Theme="Expression_Dark" AutoGenerateColumns="False" SelectionMode="Extended" 
+                         ShowGroupPanel="False" ShowColumnSortIndexes="False" CanUserDeleteRows="True" CanUserFreezeColumns="False" 
+                         CanUserInsertRows="True" CanUserReorderColumns="False" CanUserSortColumns="False" CanUserSortGroups="False" 
+                         FontSize="16" FontFamily="Segoe UI Light" Margin="10,10,10,80"
+                         GroupRenderMode="Flat" IsFilteringAllowed="False" IsHitTestVisible="True" 
+                         GridLinesVisibility="Both" VerticalGridLinesBrush="#888888" HorizontalGridLinesBrush="#888888" >
+            <rad:RadGridView.Columns>
+                <rad:GridViewDataColumn Header="Index" IsReadOnly="True" Width="45" DataMemberBinding="{Binding Index}"/>
+                <rad:GridViewDataColumn Header="Starting" IsReadOnly="True" Width="70" DataMemberBinding="{Binding StartingMinutes}"/>
+                <rad:GridViewDataColumn Header="Duration" IsReadOnly="False" Width="70" DataMemberBinding="{Binding DurationMinutes}"/>
+                <rad:GridViewDataColumn Header="Ending" IsReadOnly="True" Width="70" DataMemberBinding="{Binding EndingMinutes}"/>
+                <rad:GridViewDataColumn Header="FTP % Low" IsReadOnly="False" Width="95" DataMemberBinding="{Binding PercentageOfFtpMin}" DataFormatString="{}{0:0.0}"/>
+                <rad:GridViewDataColumn Header="FTP % High" IsReadOnly="False" Width="95" DataMemberBinding="{Binding PercentageOfFtpMax}"  DataFormatString="{}{0:0.0}"/>
+                <rad:GridViewDataColumn Header="Zones" IsReadOnly="True" Width="105" DataMemberBinding="{Binding ZonesRangeString}"/>
+                <rad:GridViewDataColumn Header="RPM Low" IsReadOnly="False" Width="85" DataMemberBinding="{Binding CadenceMin}" />
+                <rad:GridViewDataColumn Header="RPM High" IsReadOnly="False" Width="85" DataMemberBinding="{Binding CadenceMax}" />
+
+                <rad:GridViewDataColumn Header="Description" IsReadOnly="False" Width="*" DataMemberBinding="{Binding Description}"/>
+            </rad:RadGridView.Columns>
+            <rad:RadContextMenu.ContextMenu>
+                <rad:RadContextMenu>
+                    <rad:RadMenuItem Name="mnuAddRow" Header="Add Row" Click="mnuAddRow_Click"/>
+                    <rad:RadMenuItem Name="mnuRemoveRow" Header="Remove Row" Click="mnuRemoveRow_Click"/>
+                    <rad:RadMenuSeparatorItem/>
+                    <rad:RadMenuItem Name="mnuMoveRowUp" Header="Move Up" Click="mnuMoveRowUp_Click"/>
+                    <rad:RadMenuItem Name="mnuMoveRowDown" Header="Move Down" Click="mnuMoveRowDown_Click"/>
+                </rad:RadContextMenu>
+            </rad:RadContextMenu.ContextMenu>
+        </rad:RadGridView>
+
+    </Grid>
+</Window>
