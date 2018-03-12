@@ -11,7 +11,14 @@ namespace ErgGenerator
 
     public class Intervals : ObservableCollection<Interval>
     {
+        private PowerZones maZones;
         private uint mnIndex = 0;
+
+
+        public Intervals(PowerZones zones)
+        {
+            maZones = zones;
+        }
 
         public Interval Add()
         {
@@ -32,6 +39,12 @@ namespace ErgGenerator
                     // recalc everything below
                     UpdateStartingEnding();
                     break;
+
+                case "PercentageOfFtpMin":
+                case "PercentageOfFtpMax":
+                    interval.ZonesRangeString  = maZones.GenerateRangesString(interval.PercentageOfFtpMin, interval.PercentageOfFtpMax);
+                    break;                    
+
 
             }
         }
@@ -89,6 +102,9 @@ namespace ErgGenerator
         private uint mnIndex;
         private uint mnStartingMinutes;
         private uint mnDuration;
+        private string msZonesRanges;
+        private uint mnPercentageOfFtpMin;
+        private uint mnPercentageOfFtpMax;
 
         public Interval(uint index, uint startingMinutes)
         {
@@ -114,13 +130,40 @@ namespace ErgGenerator
 
         public uint EndingMinutes => mnStartingMinutes + mnDuration;
 
-        public uint PercentageOfFtpMin { get; set; }
-        public uint PercentageOfFtpMax { get; set; }
+        public uint PercentageOfFtpMin {
+            get { return mnPercentageOfFtpMin; }
+            set
+            {
+                mnPercentageOfFtpMin = value;
+                Notify(nameof(PercentageOfFtpMin));
+            }
+        }
+
+        public uint PercentageOfFtpMax
+        {
+            get { return mnPercentageOfFtpMax; }
+            set
+            {
+                mnPercentageOfFtpMax = value;
+                Notify(nameof(PercentageOfFtpMax));
+            }
+        }
+
 
         public uint CadenceMin { get; set; }
+
         public uint CadenceMax { get; set; }
 
-        public string ZonesRangeString { get; }
+        public string ZonesRangeString {
+            get { return msZonesRanges; }
+            set
+            {
+                msZonesRanges = value;
+                Notify(nameof(ZonesRangeString));
+            }
+
+        }
+
         public string Description { get; set; }
 
         // only access from parent

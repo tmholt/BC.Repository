@@ -7,17 +7,32 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:local="clr-namespace:ErgGenerator"
         mc:Ignorable="d" Background="#333"
-        Title="ERG / MRC structured workout generator" Height="350" Width="1000">
+        Title="ERG / MRC structured workout generator" Height="650" Width="1000">
     <Grid>
-        <Button x:Name="button" Content="Button" Padding="8" FontFamily="Segoe UI Light" FontSize="14" Background="#444" Foreground="White"  HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="75"/>
-        <TextBox x:Name="textBox"  Padding="8" FontFamily="Segoe UI Light" FontSize="14" Background="#888" Foreground="White"  HorizontalAlignment="Left"  Margin="100,0,0,10" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Bottom" Width="120"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="5"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="4"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="58"/>
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="5"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5"/>
+        </Grid.ColumnDefinitions>
+        
+        <Button x:Name="button" Grid.Row="4" Grid.Column="1" Content="Button" Padding="8" FontFamily="Segoe UI Light" FontSize="14" Background="#444" Foreground="White"  HorizontalAlignment="Left" Margin="0,0,0,10" VerticalAlignment="Bottom" Width="75"/>
+        <TextBox x:Name="txtFTP" Grid.Row="4"  Grid.Column="1"  Padding="8" FontFamily="Segoe UI Light" FontSize="14" Background="#888" Foreground="White"  HorizontalAlignment="Left"  Margin="90,0,0,10" Text="{Binding FTP, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" Width="120"/>
+        <TextBox x:Name="txtFTHR" Grid.Row="4"  Grid.Column="1"  Padding="8" FontFamily="Segoe UI Light" FontSize="14" Background="#888" Foreground="White"  HorizontalAlignment="Left"  Margin="220,0,0,10" Text="{Binding FTHR, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" Width="120"/>
 
-        <rad:RadGridView Name="dgIntervals"  rad:StyleManager.Theme="Expression_Dark" AutoGenerateColumns="False" SelectionMode="Extended" 
+        <rad:RadGridView Grid.Row="1"  Grid.Column="1" Name="dgIntervals"  rad:StyleManager.Theme="Expression_Dark" AutoGenerateColumns="False" SelectionMode="Extended" 
                          ShowGroupPanel="False" ShowColumnSortIndexes="False" CanUserDeleteRows="True" CanUserFreezeColumns="False" 
                          CanUserInsertRows="True" CanUserReorderColumns="False" CanUserSortColumns="False" CanUserSortGroups="False" 
-                         FontSize="16" FontFamily="Segoe UI Light" Margin="10,10,10,80"
+                         FontFamily="Segoe UI Light" 
                          GroupRenderMode="Flat" IsFilteringAllowed="False" IsHitTestVisible="True" 
-                         GridLinesVisibility="Both" VerticalGridLinesBrush="#888888" HorizontalGridLinesBrush="#888888" >
+                         GridLinesVisibility="Both" VerticalGridLinesBrush="#444" HorizontalGridLinesBrush="#444" >
             <rad:RadGridView.Columns>
                 <rad:GridViewDataColumn Header="Index" IsReadOnly="True" Width="45" DataMemberBinding="{Binding Index}"/>
                 <rad:GridViewDataColumn Header="Starting" IsReadOnly="True" Width="70" DataMemberBinding="{Binding StartingMinutes}"/>
@@ -28,7 +43,6 @@
                 <rad:GridViewDataColumn Header="Zones" IsReadOnly="True" Width="105" DataMemberBinding="{Binding ZonesRangeString}"/>
                 <rad:GridViewDataColumn Header="RPM Low" IsReadOnly="False" Width="85" DataMemberBinding="{Binding CadenceMin}" />
                 <rad:GridViewDataColumn Header="RPM High" IsReadOnly="False" Width="85" DataMemberBinding="{Binding CadenceMax}" />
-
                 <rad:GridViewDataColumn Header="Description" IsReadOnly="False" Width="*" DataMemberBinding="{Binding Description}"/>
             </rad:RadGridView.Columns>
             <rad:RadContextMenu.ContextMenu>
@@ -40,6 +54,23 @@
                     <rad:RadMenuItem Name="mnuMoveRowDown" Header="Move Down" Click="mnuMoveRowDown_Click"/>
                 </rad:RadContextMenu>
             </rad:RadContextMenu.ContextMenu>
+        </rad:RadGridView>
+
+        <rad:RadGridView Grid.Row="3"  Grid.Column="1" Name="dgZones"  rad:StyleManager.Theme="Expression_Dark" AutoGenerateColumns="False" SelectionMode="Single" 
+                         ShowGroupPanel="False" ShowColumnSortIndexes="False" CanUserDeleteRows="False" CanUserFreezeColumns="False" 
+                         CanUserInsertRows="True" CanUserReorderColumns="False" CanUserSortColumns="False" CanUserSortGroups="False" 
+                         FontFamily="Segoe UI Light" IsReadOnly="True"
+                         GroupRenderMode="Flat" IsFilteringAllowed="False" IsHitTestVisible="True" 
+                         GridLinesVisibility="Both" VerticalGridLinesBrush="#333" HorizontalGridLinesBrush="#333" >
+            <rad:RadGridView.Columns>
+                <rad:GridViewDataColumn Header="Zone"  Width="45" DataMemberBinding="{Binding ZoneNumber}"/>
+                <rad:GridViewDataColumn Header="FTP % Low" Width="75" DataMemberBinding="{Binding WattsPercentageLow}"/>
+                <rad:GridViewDataColumn Header="FTP % High" Width="75" DataMemberBinding="{Binding WattsPercentageHigh}"/>
+                <rad:GridViewDataColumn Header="FTHR % Low" Width="75" DataMemberBinding="{Binding HeartRatePercentageLow}"/>
+                <rad:GridViewDataColumn Header="FTHR % High" Width="75" DataMemberBinding="{Binding HeartRatePercentageHigh}"/>
+                <rad:GridViewDataColumn Header="Ranges" Width="200" DataMemberBinding="{Binding RangesString}"/>
+                <rad:GridViewDataColumn Header="Description" Width="*" DataMemberBinding="{Binding Description}"/>
+            </rad:RadGridView.Columns>
         </rad:RadGridView>
 
     </Grid>

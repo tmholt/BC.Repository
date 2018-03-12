@@ -21,12 +21,20 @@ namespace ErgGenerator
     public partial class MainWindow : Window
     {
 
-        private Intervals maIntervals = new Intervals();
+        private Intervals maIntervals;
+        private PowerZones maZones;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            maZones = new PowerZones();
+            maIntervals = new Intervals(maZones);
+
+            this.DataContext = maZones;
             dgIntervals.ItemsSource = maIntervals;
+            dgZones.ItemsSource = maZones;
+
         }
 
         private void mnuAddRow_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
