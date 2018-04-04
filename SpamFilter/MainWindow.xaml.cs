@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -132,18 +133,6 @@ namespace SpamFilter {
 			maMessageHeaders = new ObservableCollection<MessageHeaderInfo>();
 			dgHeaders.ItemsSource = maMessageHeaders;
 
-			/* test test test
-			mFilterSet.Add(new FilterCriteria() {
-				Action = FilterAction.Delete,
-				Field = FilterField.SubjectContains,
-				Text = "Rachael Ray"
-			});
-			mFilterSet.Add(new FilterCriteria() {
-				Action = FilterAction.Keep,
-				Field = FilterField.FromName,
-				Text = "Christine Rather"
-			});
-			*/
 
 			await GetMessagesAndEvaluate();
 			dgHeaders.Rebind();
@@ -172,16 +161,20 @@ namespace SpamFilter {
 
 		private async Task GetMessagesAndEvaluate() {
 			await GetMessagesInBackground();
-			await mFilterSet.Evaluate(maMessageHeaders);
-		}
 
-		private async Task GetMessagesInBackground() {
+		    StatusInfo = "Evaluating headers vs ruleset";
+            await mFilterSet.Evaluate(maMessageHeaders);
+
+		    //StatusInfo = "Evaluating message bodies";
+            //await Task.Factory.StartNew(EvaluateUndetermined);
+        }
+
+        private async Task GetMessagesInBackground() {
 			this.Cursor = Cursors.Wait;
+
 			maMessageHeaders.Clear();
-
 			await Task.Factory.StartNew(GetMessages);
-
-			this.Cursor = Cursors.Arrow;
+            this.Cursor = Cursors.Arrow;
 		}
 
 		private void GetMessages() {
@@ -320,12 +313,75 @@ namespace SpamFilter {
 			catch ( System.Exception ex ) {
 				MessageBox.Show("Error getting email message from server.\r\n" + ex.Message);
 			}
-
 		}
 
-		#region Control events
+	    private void EvaluateUndetermined()
+	    {
+	        var list = maMessageHeaders.Where((hinfo) => hinfo.Action == FilterAction.Undetermined).ToList();
+	        foreach ( var header in list )
+	        {
+	            FilterAction action;
+	            bool completed = EvaluateMessageBody(header, out action);
+	            if ( !completed ) break;
+                header.Action = action;
+	        }
 
-		private void Window_Loaded(object sender, RoutedEventArgs e) {
+        }
+
+	    private string[] BodyFlags = new string[]
+	    {
+	        "unsubscribe",
+	        "stop receiving",
+	        "stop these",
+            "email advertisement"
+	    };
+
+        private bool EvaluateMessageBody(MessageHeaderInfo hinfo, out FilterAction newAction)
+	    {
+	        newAction = FilterAction.Undetermined;
+            try
+	        {
+	            OpenPop.Mime.Message msg = mClient.GetMessage(hinfo.ID);
+
+
+
+	            OpenPop.Mime.MessagePart plainText = msg.FindFirstPlainTextVersion();
+	            if ( plainText != null )
+	            {
+	                string text = plainText.GetBodyAsText();
+	                int index = CultureInfo.CurrentCulture.CompareInfo.IndexOf(text, "unsubscribe", CompareOptions.IgnoreCase);
+	                if ( index >= 0 )
+	                {
+	                    newAction = FilterAction.Delete;
+	                    return true;
+	                }
+                }
+
+	            OpenPop.Mime.MessagePart htmlText = msg.FindFirstHtmlVersion();
+	            if ( htmlText != null )
+	            {
+	                string html = htmlText.GetBodyAsText();
+	                int index = CultureInfo.CurrentCulture.CompareInfo.IndexOf(html, "unsubscribe", CompareOptions.IgnoreCase);
+	                if ( index >= 0 )
+	                {
+	                    newAction = FilterAction.Delete;
+	                    return true;
+	                }
+                }
+
+
+
+                return true;
+	        }
+	        catch ( System.Exception )
+	        {
+	            return false;
+	        }
+	    }
+
+        #region Control events
+
+        private void Window_Loaded(object sender, RoutedEventArgs e) {
 			Initialize();
 		}
 
