@@ -423,7 +423,23 @@ namespace SpamFilter {
 			}
 		}
 
-		private async void tbBtnRefreshClick(object sender, RoutedEventArgs e) {
+	    private void tbBtnViewAll_Click(object sender, RoutedEventArgs e) {
+	        dgHeaders.ItemsSource = maMessageHeaders;
+        }
+
+        private void tbBtnViewGood_Click(object sender, RoutedEventArgs e) {
+            dgHeaders.ItemsSource = maMessageHeaders.Where((hinfo) => hinfo.Action == FilterAction.Keep);
+        }
+
+        private void tbBtnViewMaybe_Click(object sender, RoutedEventArgs e) {
+            dgHeaders.ItemsSource = maMessageHeaders.Where((hinfo) => hinfo.Action == FilterAction.Maybe);
+	    }
+
+        private void tbBtnViewUnk_Click(object sender, RoutedEventArgs e) {
+            dgHeaders.ItemsSource = maMessageHeaders.Where((hinfo) => hinfo.Action == FilterAction.Undetermined);
+	    }
+
+        private async void tbBtnRefreshClick(object sender, RoutedEventArgs e) {
 
 			// NOTE: this is a hard refresh from scratch. It might be better to use this
 			// List<string> uids = mClient.GetMessageUids();
@@ -488,7 +504,29 @@ namespace SpamFilter {
 			ReevaluateMessages();
 		}
 
-		private void ctxtmnuFilterBySenderName_Click(object sender, Telerik.Windows.RadRoutedEventArgs e) {
+	    private void ctxtmnuMaybeByDomain_Click(object sender, Telerik.Windows.RadRoutedEventArgs e)
+	    {
+	        if ( !dgHeaders.SelectedItems.Any() ) return;
+
+	        foreach ( MessageHeaderInfo hinfo in dgHeaders.SelectedItems )
+	        {
+
+	            string domain = FilterSet.GetDomainFromAddress(hinfo.FromAddress);
+	            if ( string.IsNullOrEmpty(domain) ) continue;
+
+	            var filter = new FilterCriteria()
+	            {
+	                Action = FilterAction.Maybe,
+	                Field = FilterField.FromDomain,
+	                Text = domain
+	            };
+	            mFilterSet.Add(filter);
+	        }
+
+	        ReevaluateMessages();
+        }
+
+        private void ctxtmnuFilterBySenderName_Click(object sender, Telerik.Windows.RadRoutedEventArgs e) {
 			if ( !dgHeaders.SelectedItems.Any() ) return;
 
 			foreach ( MessageHeaderInfo hinfo in dgHeaders.SelectedItems ) {

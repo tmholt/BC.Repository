@@ -41,7 +41,10 @@ namespace SpamFilter.Data {
 				case FilterAction.Keep:
 					ImageUrl = "res\\item-good.png";
 					break;
-				case FilterAction.Undetermined:
+			    case FilterAction.Maybe:
+			        ImageUrl = "res\\item-maybe.png";
+			        break;
+                case FilterAction.Undetermined:
 					ImageUrl = "res\\item-unk.png";
 					break;
 			}

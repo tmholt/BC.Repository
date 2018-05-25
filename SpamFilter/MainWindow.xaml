@@ -3,14 +3,17 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:rad="http://schemas.telerik.com/2008/xaml/presentation" 
 		Loaded="Window_Loaded"
-        Title="BengalCore Spam Filter" Height="350" Width="525" Icon="Res/email.ico">
+        Title="BengalCore Spam Filter" Height="350" Width="625" Icon="Res/email.ico">
 	<Window.Resources>
 		<Style x:Key="radGridViewRowStyle" TargetType="rad:GridViewRow">
 			<Style.Triggers>
 				<DataTrigger Binding="{Binding Action}" Value="Keep">
 					<Setter Property="Background" Value="#e8ffe8"/>
 				</DataTrigger>
-				<DataTrigger Binding="{Binding Action}" Value="Delete">
+			    <DataTrigger Binding="{Binding Action}" Value="Maybe">
+			        <Setter Property="Background" Value="#ffe8d4"/>
+			    </DataTrigger>
+                <DataTrigger Binding="{Binding Action}" Value="Delete">
 					<Setter Property="Background" Value="#ffe8e8"/>
 				</DataTrigger>
 				<DataTrigger Binding="{Binding Action}" Value="Undetermined">
@@ -49,6 +52,30 @@
 									Checked="tbrbViewFilters_Checked" />
 
 			</rad:RadToolBar>
+		    <rad:RadToolBar Band="0" BandIndex="3" rad:StyleManager.Theme="Windows8" MinHeight="24">
+
+		        <rad:RadButton Name="tbBtnViewAll"  Click="tbBtnViewAll_Click" ToolTip="View all emails" >
+		            <rad:RadButton.Content>
+		                <Image Source="Res/item-all.png" Width="24"/>
+		            </rad:RadButton.Content>
+		        </rad:RadButton>
+                <rad:RadButton Name="tbBtnViewGood"  Click="tbBtnViewGood_Click" ToolTip="View emails marked as good" >
+		            <rad:RadButton.Content>
+		                <Image Source="Res/item-good.png" Width="24"/>
+		            </rad:RadButton.Content>
+		        </rad:RadButton>
+		        <rad:RadButton Name="tbBtnViewMaybe"  Click="tbBtnViewMaybe_Click" ToolTip="View emails marked as maybe" >
+		            <rad:RadButton.Content>
+		                <Image Source="Res/item-maybe.png" Width="24"/>
+		            </rad:RadButton.Content>
+		        </rad:RadButton>
+		        <rad:RadButton Name="tbBtnViewUnk"  Click="tbBtnViewUnk_Click" ToolTip="View emails marked as unknown" >
+		            <rad:RadButton.Content>
+		                <Image Source="Res/item-unk.png" Width="24"/>
+		            </rad:RadButton.Content>
+		        </rad:RadButton>
+
+            </rad:RadToolBar>
 		</rad:RadToolBarTray>
 		
 		<StatusBar VerticalAlignment="Bottom" Name="statBar" Height="24" Background="#80b0ff">
@@ -105,7 +132,16 @@
 						</rad:RadMenuItem.Icon>
 					</rad:RadMenuItem>
 
-					<rad:RadMenuItem IsSeparator="True"/>
+				    <rad:RadMenuItem IsSeparator="True"/>
+
+                    <rad:RadMenuItem Header="Maybe by Domain" Click="ctxtmnuMaybeByDomain_Click">
+				        <rad:RadMenuItem.Icon>
+				            <Image Source="/Res/item-maybe.png" Width="16" Height="16"/>
+				        </rad:RadMenuItem.Icon>
+				    </rad:RadMenuItem>
+
+
+                    <rad:RadMenuItem IsSeparator="True"/>
 					
 					<rad:RadMenuItem Header="Keep by Sender Address" Click="ctxtmnuKeepBySenderAddress_Click">
 						<rad:RadMenuItem.Icon>

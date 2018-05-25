@@ -22,6 +22,7 @@ namespace SpamFilter.Data {
 
 	public enum FilterAction {
 		Keep,
+        Maybe,
 		Delete,
 		Undetermined
 	}
@@ -47,8 +48,10 @@ namespace SpamFilter.Data {
 		private const string DATA_FILE_PATH = @"C:\temp\spam-email-filter-criteria.dat";
 
 		private ObservableCollection<FilterCriteria> maCriteria;
+	    private bool mbDisposed = false;
 
-		private FilterSet() {
+
+        private FilterSet() {
 			maCriteria = new ObservableCollection<FilterCriteria>();
 		}
 
@@ -114,6 +117,7 @@ namespace SpamFilter.Data {
 					if ( Regex.IsMatch(text2eval, filter.Text, RegexOptions.IgnoreCase) ) {
 						switch ( action ) { 
 							case FilterAction.Undetermined:
+                            case FilterAction.Maybe:
 							case FilterAction.Delete:
 								action = filter.Action;
 								break;
@@ -127,6 +131,7 @@ namespace SpamFilter.Data {
 					if ( string.Equals(text2eval, filter.Text, StringComparison.CurrentCultureIgnoreCase) ) {
 						switch ( action ) {
 							case FilterAction.Undetermined:
+							case FilterAction.Maybe:
 							case FilterAction.Delete:
 								action = filter.Action;
 								break;
@@ -179,7 +184,6 @@ namespace SpamFilter.Data {
 			fs.Close();
 		}
 
-		private bool mbDisposed = false;
 
 		public void Dispose() {
 			if ( mbDisposed ) return;
