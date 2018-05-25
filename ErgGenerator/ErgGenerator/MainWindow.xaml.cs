@@ -28,8 +28,6 @@ namespace ErgGenerator
         {
             InitializeComponent();
 
-            maZones = new PowerZones();
-            maIntervals = new Intervals(maZones);
 
             this.DataContext = maZones;
             dgIntervals.ItemsSource = maIntervals;

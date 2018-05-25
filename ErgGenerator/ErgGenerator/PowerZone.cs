@@ -14,9 +14,13 @@ namespace ErgGenerator
         private uint mnFtp;
         private uint mnFthr;
 
+        public event PropertyChangedEventHandler PowerZonesPropertyChanged;
+
+
         public PowerZones()
         {
             Initialize();
+
         }
 
         public uint FTP
@@ -26,6 +30,7 @@ namespace ErgGenerator
             {
                 mnFtp = value;
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(FTP)));
+                PowerZonesPropertyChanged(this, new PropertyChangedEventArgs(nameof(FTP)));
                 SetThresholds();
             }
         }
@@ -37,13 +42,28 @@ namespace ErgGenerator
             {
                 mnFthr = value;
                 OnPropertyChanged(new PropertyChangedEventArgs(nameof(FTHR)));
+                PowerZonesPropertyChanged(this, new PropertyChangedEventArgs(nameof(FTHR)));
                 SetThresholds();
             }
         }
 
         internal string GenerateRangesString(uint percentageOfFtpMin, uint percentageOfFtpMax)
         {
-            return FTP.ToString();
+            var lowZone = this.FirstOrDefault(z => z.WattsPercentageLow != null && z.WattsPercentageHigh != null && z.WattsPercentageLow <= percentageOfFtpMin && z.WattsPercentageHigh >= percentageOfFtpMin);
+            var highZone = this.FirstOrDefault(z => z.WattsPercentageLow != null && z.WattsPercentageHigh != null && z.WattsPercentageLow <= percentageOfFtpMax && z.WattsPercentageHigh >= percentageOfFtpMax);
+
+            if ( lowZone == null || highZone == null ) return "UNK";
+
+            double top =  percentageOfFtpMin - (uint)lowZone.WattsPercentageLow;
+            double bottom = (uint)lowZone.WattsPercentageHigh - (uint)lowZone.WattsPercentageLow;
+            double lowValue = lowZone.ZoneNumber + Math.Round(top/bottom, 1);
+
+            top =  percentageOfFtpMax - (uint)highZone.WattsPercentageLow;
+            bottom = (uint)highZone.WattsPercentageHigh - (uint)highZone.WattsPercentageLow;
+            double highValue = highZone.ZoneNumber + Math.Round(top/bottom, 1);
+
+            return string.Format("{0:0.0} ({1:000}) - {2:0.0} ({3:000})", 
+                lowValue, FTP * ((double)percentageOfFtpMin/100.0), highValue, FTP * ((double)percentageOfFtpMax/100.0));
         }
 
 
@@ -66,6 +86,8 @@ namespace ErgGenerator
                 zone.SetThresholds(FTP, FTHR);
             }
         }
+
+
 
 
 

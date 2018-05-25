@@ -18,6 +18,22 @@ namespace ErgGenerator
         public Intervals(PowerZones zones)
         {
             maZones = zones;
+
+            maZones.PowerZonesPropertyChanged += (sender, args) =>
+            {
+                switch ( args.PropertyName )
+                {
+                    case "FTP":
+                        foreach ( var interval in this )
+                        {
+                            interval.ZonesRangeString = maZones.GenerateRangesString(interval.PercentageOfFtpMin, interval.PercentageOfFtpMax);
+                        }
+                        break;
+
+                    case "FTHR":
+                        break;
+                }
+            };
         }
 
         public Interval Add()
@@ -42,7 +58,7 @@ namespace ErgGenerator
 
                 case "PercentageOfFtpMin":
                 case "PercentageOfFtpMax":
-                    interval.ZonesRangeString  = maZones.GenerateRangesString(interval.PercentageOfFtpMin, interval.PercentageOfFtpMax);
+                    interval.ZonesRangeString = maZones.GenerateRangesString(interval.PercentageOfFtpMin, interval.PercentageOfFtpMax);
                     break;                    
 
 
