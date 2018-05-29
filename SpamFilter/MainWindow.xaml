@@ -61,17 +61,17 @@
 		        </rad:RadButton>
                 <rad:RadButton Name="tbBtnViewGood"  Click="tbBtnViewGood_Click" ToolTip="View emails marked as good" >
 		            <rad:RadButton.Content>
-		                <Image Source="Res/item-good.png" Width="24"/>
+		                <Image Source="Res/item-good.png" Width="16"/>
 		            </rad:RadButton.Content>
 		        </rad:RadButton>
 		        <rad:RadButton Name="tbBtnViewMaybe"  Click="tbBtnViewMaybe_Click" ToolTip="View emails marked as maybe" >
 		            <rad:RadButton.Content>
-		                <Image Source="Res/item-maybe.png" Width="24"/>
+		                <Image Source="Res/item-maybe.png" Width="16"/>
 		            </rad:RadButton.Content>
 		        </rad:RadButton>
 		        <rad:RadButton Name="tbBtnViewUnk"  Click="tbBtnViewUnk_Click" ToolTip="View emails marked as unknown" >
 		            <rad:RadButton.Content>
-		                <Image Source="Res/item-unk.png" Width="24"/>
+		                <Image Source="Res/item-unk.png" Width="16"/>
 		            </rad:RadButton.Content>
 		        </rad:RadButton>
 
