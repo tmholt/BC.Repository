@@ -10,7 +10,7 @@
         Title="ERG / MRC structured workout generator" Height="650" Width="1000">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="5"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="4"/>
             <RowDefinition Height="*"/>
@@ -22,7 +22,45 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="5"/>
         </Grid.ColumnDefinitions>
-        
+
+        <rad:RadToolBarTray Grid.ColumnSpan="5" Grid.Row="0"  VerticalAlignment="Top" rad:StyleManager.Theme="Windows8" Background="#555">
+            <!-- file operations -->
+            <rad:RadToolBar Band="0" BandIndex="0" rad:StyleManager.Theme="Windows8" Background="#444" MinHeight="26" OverflowButtonVisibility="Hidden">
+                <rad:RadButton ToolTip="Open workout file" Padding="12,2,6,2" Click="btnFileOpen_Click">
+                    <rad:RadButton.Content>
+                        <Image Width="16" Height="16" Source="Res/folder-open-26.png"/>
+                    </rad:RadButton.Content>
+                </rad:RadButton>
+                <rad:RadButton 
+                    ToolTip="Save workout file" 
+                    Padding="6,2" 
+                    Click="btnFileSave_Click" >
+                    <rad:RadButton.Content>
+                        <Image Width="14" Height="14" Source="Res/file-save-26.png"/>
+                    </rad:RadButton.Content>
+                </rad:RadButton>
+                <rad:RadToggleButton 
+                    Name="tbDataFeedSave" 
+                    ToolTip="Record TOA data to a raw log file" 
+                    Padding="6,2,6,2" 
+                    Click="btnDataFeedSave_Click">
+                    <rad:RadToggleButton.Content>
+                        <Ellipse Width="10" Height="10" Name="ellipDataFeedSave" Fill="White" Stroke="White" StrokeThickness="1"/>
+                    </rad:RadToggleButton.Content>
+                </rad:RadToggleButton>
+                <rad:RadButton ToolTip="System options" Padding="6,2" Click="btnViewOptions_Click" >
+                    <rad:RadButton.Content>
+                        <Image Width="16" Height="16" Source="Res/settings-16.png"/>
+                    </rad:RadButton.Content>
+                </rad:RadButton>
+                <rad:RadButton ToolTip="Generate a screenshot of this application" Padding="6,2" Click="btnViewScreenshot_Click">
+                    <rad:RadButton.Content>
+                        <Image Width="16" Height="16" Source="Res/screenshot-16.png"/>
+                    </rad:RadButton.Content>
+                </rad:RadButton>
+            </rad:RadToolBar>
+        </rad:RadToolBarTray>
+
         <TextBox x:Name="txtFTP" Grid.Row="4"  Grid.Column="1"  Padding="8" FontFamily="Segoe UI Light" FontSize="14" Background="#aaa" Foreground="White"  HorizontalAlignment="Left"  Margin="10,0,0,10" Text="{Binding FTP, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" Width="120"/>
         <TextBox x:Name="txtFTHR" Grid.Row="4"  Grid.Column="1"  Padding="8" FontFamily="Segoe UI Light" FontSize="14" Background="#aaa" Foreground="White"  HorizontalAlignment="Left"  Margin="145,0,0,10" Text="{Binding FTHR, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Bottom" Width="120"/>
 
