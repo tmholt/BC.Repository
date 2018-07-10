@@ -102,7 +102,7 @@ namespace SpamFilter {
 					AccountName = "BengalCore / tmholt",
 					Server = "mail.bengalcore.com",
 					Username = "tmholt@bengalcore.com",
-					Password = "Squawk12!",
+					Password = "Squawk13!",
 					Port = 110,
 					UseSSL = false
 				},
