@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module external.linked.project.id="proxies-common" external.linked.project.path="$MODULE_DIR$/../../proxies-common" external.root.project.path="$MODULE_DIR$/../../proxies-common" external.system.id="GRADLE" external.system.module.group="mil.don.proxies" external.system.module.version="0.0.1" type="JAVA_MODULE" version="4">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$/../../proxies-common">
+      <excludeFolder url="file://$MODULE_DIR$/../../proxies-common/.gradle" />
+      <excludeFolder url="file://$MODULE_DIR$/../../proxies-common/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../proxies-common/out" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

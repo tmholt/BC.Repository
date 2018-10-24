@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/client1.iml" filepath="$PROJECT_DIR$/.idea/modules/client1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/client1_main.iml" filepath="$PROJECT_DIR$/.idea/modules/client1_main.iml" group="client1" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/client1_test.iml" filepath="$PROJECT_DIR$/.idea/modules/client1_test.iml" group="client1" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common.iml" filepath="$PROJECT_DIR$/.idea/modules/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common_main.iml" filepath="$PROJECT_DIR$/.idea/modules/common_main.iml" group="common" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/common_test.iml" filepath="$PROJECT_DIR$/.idea/modules/common_test.iml" group="common" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/device-mgr-service.iml" filepath="$PROJECT_DIR$/.idea/modules/device-mgr-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/device-mgr-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/device-mgr-service_main.iml" group="device-mgr-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/device-mgr-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/device-mgr-service_test.iml" group="device-mgr-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/eureka-service.iml" filepath="$PROJECT_DIR$/.idea/modules/eureka-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/eureka-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/eureka-service_main.iml" group="eureka-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/eureka-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/eureka-service_test.iml" group="eureka-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logging-service.iml" filepath="$PROJECT_DIR$/.idea/modules/logging-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logging-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/logging-service_main.iml" group="logging-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/logging-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/logging-service_test.iml" group="logging-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nighthawk.iml" filepath="$PROJECT_DIR$/.idea/modules/nighthawk.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nighthawk_main.iml" filepath="$PROJECT_DIR$/.idea/modules/nighthawk_main.iml" group="nighthawk" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/nighthawk_test.iml" filepath="$PROJECT_DIR$/.idea/modules/nighthawk_test.iml" group="nighthawk" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/proxies-common.iml" filepath="$PROJECT_DIR$/.idea/modules/proxies-common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/proxies-common_main.iml" filepath="$PROJECT_DIR$/.idea/modules/proxies-common_main.iml" group="proxies-common" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/proxies-common_test.iml" filepath="$PROJECT_DIR$/.idea/modules/proxies-common_test.iml" group="proxies-common" />
+    </modules>
+  </component>
+</project>

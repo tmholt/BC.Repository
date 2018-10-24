@@ -1,0 +1,58 @@
+
+buildscript {
+	ext {
+		springBootVersion = '2.0.5.RELEASE'
+	}
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+	}
+}
+
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+
+group = 'mil.don.proxies'
+version = '0.0.1'
+sourceCompatibility = 1.8
+
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	springCloudVersion = 'Finchley.SR1'
+}
+
+dependencies {
+	implementation('org.springframework.boot:spring-boot-starter-actuator')
+	implementation('org.springframework.boot:spring-boot-starter-web')
+	implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
+	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+	runtimeOnly('org.springframework.boot:spring-boot-devtools')
+	runtimeOnly('javax.xml.bind:jaxb-api:2.3.0')
+	compile files('../lib/mil.don.common-0.0.1.jar')
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+	}
+}
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	destinationDir = file("$rootDir/../lib")
+	manifest {
+		attributes 'Implementation-Title': 'mil-don-proxies dll',
+				'Implementation-Version': '0.0.1'
+	}
+	baseName = 'mil.don.proxies'
+	from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+	with jar
+}

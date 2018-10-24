@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="client1_main" target="1.8" />
+      <module name="client1_test" target="1.8" />
+      <module name="common_main" target="1.8" />
+      <module name="common_test" target="1.8" />
+      <module name="device-mgr-service_main" target="1.8" />
+      <module name="device-mgr-service_test" target="1.8" />
+      <module name="eureka-service_main" target="1.8" />
+      <module name="eureka-service_test" target="1.8" />
+      <module name="logging-service_main" target="1.8" />
+      <module name="logging-service_test" target="1.8" />
+      <module name="nighthawk_main" target="1.8" />
+      <module name="nighthawk_test" target="1.8" />
+      <module name="proxies-common_main" target="1.8" />
+      <module name="proxies-common_test" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
