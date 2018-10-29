@@ -1,14 +1,16 @@
 package mil.don.devicemgr.devicemgrservice;
 
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-//@EnableFeignClients // ("mil.don.devicemgr.devicemgrservice") // don't need - not sure why this was here // now i understand
-@EnableFeignClients("mil.don.proxies")
+@EnableFeignClients("mil.don.proxies") // where to find the proxies
 @EnableDiscoveryClient
+@EnableScheduling
 public class DeviceMgrServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(DeviceMgrServiceApplication.class, args);

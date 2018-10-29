@@ -7,6 +7,7 @@ public class DeviceEntity {
 
     private String _id;
     private String _name;
+    private String _deviceType;
     private double _latitude;
     private double _longitude;
     private double _altitude;
@@ -35,6 +36,9 @@ public class DeviceEntity {
         return _name;
     }
     public DeviceEntity setName(String name) { _name = name; return this; }
+
+    public String getDeviceType() { return _deviceType; }
+    public DeviceEntity setDeviceNmae(String deviceType) { _deviceType = deviceType; return this; }
 
     public double getLatitude() {
         return _latitude;

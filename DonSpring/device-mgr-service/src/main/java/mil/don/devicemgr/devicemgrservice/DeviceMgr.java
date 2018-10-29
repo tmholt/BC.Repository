@@ -3,16 +3,27 @@ package mil.don.devicemgr.devicemgrservice;
 
 import mil.don.common.devices.DeviceEntity;
 import mil.don.common.devices.DeviceType;
+import mil.don.common.events.StatusEvent;
 import mil.don.common.logging.Priority;
+import mil.don.common.status.ServiceStatus;
+import mil.don.common.status.StatusType;
 import mil.don.proxies.LoggingProxy;
+
+import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -21,12 +32,82 @@ public class DeviceMgr
         implements HealthIndicator, IDeviceMgr {
 
 
+    public static final String ROUTING_KEY = "status.service";
+
     @Autowired
     private LoggingProxy _logging;
 
 
-    public DeviceMgr() {
+
+    private ScheduledExecutorService _statusPublisher;
+    private RabbitTemplate _rabbitTemplate;
+    private Exchange _exchange;
+
+
+    // this constructor is called via a bean defined in configuration
+    @Autowired
+    public DeviceMgr(RabbitTemplate rabbitTemplate, Exchange exchange) {
+        _rabbitTemplate = rabbitTemplate;
+        _exchange = exchange;
+
+        //publishStatusAtFixedRate();
     }
+
+    // ApplicationEvents are for internal (in-process) event support
+    /*
+    private void publishStatusAtFixedRate() {
+
+        _statusPublisher = Executors.newScheduledThreadPool(1);
+
+        Runnable task = () -> {
+            ServiceStatus status = new ServiceStatus(getServiceName(), new Date(), true);
+            StatusEvent sevent = new StatusEvent(getServiceName(), StatusType.SERVICE, status);
+            _eventPublisher.publishEvent(sevent);
+        };
+
+        _statusPublisher.scheduleWithFixedDelay(task, 5, 5, TimeUnit.SECONDS);
+    }
+     */
+
+    // we want to publish between uservices
+    /* nope
+    @Bean
+    @InboundChannelAdapter(value = Source.OUTPUT, poller = @Poller(fixedDelay = "5000", maxMessagesPerPoll = "1"))
+    public MessageSource<StatusEvent> publishStatusAtFixedRate()
+    {
+        return () -> {
+            ServiceStatus status = new ServiceStatus(getServiceName(), new Date(), true);
+            StatusEvent sevent = new StatusEvent(getServiceName(), StatusType.SERVICE, status);
+
+            return MessageBuilder
+                .withPayload(sevent)
+                .build();
+        };
+    }
+    */
+
+
+    private void publishStatusAtFixedRate() {
+
+        Runnable task = () -> sendServiceStatusEvent();
+
+        _statusPublisher = Executors.newScheduledThreadPool(1);
+        _statusPublisher.scheduleWithFixedDelay(task, 5, 5, TimeUnit.SECONDS);
+    }
+
+
+    @Scheduled(initialDelay = 5000, fixedRate = 5000)
+    void sendServiceStatusEvent() {
+        ServiceStatus status = new ServiceStatus(getServiceName(), new Date(), true);
+        _rabbitTemplate.convertAndSend(_exchange.getName(), ROUTING_KEY, status ); // sevent
+    }
+
+    // part of IDonService or something like that
+    public String getServiceName() {
+        return "DeviceManager";
+    }
+
+
 
     public boolean addDevice(DeviceEntity device) {
         if ( this.containsKey(device.getId()) ) {

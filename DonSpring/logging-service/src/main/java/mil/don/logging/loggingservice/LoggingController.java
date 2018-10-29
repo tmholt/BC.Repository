@@ -38,4 +38,9 @@ public class LoggingController {
 
         return "ok";
     }
+
+    @RequestMapping(value="/logging/recent")
+    public LoggingEntity[] getRecent() {
+        return _logger.getRecent();
+    }
 }

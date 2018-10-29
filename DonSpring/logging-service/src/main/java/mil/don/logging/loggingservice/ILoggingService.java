@@ -7,4 +7,6 @@ import mil.don.common.logging.LoggingEntity;
 public interface ILoggingService {
 
     void log(LoggingEntity log);
+
+    LoggingEntity[] getRecent();
 }

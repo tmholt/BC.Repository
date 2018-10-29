@@ -21,6 +21,7 @@ sourceCompatibility = 1.8
 bootJar {
 	baseName = 'mil.don.logging'
 	version =  '0.0.1'
+    mainClassName = 'mil.don.logging.loggingservice.LoggingServiceApplication'
 }
 
 repositories {
@@ -37,6 +38,9 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-web')
 	implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
 	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.2'
+
 	runtimeOnly('org.springframework.boot:spring-boot-devtools')
 	testCompile("org.springframework.boot:spring-boot-starter-test")
 	testCompile("junit:junit")

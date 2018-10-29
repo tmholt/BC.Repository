@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @FeignClient(name="logging-service") // eureka lookup
+//@FeignClient(url="http://localhost:8012") // eureka lookup
 public interface LoggingProxy {
 
     @RequestMapping(method = RequestMethod.POST, value = "/logging/log")

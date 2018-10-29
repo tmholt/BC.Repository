@@ -41,6 +41,8 @@ dependencies {
 	runtimeOnly('javax.xml.bind:jaxb-api:2.3.0')
 	compile files('../lib/mil.don.common-0.0.1.jar')
     compile files('../lib/mil.don.proxies-0.0.1.jar')
+
+    compile('org.springframework.boot:spring-boot-starter-amqp')
 }
 
 dependencyManagement {
