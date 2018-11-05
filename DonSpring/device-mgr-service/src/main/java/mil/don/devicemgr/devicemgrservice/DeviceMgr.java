@@ -1,12 +1,12 @@
 package mil.don.devicemgr.devicemgrservice;
 
 
+import com.netflix.appinfo.ApplicationInfoManager;
+
 import mil.don.common.devices.DeviceEntity;
 import mil.don.common.devices.DeviceType;
-import mil.don.common.events.StatusEvent;
 import mil.don.common.logging.Priority;
 import mil.don.common.status.ServiceStatus;
-import mil.don.common.status.StatusType;
 import mil.don.proxies.LoggingProxy;
 
 import org.springframework.amqp.core.Exchange;
@@ -21,9 +21,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.PostConstruct;
 
 
 @Service
@@ -32,10 +35,15 @@ public class DeviceMgr
         implements HealthIndicator, IDeviceMgr {
 
 
+    // this is the topic name that service status events will be pushed to
     public static final String ROUTING_KEY = "status.service";
 
+    // the proxy to our logging service
     @Autowired
     private LoggingProxy _logging;
+
+    @Autowired
+    private ApplicationInfoManager _appInfo;
 
 
 
@@ -53,24 +61,29 @@ public class DeviceMgr
         //publishStatusAtFixedRate();
     }
 
+    // this is an example of adding to the meta-data available from eureka for this service.
+    // in this case, this is a terrible example, as we are getting a number that isn't available yet. :)
+    @PostConstruct
+    public void initialize() {
+        Map<String, String> mapping = _appInfo.getInfo().getMetadata();
+        mapping.put("num_devices", String.valueOf(this.size()));
+    }
+
     // ApplicationEvents are for internal (in-process) event support
     /*
     private void publishStatusAtFixedRate() {
-
         _statusPublisher = Executors.newScheduledThreadPool(1);
-
         Runnable task = () -> {
             ServiceStatus status = new ServiceStatus(getServiceName(), new Date(), true);
             StatusEvent sevent = new StatusEvent(getServiceName(), StatusType.SERVICE, status);
             _eventPublisher.publishEvent(sevent);
         };
-
         _statusPublisher.scheduleWithFixedDelay(task, 5, 5, TimeUnit.SECONDS);
     }
      */
 
     // we want to publish between uservices
-    /* nope
+    /* nope. although maybe an alternative to rabbitmq. don't really understand this stuff
     @Bean
     @InboundChannelAdapter(value = Source.OUTPUT, poller = @Poller(fixedDelay = "5000", maxMessagesPerPoll = "1"))
     public MessageSource<StatusEvent> publishStatusAtFixedRate()
@@ -86,19 +99,19 @@ public class DeviceMgr
     }
     */
 
-
+    /* alternate to using @scheduled
     private void publishStatusAtFixedRate() {
-
         Runnable task = () -> sendServiceStatusEvent();
-
         _statusPublisher = Executors.newScheduledThreadPool(1);
         _statusPublisher.scheduleWithFixedDelay(task, 5, 5, TimeUnit.SECONDS);
     }
+    */
 
+    private static long _statusId = 1;
 
     @Scheduled(initialDelay = 5000, fixedRate = 5000)
     void sendServiceStatusEvent() {
-        ServiceStatus status = new ServiceStatus(getServiceName(), new Date(), true);
+        ServiceStatus status = new ServiceStatus(_statusId++, getServiceName(), new Date(), true);
         _rabbitTemplate.convertAndSend(_exchange.getName(), ROUTING_KEY, status ); // sevent
     }
 

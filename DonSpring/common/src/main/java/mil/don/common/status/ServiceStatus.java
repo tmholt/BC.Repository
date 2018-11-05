@@ -8,6 +8,7 @@ import mil.don.common.devices.DeviceEntity;
 public class ServiceStatus
     implements IStatusData, Serializable
 {
+    private long _id;
     private Date _lastHeard;
     private String _sourceName;
     private boolean _isOperational;
@@ -16,7 +17,8 @@ public class ServiceStatus
     public ServiceStatus() {
     }
 
-    public ServiceStatus(String sourceName, Date lastHeard, boolean isOperational) {
+    public ServiceStatus(long id, String sourceName, Date lastHeard, boolean isOperational) {
+        _id = id;
         _sourceName = sourceName;
         _lastHeard = lastHeard;
         _isOperational = isOperational;
@@ -41,8 +43,8 @@ public class ServiceStatus
 
     @Override
     public String toString() {
-        return String.format("service.status last='%s', source='%s', isop='%s'",
-            _lastHeard, _sourceName, _isOperational);
+        return String.format("service.status last='%s', id='%d', source='%s', isop='%s'",
+            _lastHeard, _id, _sourceName, _isOperational);
     }
 
 }

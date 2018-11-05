@@ -6,6 +6,8 @@
       <module name="client1_test" target="1.8" />
       <module name="common_main" target="1.8" />
       <module name="common_test" target="1.8" />
+      <module name="configuration-service_main" target="1.8" />
+      <module name="configuration-service_test" target="1.8" />
       <module name="device-mgr-service_main" target="1.8" />
       <module name="device-mgr-service_test" target="1.8" />
       <module name="eureka-service_main" target="1.8" />

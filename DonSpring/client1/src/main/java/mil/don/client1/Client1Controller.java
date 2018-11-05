@@ -2,6 +2,7 @@ package mil.don.client1;
 
 
 
+import mil.don.common.status.ServiceStatus;
 import mil.don.proxies.DeviceMgrProxy;
 import mil.don.proxies.LoggingProxy;
 import mil.don.common.devices.DeviceEntity;
@@ -28,11 +29,14 @@ public class Client1Controller {
     @Autowired
     private DeviceMgrProxy _deviceMgr;
 
+    @Autowired
+    private Client1StatusListener _statusListener;
 
-	@RequestMapping("/services/{applicationName}")
+
+	@RequestMapping("/services/{serviceId}")
     public List<ServiceInstance> serviceInstancesByApplicationName(
-            @PathVariable String applicationName) {
-        return _discoveryClient.getInstances(applicationName);
+            @PathVariable String serviceId) {
+        return _discoveryClient.getInstances(serviceId);
     }
 
     @RequestMapping("/services")
@@ -57,7 +61,12 @@ public class Client1Controller {
 
     @RequestMapping("/testdevices")
     public DeviceEntity[] testDeviceMgrService() {
-        return _deviceMgr.getAll();
+	    return _deviceMgr.getAll();
+    }
+
+    @RequestMapping("/status-events")
+    public ServiceStatus[] getRecentStatusEvents() {
+        return _statusListener.getRecent();
     }
 
 

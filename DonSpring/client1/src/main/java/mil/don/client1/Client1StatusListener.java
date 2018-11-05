@@ -20,12 +20,10 @@
 package mil.don.client1;
 
 
-import org.springframework.amqp.core.Message;
+import org.apache.commons.collections4.queue.CircularFifoQueue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import mil.don.common.events.StatusEvent;
 import mil.don.common.status.ServiceStatus;
 
 /*
@@ -47,20 +45,21 @@ public class Client1StatusListener implements ApplicationListener<StatusEvent>
 public class Client1StatusListener
 {
 
+    CircularFifoQueue<ServiceStatus> _statusEvents = new CircularFifoQueue<>(100);
+
 
     public Client1StatusListener() {
-        System.out.println("listener up!");
+        System.out.println("service status events listener up!");
     }
 
-    /*
-    @RabbitListener(queues="status-queue")
-    public void receiveStatus(final Message message) { // StatusEvent status
-        System.out.println("generic!! " + message.toString());
-    }
-    */
 
     @RabbitListener(queues="status-queue")
     public void receiveStatus(final ServiceStatus status) { // StatusEvent status
-        System.out.println("specific!! " + status.toString());
+        System.out.println("received ServiceStatus event: " + status.toString());
+        _statusEvents.add(status);
+    }
+
+    public ServiceStatus[] getRecent() {
+        return _statusEvents.toArray(new ServiceStatus[_statusEvents.size()]);
     }
 }

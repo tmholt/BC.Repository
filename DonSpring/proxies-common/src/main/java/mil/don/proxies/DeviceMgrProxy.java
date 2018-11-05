@@ -6,7 +6,7 @@ import mil.don.common.devices.DeviceType;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name="device-mgr-service") // eureka lookup
+@FeignClient(name="don.service.device-mgr") // eureka lookup
 public interface DeviceMgrProxy {
 
     @RequestMapping(value="/devices/byid/{id}")
