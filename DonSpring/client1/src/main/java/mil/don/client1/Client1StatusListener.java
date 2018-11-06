@@ -53,7 +53,7 @@ public class Client1StatusListener
     }
 
 
-    @RabbitListener(queues="status-queue")
+    @RabbitListener(queues="#{clientQueue.name}")
     public void receiveStatus(final ServiceStatus status) { // StatusEvent status
         System.out.println("received ServiceStatus event: " + status.toString());
         _statusEvents.add(status);

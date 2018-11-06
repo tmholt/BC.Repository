@@ -23,32 +23,42 @@ package mil.don.client1.configuration;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.UUID;
 
 import mil.don.client1.Client1StatusListener;
 
 @Configuration
 public class EventConsumerConfiguration
 {
+    // this is the topic that we want to bind our queue to
     @Bean
     public Exchange eventExchange() {
-        return new TopicExchange("rmq-exchange");
+        return new FanoutExchange("status-events");
     }
 
+
+    // this is our personal queue of rabbitmq status messages
     @Bean
-    public Queue queue() {
-        return new Queue("status-queue");
+    public Queue clientQueue() {
+        UUID extension = UUID.randomUUID();
+        return new Queue(
+            "status-queue-" + extension.toString(),
+            false, true, true);
     }
+
 
     @Bean
     public Binding binding(Queue queue, Exchange eventExchange) {
         return BindingBuilder
             .bind(queue)
             .to(eventExchange)
-            .with("status.*")
+            .with("status.*") // if we want a subset
             .noargs(); // status.service and status.device
     }
 
