@@ -34,12 +34,13 @@ ext {
 
 
 dependencies {
-	implementation('org.springframework.boot:spring-boot-starter-actuator')
+	//implementation('org.springframework.boot:spring-boot-starter-actuator')
     implementation('org.springframework.boot:spring-boot-starter-web')
     //implementation('org.springframework.boot:spring-boot-starter-config')
     implementation('org.springframework.cloud:spring-cloud-starter-security')
 	implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
 	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+    implementation('org.springframework.cloud:spring-cloud-starter-config')
 	runtimeOnly('org.springframework.boot:spring-boot-devtools')
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("junit:junit")
@@ -48,6 +49,7 @@ dependencies {
 
     compile files('../lib/mil.don.common-0.0.1.jar')
     compile files('../lib/mil.don.proxies-0.0.1.jar')
+    compile files('../lib/mil.don.devices.nighthawk-0.0.1.jar')
 }
 
 dependencyManagement {

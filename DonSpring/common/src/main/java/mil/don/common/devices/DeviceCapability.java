@@ -1,6 +1,7 @@
 package mil.don.common.devices;
 
-public enum DeviceType {
+public enum DeviceCapability
+{
     CAMERA,
     RADAR,
     WEAPON

@@ -2,7 +2,7 @@ package mil.don.proxies;
 
 
 import mil.don.common.devices.DeviceEntity;
-import mil.don.common.devices.DeviceType;
+import mil.don.common.devices.DeviceCapability;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,9 +13,9 @@ public interface DeviceMgrProxy {
     DeviceEntity getById(
             @RequestParam("id")String id);
 
-    @RequestMapping(value="/devices/bytype/{type}")
-    DeviceEntity[] getByType(
-            @RequestParam("type") DeviceType type);
+    @RequestMapping(value="/devices/bycap/{cap}")
+    DeviceEntity[] getByCapability(
+            @RequestParam("cap") DeviceCapability cap);
 
     @RequestMapping(value="/devices")
     DeviceEntity[] getAll();

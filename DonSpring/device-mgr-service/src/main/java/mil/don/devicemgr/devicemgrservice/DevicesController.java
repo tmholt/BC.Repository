@@ -2,10 +2,12 @@ package mil.don.devicemgr.devicemgrservice;
 
 
 import mil.don.common.devices.DeviceEntity;
-import mil.don.common.devices.DeviceType;
+import mil.don.common.devices.DeviceCapability;
+import mil.don.common.interfaces.IDevice;
+import mil.don.devicemgr.devicemgrservice.configuration.AppConfig;
+import mil.don.devicemgr.devicemgrservice.configuration.GlobalConfig;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,19 +23,33 @@ public class DevicesController {
     @Autowired
     private IDeviceMgr _repo;
 
+    // this is the configuration for this device manager service
+    @Autowired
+    private AppConfig _appConfig;
+
+    // this is the config everyone gets
+    @Autowired
+    private GlobalConfig _globalConfig;
+
+
+    // test for remote configuration server
+    @GetMapping("/devices/configuration")
+    public String showConfiguration() {
+        return _appConfig.toString();
+    }
 
     @GetMapping("/devices/byid/{id}")
-    public DeviceEntity getById(@PathVariable String id) {
+    public IDevice getById(@PathVariable String id) {
         return _repo.getById(id);
     }
 
-    @GetMapping("/devices/bytype/{type}")
-    public DeviceEntity[] getByType(@PathVariable DeviceType type) {
-        return (_repo.getByType(type));
+    @GetMapping("/devices/bycap/{cap}")
+    public IDevice[] getByCapability(@PathVariable DeviceCapability cap) {
+        return (_repo.getByCapability(cap));
     }
 
     @GetMapping("/devices")
-    public DeviceEntity[] getAll() {
+    public IDevice[] getAll() {
         return _repo.getAll();
     }
 

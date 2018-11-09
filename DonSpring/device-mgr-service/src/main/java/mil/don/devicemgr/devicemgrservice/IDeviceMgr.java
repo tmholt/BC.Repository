@@ -1,15 +1,16 @@
 package mil.don.devicemgr.devicemgrservice;
 
-import mil.don.common.devices.DeviceEntity;
-import mil.don.common.devices.DeviceType;
+import mil.don.common.devices.DeviceCapability;
+import mil.don.common.interfaces.IDevice;
+
 
 public interface IDeviceMgr {
 
-    boolean addDevice(DeviceEntity device);
+    boolean addDevice(IDevice device);
 
-    DeviceEntity getById(String id);
+    IDevice getById(String id);
 
-    DeviceEntity[] getByType(DeviceType type);
+    IDevice[] getByCapability(DeviceCapability type);
 
-    DeviceEntity[] getAll();
+    IDevice[] getAll();
 }

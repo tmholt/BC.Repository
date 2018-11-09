@@ -3,8 +3,9 @@ package mil.don.devicemgr.devicemgrservice;
 
 import com.netflix.appinfo.ApplicationInfoManager;
 
+import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceEntity;
-import mil.don.common.devices.DeviceType;
+import mil.don.common.interfaces.IDevice;
 import mil.don.common.logging.Priority;
 import mil.don.common.status.ServiceStatus;
 import mil.don.proxies.LoggingProxy;
@@ -12,27 +13,22 @@ import mil.don.proxies.LoggingProxy;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.health.Health;
-import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
 
 @Service
 public class DeviceMgr
-        extends HashMap<String, DeviceEntity>
-        implements HealthIndicator, IDeviceMgr {
+        extends HashMap<String, IDevice>
+        implements IDeviceMgr { // HealthIndicator
 
 
     // this is the topic name that service status events will be pushed to
@@ -42,12 +38,12 @@ public class DeviceMgr
     @Autowired
     private LoggingProxy _logging;
 
+    // eureka
     @Autowired
     private ApplicationInfoManager _appInfo;
 
 
 
-    private ScheduledExecutorService _statusPublisher;
     private RabbitTemplate _rabbitTemplate;
     private Exchange _exchange;
 
@@ -71,6 +67,8 @@ public class DeviceMgr
 
     // ApplicationEvents are for internal (in-process) event support
     /*
+    private ScheduledExecutorService _statusPublisher;
+
     private void publishStatusAtFixedRate() {
         _statusPublisher = Executors.newScheduledThreadPool(1);
         Runnable task = () -> {
@@ -112,7 +110,8 @@ public class DeviceMgr
     @Scheduled(initialDelay = 5000, fixedRate = 5000)
     void sendServiceStatusEvent() {
         ServiceStatus status = new ServiceStatus(_statusId++, getServiceName(), new Date(), true);
-        _rabbitTemplate.convertAndSend(_exchange.getName(), ROUTING_KEY, status ); // sevent
+        _rabbitTemplate.convertAndSend(_exchange.getName(), ROUTING_KEY, status );
+        System.out.println("sent service status event: " + status.toString());
     }
 
     // part of IDonService or something like that
@@ -122,7 +121,7 @@ public class DeviceMgr
 
 
 
-    public boolean addDevice(DeviceEntity device) {
+    public boolean addDevice(IDevice device) {
         if ( this.containsKey(device.getId()) ) {
             return false;
         }
@@ -132,7 +131,7 @@ public class DeviceMgr
         return true;
     }
 
-    public DeviceEntity getById(String id) {
+    public IDevice getById(String id) {
 
         if ( this.containsKey(id) ) {
             _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Device lookup success: " + id);
@@ -144,25 +143,35 @@ public class DeviceMgr
         }
     }
 
-    public DeviceEntity[] getByType(DeviceType type) {
-        ArrayList<DeviceEntity> list = new ArrayList<>();
-        for ( DeviceEntity entity : this.values() ) {
-            List<DeviceType> capabilities = entity.getCapabilities();
-            if ( capabilities.contains(type) ) list.add(entity);
-        }
+    public IDevice[] getByCapability(DeviceCapability cap) {
 
-        int count = list.size();
-        _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Device type " + type + " lookup found: " + count);
-        return list.toArray(new DeviceEntity[count]);
+        // these 2 code blocks are the same - first with streams, second explicit
+
+        List<IDevice> list1 = this.entrySet().stream()
+            .map(entry -> entry.getValue())
+            .filter(entity -> entity.getCapabilities().contains(cap))
+            .collect(Collectors.toList());
+
+        /*
+        ArrayList<DeviceEntity> list2 = new ArrayList<>();
+        for ( DeviceEntity entity : this.values() ) {
+            List<DeviceCapability> capabilities = entity.getCapabilities();
+            if ( capabilities.contains(cap) ) list2.add(entity);
+        }
+         */
+
+        int count = list1.size();
+        _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Device cap " + cap + " lookup found: " + count);
+        return list1.toArray(new IDevice[count]);
     }
 
-    public DeviceEntity[] getAll() {
+    public IDevice[] getAll() {
         _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Device list request: " + this.size());
-        return this.values().toArray(new DeviceEntity[this.size()]);
+        return this.values().toArray(new IDevice[this.size()]);
     }
 
     // region HealthIndicator implementation
-
+    /*
     @Override
     public Health health() {
         _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Health request received");
@@ -172,7 +181,7 @@ public class DeviceMgr
                 .withDetail("device manager is happy", "smiley-face")
                 .build();
     }
-
+     */
     // endregion
 
 }

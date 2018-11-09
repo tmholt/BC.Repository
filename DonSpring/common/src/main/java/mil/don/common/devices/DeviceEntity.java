@@ -3,55 +3,44 @@ package mil.don.common.devices;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DeviceEntity {
+import mil.don.common.coordinates.CompositeCoordinate;
+import mil.don.common.interfaces.IDevice;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+// base data values for a device
+public class DeviceEntity implements IDevice
+{
     private String _id;
     private String _name;
     private String _deviceType;
-    private double _latitude;
-    private double _longitude;
-    private double _altitude;
-    private ArrayList<DeviceType> _capabilities;
+    private final CompositeCoordinate _position = new CompositeCoordinate();
+    private final List<DeviceCapability> _capabilities = new ArrayList<>();
 
 
     public DeviceEntity() {
     }
 
-    public DeviceEntity(String id, String name, double lat, double lon, double alt) {
-        _capabilities = new ArrayList<>();
+    public DeviceEntity(String id, String deviceType, String name) {
         _id = id;
+        _deviceType = deviceType;
         _name = name;
-        _latitude = lat;
-        _longitude = lon;
-        _altitude = alt;
     }
 
 
     public String getId() {
         return _id;
     }
-    public DeviceEntity setId(String id) { _id = id; return this; }
-
     public String getName() {
         return _name;
     }
-    public DeviceEntity setName(String name) { _name = name; return this; }
-
     public String getDeviceType() { return _deviceType; }
-    public DeviceEntity setDeviceNmae(String deviceType) { _deviceType = deviceType; return this; }
-
-    public double getLatitude() {
-        return _latitude;
+    public CompositeCoordinate getPosition() {
+        return _position;
     }
-    public DeviceEntity setLatitude(double latitude) { _latitude = latitude; return this; }
+    public List<DeviceCapability> getCapabilities() { return _capabilities; }
 
-    public double getLongitude() {
-        return _longitude;
+    public void run() {
+        // noop
     }
-    public DeviceEntity setLongitude(double longitude) { _longitude = longitude; return this; }
 
-    public List<DeviceType> getCapabilities() {
-        return _capabilities;
-    }
-    public DeviceEntity setCapabilities(List<DeviceType> caps) { _capabilities = new ArrayList<>(caps); return this; }
 }
