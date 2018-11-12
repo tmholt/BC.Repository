@@ -8,9 +8,9 @@ public interface IDeviceMgr {
 
     boolean addDevice(IDevice device);
 
-    IDevice getById(String id);
+    IDevice getDeviceById(String id);
 
-    IDevice[] getByCapability(DeviceCapability type);
+    IDevice[] getDevicesByCapability(DeviceCapability type);
 
-    IDevice[] getAll();
+    IDevice[] getAllDevices();
 }

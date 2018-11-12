@@ -45,11 +45,12 @@ dependencies {
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("junit:junit")
     compile('org.springframework.boot:spring-boot-starter-amqp')
-
+    compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.2.3'
 
     compile files('../lib/mil.don.common-0.0.1.jar')
     compile files('../lib/mil.don.proxies-0.0.1.jar')
     compile files('../lib/mil.don.devices.nighthawk-0.0.1.jar')
+    compile files('../lib/mil.don.devices.duke5-0.0.1.jar')
 }
 
 dependencyManagement {

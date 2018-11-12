@@ -14,6 +14,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/device-mgr-service.iml" filepath="$PROJECT_DIR$/.idea/modules/device-mgr-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/device-mgr-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/device-mgr-service_main.iml" group="device-mgr-service" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/device-mgr-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/device-mgr-service_test.iml" group="device-mgr-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/duke5.iml" filepath="$PROJECT_DIR$/.idea/modules/duke5.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/duke5_main.iml" filepath="$PROJECT_DIR$/.idea/modules/duke5_main.iml" group="duke5" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/duke5_test.iml" filepath="$PROJECT_DIR$/.idea/modules/duke5_test.iml" group="duke5" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/eureka-service.iml" filepath="$PROJECT_DIR$/.idea/modules/eureka-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/eureka-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/eureka-service_main.iml" group="eureka-service" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/eureka-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/eureka-service_test.iml" group="eureka-service" />

@@ -1,7 +1,6 @@
 package mil.don.devicemgr.devicemgrservice;
 
 
-import mil.don.common.devices.DeviceEntity;
 import mil.don.common.devices.DeviceCapability;
 import mil.don.common.interfaces.IDevice;
 import mil.don.devicemgr.devicemgrservice.configuration.AppConfig;
@@ -40,17 +39,17 @@ public class DevicesController {
 
     @GetMapping("/devices/byid/{id}")
     public IDevice getById(@PathVariable String id) {
-        return _repo.getById(id);
+        return _repo.getDeviceById(id);
     }
 
     @GetMapping("/devices/bycap/{cap}")
     public IDevice[] getByCapability(@PathVariable DeviceCapability cap) {
-        return (_repo.getByCapability(cap));
+        return (_repo.getDevicesByCapability(cap));
     }
 
     @GetMapping("/devices")
     public IDevice[] getAll() {
-        return _repo.getAll();
+        return _repo.getAllDevices();
     }
 
     public int getServicePort() {

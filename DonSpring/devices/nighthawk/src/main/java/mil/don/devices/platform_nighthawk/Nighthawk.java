@@ -1,14 +1,21 @@
 package mil.don.devices.platform_nighthawk;
 
 
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 import mil.don.common.configuration.DeviceConfiguration;
-import mil.don.common.devices.DeviceEntity;
+import mil.don.common.devices.DetectionMessage;
+import mil.don.common.devices.DeviceBase;
+import mil.don.common.devices.DeviceCapability;
 import mil.don.common.interfaces.IDeviceCamera;
-
-import org.springframework.context.annotation.Bean;
+import mil.don.common.status.DeviceStatusMessage;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
+
+
+import java.util.Date;
+import java.util.List;
 
 /*
  * What are the things that a device needs to do, and what does it need in order to do that job?
@@ -31,23 +38,65 @@ import org.springframework.stereotype.Service;
 @Component("NighthawkDevice")
 @Scope("prototype")
 public class Nighthawk
-    extends DeviceEntity
+    extends DeviceBase
     implements IDeviceCamera
 {
 
-    DeviceConfiguration _config;
+    private final Subject<DeviceStatusMessage> _rxStatus = PublishSubject.create();
+    private long _id = 100;
+
+
 
     public Nighthawk() {
+        List<DeviceCapability> caps = this.getCapabilities();
+        caps.add(DeviceCapability.CAMERA);
     }
 
-    public Nighthawk(DeviceConfiguration config) {
-        _config = config;
+    @Override
+    public String getDeviceType() { return "Nighthawk"; }
+
+    @Override
+    public boolean configure(DeviceConfiguration deviceConfig) {
+
+        boolean baseOk = super.configure(deviceConfig);
+        return baseOk;
     }
+
+    public Observable<DetectionMessage> getDetectionsStream() {
+        return null;
+    }
+
+    public Observable<DeviceStatusMessage> getStatusStream() {
+        return _rxStatus;
+    }
+
 
     @Override
     public void run() {
 
+        int i = 0;
+        while ( true ) {
+            try
+            {
+                Thread.sleep(1500);
+            }
+            catch ( InterruptedException e )
+            {
+            }
+
+
+            i++;
+            _rxStatus.onNext(buildDeviceStatus());
+
+        }
+
     }
+
+    private DeviceStatusMessage buildDeviceStatus() {
+        return new DeviceStatusMessage(_id++, "Nighthawk", new Date(), true, this);
+    }
+
+
 
 
 }

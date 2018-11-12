@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-//@FeignClient(name="don.service.logging") // eureka lookup
-@FeignClient(name="don.service.logging", url="http://localhost:8012") // port lookup
+@FeignClient(name="don.service.logging") // eureka lookup
+//@FeignClient(name="don.service.logging", url="http://localhost:8012") // port lookup
 public interface LoggingProxy {
 
     @RequestMapping(method = RequestMethod.POST, value = "/logging/log")

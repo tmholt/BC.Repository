@@ -27,7 +27,9 @@ import mil.don.common.coordinates.Lla;
 
 public class DeviceConfiguration
 {
-    private static class Position {
+
+    public static class DeviceConfigurationPosition
+    {
         private final Lla _lla = new Lla();
         private final Ecef _ecef = new Ecef();
 
@@ -41,7 +43,8 @@ public class DeviceConfiguration
         }
     }
 
-    private static class Comms {
+    public static class DeviceConfigurationComms
+    {
         private String _commandUri;
         private String _dataUri;
 
@@ -67,11 +70,11 @@ public class DeviceConfiguration
     private String _type;
     private String _symbolCode;
     private double _range;
-    private final Position _position = new Position();
-    private final Comms _comms = new Comms();
+    private final DeviceConfigurationPosition _position = new DeviceConfigurationPosition();
+    private final DeviceConfigurationComms _comms = new DeviceConfigurationComms();
     private final Map<String, String> _options = new HashMap<>();
 
-    // region
+    // region properties
 
     public String getName()
     {
@@ -105,11 +108,11 @@ public class DeviceConfiguration
     {
         this._range = range;
     }
-    public Position getPosition()
+    public DeviceConfigurationPosition getPosition()
     {
         return _position;
     }
-    public Comms getComms()
+    public DeviceConfigurationComms getComms()
     {
         return _comms;
     }

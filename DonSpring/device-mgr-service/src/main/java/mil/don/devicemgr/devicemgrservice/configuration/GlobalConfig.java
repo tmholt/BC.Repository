@@ -25,20 +25,22 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesBindin
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mil.don.common.configuration.ProtectedArea;
+import mil.don.common.configuration.ProtectedAreaConfiguration;
 
 // this is our global configuration values loaded for all applications
+// hmm.. why is this here then?
 @Component
 @ConfigurationProperties
 public class GlobalConfig
 {
-    private final Map<String, ProtectedArea> _protectedAreas = new HashedMap();
+    private final Map<String, ProtectedAreaConfiguration> _protectedAreas = new HashMap<>();
 
     @ConfigurationProperties("protected-areas")
-    public Map<String, ProtectedArea> getProtectedAreas()
+    public Map<String, ProtectedAreaConfiguration> getProtectedAreas()
     {
         return _protectedAreas;
     }

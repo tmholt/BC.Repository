@@ -36,11 +36,4 @@ public class EventProducerConfiguration
         return new FanoutExchange("status-events");
     }
 
-    /*
-    @Bean
-    public DeviceMgr deviceMgr(RabbitTemplate rabbitTemplate, Exchange eventExchange) {
-        return new DeviceMgr(rabbitTemplate, eventExchange);
-    }
-    */
-
 }

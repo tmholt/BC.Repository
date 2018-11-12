@@ -27,7 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import mil.don.common.configuration.Device;
+import mil.don.common.configuration.DeviceConfiguration;
 
 
 // this is our configuration values loaded for this application
@@ -36,7 +36,7 @@ import mil.don.common.configuration.Device;
 public class AppConfig
 {
     private final Map<String, String> _exchanges = new HashMap<>();
-    private final List<mil.don.common.configuration.Device> _devices = new ArrayList<>();
+    private final List<DeviceConfiguration> _devices = new ArrayList<>();
 
 
     public AppConfig() {
@@ -47,14 +47,15 @@ public class AppConfig
     {
         return _exchanges;
     }
-    public List<mil.don.common.configuration.Device> getDevices()
+
+    public List<mil.don.common.configuration.DeviceConfiguration> getDevices()
     {
         return _devices;
     }
 
     @Override
     public String toString() {
-        int optionsSum = _devices.stream().map(Device::getOptions).mapToInt(Map::size).sum();
+        int optionsSum = _devices.stream().map(DeviceConfiguration::getOptions).mapToInt(Map::size).sum();
         return String.format("%d exchanges, %d devices, %d options", _exchanges.size(), _devices.size(), optionsSum);
     }
 

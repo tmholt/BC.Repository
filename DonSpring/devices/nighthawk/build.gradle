@@ -30,6 +30,7 @@ repositories {
 
 
 dependencies {
+    compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.2.3'
     implementation('org.springframework.boot:spring-boot')
 	testCompile("junit:junit")
 

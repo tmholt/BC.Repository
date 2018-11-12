@@ -2,10 +2,10 @@ package mil.don.client1;
 
 
 
+import mil.don.common.interfaces.IDevice;
 import mil.don.common.status.ServiceStatus;
 import mil.don.proxies.DeviceMgrProxy;
 import mil.don.proxies.LoggingProxy;
-import mil.don.common.devices.DeviceEntity;
 import mil.don.common.logging.Priority;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
@@ -60,7 +60,7 @@ public class Client1Controller {
     }
 
     @RequestMapping("/testdevices")
-    public DeviceEntity[] testDeviceMgrService() {
+    public IDevice[] testDeviceMgrService() {
 	    return _deviceMgr.getAll();
     }
 

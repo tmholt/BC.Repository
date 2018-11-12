@@ -22,14 +22,25 @@ package mil.don.devicemgr.devicemgrservice.configuration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
+
+import mil.don.common.interfaces.IDevice;
+import mil.don.devices.platform_duke5.Duke5;
 import mil.don.devices.platform_nighthawk.Nighthawk;
 
+// NOTE: this seems to be the only way that I can get to the device components in their
+// respective jars. It would be nice if they just got picked up by spring.
 @Configuration
 public class DeviceProviderConfiguration
 {
     @Bean
     @Scope("prototype")
-    public static Nighthawk createNighthawk() { //DeviceConfiguration deviceConfig
+    public static IDevice createNighthawk() {
         return new Nighthawk();
+    }
+
+    @Bean
+    @Scope("prototype")
+    public static IDevice createDuke5() {
+        return new Duke5();
     }
 }
