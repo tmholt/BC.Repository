@@ -21,22 +21,19 @@ package mil.don.client1;
 
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
+import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
-import mil.don.common.status.ServiceStatus;
+import java.util.UUID;
 
-/*
-// ApplicationListener is for in-proc event handling
-@Component
-public class Client1StatusListener implements ApplicationListener<StatusEvent>
-{
-    @Override
-    public void onApplicationEvent(StatusEvent event) {
-        System.out.println("Received spring custom event - " + event.getStatusType());
-    }
-}
- */
+import javax.annotation.PostConstruct;
+
+import mil.don.common.devices.DetectionMessage;
+import mil.don.common.status.IStatusMessage;
+import mil.don.common.status.ServiceStatus;
 
 
 // don't need to do this because a bean in configuration will create it for us.
@@ -45,21 +42,42 @@ public class Client1StatusListener implements ApplicationListener<StatusEvent>
 public class Client1StatusListener
 {
 
-    CircularFifoQueue<ServiceStatus> _statusEvents = new CircularFifoQueue<>(100);
+    // save the last 100 status events that we receive
+    CircularFifoQueue<IStatusMessage> _statusEvents = new CircularFifoQueue<>(100);
+
+
+    // save the last 100 detection events that we receive
+    CircularFifoQueue<DetectionMessage> _detectionEvents = new CircularFifoQueue<>(100);
 
 
     public Client1StatusListener() {
         System.out.println("service status events listener up!");
     }
 
+    @PostConstruct
+    public void initialize() {
+    }
 
-    @RabbitListener(queues="#{clientQueue.name}")
-    public void receiveStatus(final ServiceStatus status) { // StatusEvent status
-        System.out.println("received ServiceStatus event: " + status.toString());
+
+
+    @RabbitListener(queues="#{statusMessagesQueue.name}")
+    public void receiveStatus(final IStatusMessage status) {
+        System.out.println("received status event: " + status.toString());
         _statusEvents.add(status);
     }
 
-    public ServiceStatus[] getRecent() {
-        return _statusEvents.toArray(new ServiceStatus[_statusEvents.size()]);
+    @RabbitListener(queues="#{detectionMessagesQueue.name}")
+    public void receiveDetections(final DetectionMessage detection) {
+        System.out.println("received detection event: " + detection.toString());
+        _detectionEvents.add(detection);
+    }
+
+    public IStatusMessage[] getRecentStatusEvents() {
+        return _statusEvents.toArray(new IStatusMessage[_statusEvents.size()]);
+    }
+
+
+    public DetectionMessage[] getRecentDetectionEvents() {
+        return _detectionEvents.toArray(new DetectionMessage[_detectionEvents.size()]);
     }
 }

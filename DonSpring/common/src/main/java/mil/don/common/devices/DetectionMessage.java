@@ -19,31 +19,28 @@
 
 package mil.don.common.devices;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import mil.don.common.interfaces.IDevice;
+
 
 // an event from a device in the system, reporting a detection has occurred
-public class DetectionMessage
+public class DetectionMessage implements Serializable
 {
-    private IDevice _sourceDevice;
+
     private String _detectionType;
     private String _id;
     private Date _timestamp;
+    private String _sourceDeviceName;
+    private String _sourceDeviceType;
+
     private final Map<String, String> _properties = new HashMap<>();
 
-    public IDevice getSourceDevice()
-    {
-        return _sourceDevice;
-    }
 
-    public DetectionMessage setSourceDevice(IDevice sourceDevice)
-    {
-        this._sourceDevice = sourceDevice;
-        return this;
-    }
+
+
 
     public String getDetectionType()
     {
@@ -71,12 +68,18 @@ public class DetectionMessage
     {
         return _timestamp;
     }
+    public DetectionMessage setTimestamp(Date timestamp) { this._timestamp = timestamp; return this; }
 
-    public DetectionMessage setTimestamp(Date timestamp)
-    {
-        this._timestamp = timestamp;
-        return this;
+    public String getSourceName() {
+        return _sourceDeviceName;
     }
+    public DetectionMessage setSourceName(String sourceName) { this._sourceDeviceName = sourceName; return this; }
+
+    public String getSourceDeviceType() {
+        return _sourceDeviceType;
+    }
+    public DetectionMessage setSourceDeviceType(String deviceType) { this._sourceDeviceType = deviceType; return this; }
+
 
     public Map<String, String> getProperties()
     {
@@ -85,7 +88,7 @@ public class DetectionMessage
 
     @Override
     public String toString() {
-        return String.format("device.detection last='%tc', id='%s', source='%s', origin='%s'",
-            _timestamp, _id, _detectionType, _sourceDevice);
+        return String.format("device.detection last='%tc', id='%s', type='%s', source='%s', source_type='%s'",
+            _timestamp, _id, _detectionType, _sourceDeviceName, _sourceDeviceType);
     }
 }

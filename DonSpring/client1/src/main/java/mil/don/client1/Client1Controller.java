@@ -2,7 +2,9 @@ package mil.don.client1;
 
 
 
+import mil.don.common.devices.DetectionMessage;
 import mil.don.common.interfaces.IDevice;
+import mil.don.common.status.IStatusMessage;
 import mil.don.common.status.ServiceStatus;
 import mil.don.proxies.DeviceMgrProxy;
 import mil.don.proxies.LoggingProxy;
@@ -65,11 +67,14 @@ public class Client1Controller {
     }
 
     @RequestMapping("/status-events")
-    public ServiceStatus[] getRecentStatusEvents() {
-        return _statusListener.getRecent();
+    public IStatusMessage[] getRecentStatusEvents() {
+        return _statusListener.getRecentStatusEvents();
     }
 
-
+    @RequestMapping("/detection-events")
+    public DetectionMessage[] getRecentDetectionEvents() {
+        return _statusListener.getRecentDetectionEvents();
+    }
 
 
 }

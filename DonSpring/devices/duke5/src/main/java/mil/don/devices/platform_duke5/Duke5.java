@@ -8,6 +8,7 @@ import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
+import mil.don.common.interfaces.IDevice;
 import mil.don.common.interfaces.IDeviceCamera;
 import mil.don.common.interfaces.IDeviceWeapon;
 import mil.don.common.status.DeviceStatusMessage;
@@ -44,14 +45,17 @@ public class Duke5
     implements IDeviceCamera, IDeviceWeapon
 {
 
-    private final Subject<DetectionMessage> _rxDetections = PublishSubject.create();
-    private final Subject<DeviceStatusMessage> _rxStatus = PublishSubject.create();
+    private final Subject<DetectionMessage> _rxDetections;
+    private final Subject<DeviceStatusMessage> _rxStatus;
 
-    private static long _id = 1;
+    private long _id = 1;
 
 
 
     public Duke5() {
+        _rxDetections = PublishSubject.create();
+        _rxStatus = PublishSubject.create();
+
         List<DeviceCapability> caps = this.getCapabilities();
         caps.add(DeviceCapability.CAMERA);
         caps.add(DeviceCapability.WEAPON);
@@ -104,18 +108,25 @@ public class Duke5
     }
 
     private DeviceStatusMessage buildDeviceStatus() {
-        return new DeviceStatusMessage(_id++, "DukeV5", new Date(), true, this);
+        return new DeviceStatusMessage(_id++, _name, getDeviceType(), new Date(), true);
     }
 
     private DetectionMessage buildDeviceDetection() {
         DetectionMessage msg = new DetectionMessage()
             .setDetectionType("RADAR")
             .setId(Long.toString(_id++))
-            .setSourceDevice(this)
+            .setSourceName(_name)
+            .setSourceDeviceType(getDeviceType())
             .setTimestamp(new Date());
 
         return msg;
+    }
 
+    // cloneable (kinda)
+    public IDevice copy() {
+        Duke5 d = new Duke5();
+        // d._name = this._name; //?
+        return d;
     }
 
 

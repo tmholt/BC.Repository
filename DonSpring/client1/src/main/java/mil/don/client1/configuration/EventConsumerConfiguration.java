@@ -29,6 +29,8 @@ import org.springframework.amqp.core.TopicExchange;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 import mil.don.client1.Client1StatusListener;
@@ -36,34 +38,54 @@ import mil.don.client1.Client1StatusListener;
 @Configuration
 public class EventConsumerConfiguration
 {
-    // this is the topic that we want to bind our queue to
+    // this is the exchange that we want to bind our queue to
     @Bean
-    public Exchange eventExchange() {
+    public Exchange statusExchange() {
         return new FanoutExchange("status-events");
+    }
+
+    @Bean
+    public Exchange detectExchange() {
+        return new FanoutExchange("detection-events");
     }
 
 
     // this is our personal queue of rabbitmq status messages
     @Bean
-    public Queue clientQueue() {
+    public Queue statusMessagesQueue() {
         UUID extension = UUID.randomUUID();
         return new Queue(
             "status-queue-" + extension.toString(),
             false, true, true);
     }
 
-
+    // this is our personal queue of rabbitmq device detection messages
     @Bean
-    public Binding binding(Queue queue, Exchange eventExchange) {
-        return BindingBuilder
-            .bind(queue)
-            .to(eventExchange)
-            .with("status.*") // if we want a subset
-            .noargs(); // status.service and status.device
+    public Queue detectionMessagesQueue() {
+        UUID extension = UUID.randomUUID();
+        return new Queue(
+            "detections-queue-" + extension.toString(),
+            false, true, true);
     }
 
-    //@Bean
-    //public Client1StatusListener statusReceiver() {
-    //    return new Client1StatusListener();
-    //}
+
+    @Bean
+    public List<Binding> bindings() {
+
+        Binding binding1 = BindingBuilder.bind(
+            statusMessagesQueue())
+                .to(statusExchange())
+                .with("status.*")
+                .noargs();
+
+        Binding binding2 = BindingBuilder.bind(
+            detectionMessagesQueue())
+            .to(detectExchange())
+            .with("device.*")
+            .noargs();
+
+
+        return Arrays.asList(binding1, binding2);
+    }
+
 }

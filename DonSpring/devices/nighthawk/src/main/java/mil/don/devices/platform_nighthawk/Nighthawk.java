@@ -8,6 +8,7 @@ import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
+import mil.don.common.interfaces.IDevice;
 import mil.don.common.interfaces.IDeviceCamera;
 import mil.don.common.status.DeviceStatusMessage;
 import org.springframework.context.annotation.Scope;
@@ -93,7 +94,14 @@ public class Nighthawk
     }
 
     private DeviceStatusMessage buildDeviceStatus() {
-        return new DeviceStatusMessage(_id++, "Nighthawk", new Date(), true, this);
+        return new DeviceStatusMessage(_id++, _name, getDeviceType(), new Date(), true);
+    }
+
+    // cloneable (kinda)
+    public IDevice copy() {
+        Nighthawk d = new Nighthawk();
+        // d._name = this._name; //?
+        return d;
     }
 
 

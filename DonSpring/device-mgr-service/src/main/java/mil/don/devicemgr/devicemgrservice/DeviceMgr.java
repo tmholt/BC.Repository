@@ -1,23 +1,21 @@
 package mil.don.devicemgr.devicemgrservice;
 
 
-import com.netflix.appinfo.ApplicationInfoManager;
-
 import io.reactivex.Observable;
 import mil.don.common.configuration.DeviceConfiguration;
-import mil.don.common.configuration.SystemCommsConfiguration;
 import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
 import mil.don.common.interfaces.IDevice;
 import mil.don.common.logging.Priority;
 import mil.don.common.status.DeviceStatusMessage;
-import mil.don.common.status.ServiceStatus;
+import mil.don.common.status.ServiceStatusMessage;
 import mil.don.devicemgr.devicemgrservice.configuration.AppConfig;
 import mil.don.devicemgr.devicemgrservice.configuration.GlobalConfig;
 import mil.don.proxies.LoggingProxy;
 
 import org.springframework.amqp.core.Exchange;
+import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,7 +24,6 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
@@ -39,7 +36,9 @@ public class DeviceMgr
 
 
     // this is the topic name that service status events will be pushed to
-    public static final String ROUTING_KEY = "status.service";
+    public static final String SERVICE_STATUS_ROUTING_KEY = "status.service";
+    public static final String DEVICE_STATUS_ROUTING_KEY = "status.device";
+    public static final String DEVICE_DETECTION_ROUTING_KEY = "device.detection";
 
     // incrementer for status events
     private static long _statusId = 1;
@@ -63,11 +62,8 @@ public class DeviceMgr
     // rabbitmq template
     @Autowired
     private RabbitTemplate _rabbitTemplate;
-
-    // rabbitmq exchange
-    @Autowired
-    private Exchange _exchange;
-
+    private Exchange _statusExchange;
+    private Exchange _detectExchange;
 
 
     public DeviceMgr() {
@@ -76,7 +72,31 @@ public class DeviceMgr
 
     @PostConstruct
     public void initialize() {
+        intializeExchanges();
         loadDevicesFromConfiguration();
+    }
+
+    // sends a service status event every 5 seconds over rabbitmq
+    @Scheduled(initialDelay = 5000, fixedRate = 5000)
+    void exchangeServiceStatusEvent() {
+        ServiceStatusMessage status = new ServiceStatusMessage(_statusId++, getServiceName(), new Date(), true);
+        _rabbitTemplate.convertAndSend(_statusExchange.getName(), SERVICE_STATUS_ROUTING_KEY, status );
+        System.out.println("sent service status event: " + status.toString());
+    }
+
+    void exchangeDeviceStatusEvent(DeviceStatusMessage status) {
+        _rabbitTemplate.convertAndSend(_statusExchange.getName(), DEVICE_STATUS_ROUTING_KEY, status);
+        System.out.println("sent device status event: " + status.toString());
+    }
+
+    void exchangeDeviceDetectionEvent(DetectionMessage detection) {
+        _rabbitTemplate.convertAndSend(_detectExchange.getName(), DEVICE_DETECTION_ROUTING_KEY, detection);
+        System.out.println("sent device detection event: " + detection.toString());
+    }
+
+    private void intializeExchanges() {
+        _statusExchange = new FanoutExchange("status-events");
+        _detectExchange = new FanoutExchange("detection-events");
     }
 
     // go through our config file and create the correct IDevice
@@ -98,7 +118,6 @@ public class DeviceMgr
             }
 
             log(Priority.INFO, "created device: " + specific.getName());
-            wireupDeviceEvents(specific);
             addDevice(specific);
         }
     }
@@ -112,10 +131,12 @@ public class DeviceMgr
             .orElse(null);
     }
 
+    // create our new device, hook to events from it, and start its
+    // run method in a new thread.
     private IDevice createSpecificDevice(IDevice source,
          DeviceConfiguration config) {
 
-        IDevice specific = source.clone();
+        IDevice specific = source.copy();
         specific.configure(config);
         wireupDeviceEvents(specific);
 
@@ -133,13 +154,13 @@ public class DeviceMgr
     private void wireupDeviceEvents(IDevice device) {
 
         // connect to status events from this device
-        Observable<DeviceStatusMessage> statii = device.getStatusStream();
-        if ( statii != null )
+        Observable<DeviceStatusMessage> statuses = device.getStatusStream();
+        if ( statuses != null )
         {
-            statii.subscribe(
+            statuses.subscribe(
                 // on next
                 (DeviceStatusMessage status) -> {
-                    System.out.println("got device status: " + status);
+                    exchangeDeviceStatusEvent(status);
                 },
                 // on error
                 (Throwable error) -> {
@@ -158,7 +179,7 @@ public class DeviceMgr
             detects.subscribe(
                 // on next
                 (DetectionMessage detection) -> {
-                    System.out.println("got detection message: " + detection);
+                    exchangeDeviceDetectionEvent(detection);
                 },
                 // on error
                 (Throwable error) -> {
@@ -180,15 +201,6 @@ public class DeviceMgr
         }
     }
 
-
-
-    // sends a status event every 5 seconds over rabbitmq
-    @Scheduled(initialDelay = 5000, fixedRate = 5000)
-    void sendServiceStatusEvent() {
-        ServiceStatus status = new ServiceStatus(_statusId++, getServiceName(), new Date(), true);
-        _rabbitTemplate.convertAndSend(_exchange.getName(), ROUTING_KEY, status );
-        System.out.println("sent service status event: " + status.toString());
-    }
 
     // TODO: should be part of IDonService or something like that
     public String getServiceName() {

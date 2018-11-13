@@ -35,7 +35,7 @@ public interface IDevice extends Runnable {
     // region public methods
 
     boolean configure(DeviceConfiguration deviceConfig);
-    IDevice clone();
+    IDevice copy();
 
     // endregion
 

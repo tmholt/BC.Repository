@@ -11,7 +11,7 @@ import mil.don.common.interfaces.IDevice;
 
 
 // base data values for a device
-public abstract class DeviceBase implements IDevice, Cloneable
+public abstract class DeviceBase implements IDevice
 {
     protected String _id;
     protected String _name;
@@ -78,18 +78,7 @@ public abstract class DeviceBase implements IDevice, Cloneable
     }
 
     // runnable - to be implemented by subclass
-
-    // cloneable (kinda)
-    public IDevice clone() {
-        try
-        {
-            return (IDevice)super.clone();
-        }
-        catch ( CloneNotSupportedException e )
-        {
-            return null;
-        }
-    }
+    // cloneable - to be implemented by subclass
 
     private void setPositionFromConfig(DeviceConfiguration.DeviceConfigurationPosition pos) {
 
