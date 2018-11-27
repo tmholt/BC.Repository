@@ -23,9 +23,10 @@ import java.util.Date;
 
 public interface IStatusMessage
 {
-    long getId();
+    String getId();
     StatusType getStatusType();
     String getSourceName();
     Date getTimestamp();
     boolean getIsOperational();
+    long getIndex();
 }

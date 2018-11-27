@@ -3,6 +3,8 @@ package mil.don.logging.loggingservice;
 
 import mil.don.common.logging.LoggingEntity;
 import mil.don.common.logging.Priority;
+import mil.don.common.services.ILoggingService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +21,7 @@ public class LoggingController {
     // but the principle says not to.
     @RequestMapping(method = RequestMethod.POST, value = "/logging/log")
     public String log(LoggingEntity log) {
-        _logger.log(log);
-
-        return "ok";
+        return _logger.log(log);
     }
 
     // we could probably get away with the controller implement ILoggingService,
@@ -34,9 +34,7 @@ public class LoggingController {
             @RequestParam("msg") String msg) {
 
         LoggingEntity log = new LoggingEntity(new Date(), p, source, msg);
-        _logger.log(log);
-
-        return "ok";
+        return _logger.log(log);
     }
 
     @RequestMapping(value="/logging/recent")

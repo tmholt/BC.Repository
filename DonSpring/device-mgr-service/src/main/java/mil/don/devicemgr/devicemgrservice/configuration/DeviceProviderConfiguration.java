@@ -19,28 +19,36 @@
 
 package mil.don.devicemgr.devicemgrservice.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 import mil.don.common.interfaces.IDevice;
+import mil.don.common.services.ILoggingService;
 import mil.don.devices.platform_duke5.Duke5;
 import mil.don.devices.platform_nighthawk.Nighthawk;
+import mil.don.proxies.LoggingProxy;
 
 // NOTE: this seems to be the only way that I can get to the device components in their
 // respective jars. It would be nice if they just got picked up by spring.
 @Configuration
 public class DeviceProviderConfiguration
 {
+    // the proxy to our logging service
+    @Autowired
+    private LoggingProxy _logging;
+
+
     @Bean
     @Scope("prototype")
-    public static IDevice createNighthawk() {
-        return new Nighthawk();
+    public IDevice createNighthawk() {
+        return new Nighthawk(_logging);
     }
 
     @Bean
     @Scope("prototype")
-    public static IDevice createDuke5() {
-        return new Duke5();
+    public IDevice createDuke5() {
+        return new Duke5(_logging);
     }
 }

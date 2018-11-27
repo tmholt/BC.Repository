@@ -21,19 +21,17 @@ package mil.don.client1;
 
 
 import org.apache.commons.collections4.queue.CircularFifoQueue;
-import org.springframework.amqp.core.Exchange;
-import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 
 import mil.don.common.devices.DetectionMessage;
 import mil.don.common.status.IStatusMessage;
-import mil.don.common.status.ServiceStatus;
+
 
 
 // don't need to do this because a bean in configuration will create it for us.

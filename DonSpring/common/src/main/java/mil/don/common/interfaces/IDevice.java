@@ -7,12 +7,13 @@ import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.configuration.SystemCommsConfiguration;
 import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceCapability;
+import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.status.DeviceStatusMessage;
 
 // base functionality for a device interface within DON.
 // all initialization and processing should occur from within the
 // run() method; each device processes on its own thread.
-public interface IDevice extends Runnable {
+public interface IDevice  {
 
     // region property access
 
@@ -27,14 +28,34 @@ public interface IDevice extends Runnable {
 
     // region events
 
-    Observable<DetectionMessage> getDetectionsStream();
+
     Observable<DeviceStatusMessage> getStatusStream();
 
     // endregion
 
     // region public methods
 
+    // configure passes the specific configuration for a particular device
+    // into that device. all necessary info needed for run should be loaded
+    // at this time. A return value of false means this device is not ready
+    // to connect and run.
     boolean configure(DeviceConfiguration deviceConfig);
+
+    // ability to send a command to a particular device
+    boolean executeDeviceCommand(DeviceCommandBase command);
+
+        // connect to the associated physical device, and start processing commands
+    // and messages for this device. NOTE that this call is made syncronously,
+    // and a return value is expected. If a device needs to set up a processing
+    // loop then it should be spun off to a separate thread.
+    boolean start();
+
+    // disconnect and stop processing messages for this device
+    boolean stop();
+
+
+
+    // returns a copy of this device information
     IDevice copy();
 
     // endregion

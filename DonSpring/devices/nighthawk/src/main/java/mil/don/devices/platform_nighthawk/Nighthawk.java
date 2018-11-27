@@ -5,11 +5,12 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import mil.don.common.configuration.DeviceConfiguration;
-import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
+import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.interfaces.IDevice;
 import mil.don.common.interfaces.IDeviceCamera;
+import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /*
  * What are the things that a device needs to do, and what does it need in order to do that job?
@@ -46,9 +50,11 @@ public class Nighthawk
     private final Subject<DeviceStatusMessage> _rxStatus = PublishSubject.create();
     private long _id = 100;
 
+    private boolean _initialized = false;
+    private ScheduledExecutorService _statusPublisher;
 
-
-    public Nighthawk() {
+    public Nighthawk(ILoggingService logging) {
+        super(logging);
         List<DeviceCapability> caps = this.getCapabilities();
         caps.add(DeviceCapability.CAMERA);
     }
@@ -58,13 +64,8 @@ public class Nighthawk
 
     @Override
     public boolean configure(DeviceConfiguration deviceConfig) {
-
         boolean baseOk = super.configure(deviceConfig);
         return baseOk;
-    }
-
-    public Observable<DetectionMessage> getDetectionsStream() {
-        return null;
     }
 
     public Observable<DeviceStatusMessage> getStatusStream() {
@@ -73,33 +74,50 @@ public class Nighthawk
 
 
     @Override
-    public void run() {
+    public boolean start() {
 
-        int i = 0;
-        while ( true ) {
-            try
-            {
-                Thread.sleep(1500);
-            }
-            catch ( InterruptedException e )
-            {
-            }
+        // set up our scheduled publish of status
+        // (not using @scheduled so we can create device objects)
+        Runnable task = () -> sendDeviceStatus();
+        _statusPublisher = Executors.newScheduledThreadPool(1);
+        _statusPublisher.scheduleWithFixedDelay(task, 1, 1, TimeUnit.SECONDS);
 
+        return true;
+    }
 
-            i++;
-            _rxStatus.onNext(buildDeviceStatus());
-
+    @Override
+    public boolean stop()
+    {
+        if ( _statusPublisher != null ) {
+            _statusPublisher.shutdown();
+            _statusPublisher = null;
         }
+        return true;
+    }
 
+    // ability to send a command to a particular device
+    public boolean executeDeviceCommand(DeviceCommandBase command) {
+        return true;
+    }
+
+    private void sendDeviceStatus() {
+        _rxStatus.onNext(buildDeviceStatus());
     }
 
     private DeviceStatusMessage buildDeviceStatus() {
-        return new DeviceStatusMessage(_id++, _name, getDeviceType(), new Date(), true);
+        DeviceStatusMessage msg = new DeviceStatusMessage();
+        msg.setTimestamp(new Date());
+        msg.setId(getId());
+        msg.setIndex(_id++);
+        msg.setSourceName(getName());
+        msg.setIsConnected(true);
+        msg.setIsOperational(true);
+        return msg;
     }
 
     // cloneable (kinda)
     public IDevice copy() {
-        Nighthawk d = new Nighthawk();
+        Nighthawk d = new Nighthawk(_logging);
         // d._name = this._name; //?
         return d;
     }

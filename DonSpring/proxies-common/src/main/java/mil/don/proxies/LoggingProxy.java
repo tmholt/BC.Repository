@@ -2,14 +2,17 @@ package mil.don.proxies;
 
 import mil.don.common.logging.LoggingEntity;
 import mil.don.common.logging.Priority;
+import mil.don.common.services.ILoggingService;
+
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name="don.service.logging") // eureka lookup
-//@FeignClient(name="don.service.logging", url="http://localhost:8012") // port lookup
-public interface LoggingProxy {
+//@FeignClient(name="don.service.logging") // eureka lookup
+@FeignClient(name="don.service.logging", url="http://localhost:8012") // port lookup
+public interface LoggingProxy extends ILoggingService
+{
 
     @RequestMapping(method = RequestMethod.POST, value = "/logging/log")
     String log(LoggingEntity log);
@@ -23,4 +26,7 @@ public interface LoggingProxy {
             @RequestParam("p") Priority p,
             @RequestParam("src") String source,
             @RequestParam("msg") String msg);
+
+    @RequestMapping(value="/logging/recent")
+    LoggingEntity[] getRecent();
 }

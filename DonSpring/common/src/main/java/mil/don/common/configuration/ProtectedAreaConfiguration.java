@@ -22,7 +22,7 @@ package mil.don.common.configuration;
 import java.util.ArrayList;
 import java.util.List;
 
-import mil.don.common.coordinates.Lla;
+import mil.don.common.coordinates.LlaCoordinate;
 
 public class ProtectedAreaConfiguration
 {
@@ -36,7 +36,7 @@ public class ProtectedAreaConfiguration
     private ShapeType _shape;
     private int _warnTime;
     private boolean _displayWarningArea;
-    private final List<Lla> _coordinates = new ArrayList<>();
+    private final List<LlaCoordinate> _coordinates = new ArrayList<>();
 
     public String getName()
     {
@@ -67,7 +67,7 @@ public class ProtectedAreaConfiguration
         return _displayWarningArea;
     }
     public void setDisplayWarningArea(boolean displayWarningArea) { this._displayWarningArea = displayWarningArea; }
-    public List<Lla> getCoordinates()
+    public List<LlaCoordinate> getCoordinates()
     {
         return _coordinates;
     }

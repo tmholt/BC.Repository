@@ -1,6 +1,9 @@
 package mil.don.devicemgr.devicemgrservice;
 
+import java.util.List;
+
 import mil.don.common.devices.DeviceCapability;
+import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.interfaces.IDevice;
 
 
@@ -10,7 +13,9 @@ public interface IDeviceMgr {
 
     IDevice getDeviceById(String id);
 
-    IDevice[] getDevicesByCapability(DeviceCapability type);
+    List<IDevice> getDevicesByCapability(DeviceCapability type);
 
-    IDevice[] getAllDevices();
+    List<IDevice> getAllDevices();
+
+    boolean executeDeviceCommand(DeviceCommandBase command);
 }

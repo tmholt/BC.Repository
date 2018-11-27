@@ -4,9 +4,10 @@ package mil.don.devicemgr.devicemgrservice;
 import io.reactivex.Observable;
 import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.devices.DetectionMessage;
-import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
+import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.interfaces.IDevice;
+import mil.don.common.interfaces.IDeviceDetector;
 import mil.don.common.logging.Priority;
 import mil.don.common.status.DeviceStatusMessage;
 import mil.don.common.status.ServiceStatusMessage;
@@ -14,13 +15,20 @@ import mil.don.devicemgr.devicemgrservice.configuration.AppConfig;
 import mil.don.devicemgr.devicemgrservice.configuration.GlobalConfig;
 import mil.don.proxies.LoggingProxy;
 
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.FanoutExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -39,6 +47,8 @@ public class DeviceMgr
     public static final String SERVICE_STATUS_ROUTING_KEY = "status.service";
     public static final String DEVICE_STATUS_ROUTING_KEY = "status.device";
     public static final String DEVICE_DETECTION_ROUTING_KEY = "device.detection";
+    public static final String DEVICE_COMMAND_ROUTING_KEY = "device.command";
+
 
     // incrementer for status events
     private static long _statusId = 1;
@@ -62,24 +72,33 @@ public class DeviceMgr
     // rabbitmq template
     @Autowired
     private RabbitTemplate _rabbitTemplate;
+
+    // this is the rabbitmq exchange that will contain all sent status events, both from services and
+    // from configured devices.
     private Exchange _statusExchange;
-    private Exchange _detectExchange;
+
+    // this is the rabbitmq exchange that will contain all detection events from devices that perform detections
+    private Exchange _detectionsExchange;
 
 
-    public DeviceMgr() {
-    }
 
 
     @PostConstruct
     public void initialize() {
-        intializeExchanges();
+        initializeExchanges();
         loadDevicesFromConfiguration();
+    }
+
+
+    @RabbitListener(queues="device-commands-queue")
+    public void receiveDeviceCommands(final DeviceCommandBase command) {
+        System.out.println("received device command: " + command.toString());
     }
 
     // sends a service status event every 5 seconds over rabbitmq
     @Scheduled(initialDelay = 5000, fixedRate = 5000)
     void exchangeServiceStatusEvent() {
-        ServiceStatusMessage status = new ServiceStatusMessage(_statusId++, getServiceName(), new Date(), true);
+        ServiceStatusMessage status = new ServiceStatusMessage(getServiceName(), getServiceName(), new Date(), true);
         _rabbitTemplate.convertAndSend(_statusExchange.getName(), SERVICE_STATUS_ROUTING_KEY, status );
         System.out.println("sent service status event: " + status.toString());
     }
@@ -90,13 +109,14 @@ public class DeviceMgr
     }
 
     void exchangeDeviceDetectionEvent(DetectionMessage detection) {
-        _rabbitTemplate.convertAndSend(_detectExchange.getName(), DEVICE_DETECTION_ROUTING_KEY, detection);
+        _rabbitTemplate.convertAndSend(_detectionsExchange.getName(), DEVICE_DETECTION_ROUTING_KEY, detection);
         System.out.println("sent device detection event: " + detection.toString());
     }
 
-    private void intializeExchanges() {
+    private void initializeExchanges() {
         _statusExchange = new FanoutExchange("status-events");
-        _detectExchange = new FanoutExchange("detection-events");
+        _detectionsExchange = new FanoutExchange("detection-events");
+
     }
 
     // go through our config file and create the correct IDevice
@@ -111,6 +131,7 @@ public class DeviceMgr
                 continue;
             }
 
+            // create a specific copy of our template device and crank it up
             IDevice specific = createSpecificDevice(handler, deviceConfig);
             if ( specific == null ) {
                 log(Priority.ERROR, "ERROR creating device type " + lookup);
@@ -140,13 +161,7 @@ public class DeviceMgr
         specific.configure(config);
         wireupDeviceEvents(specific);
 
-        Thread t = new Thread(specific);
-        t.start();
-
-        // TODO: think about this pattern. I like the device being the place to keep
-        // the run thread, but don't like casting to a base class.
-        DeviceBase deviceBase = (DeviceBase) specific;
-        deviceBase.setRunThread(t);
+        boolean started = specific.start();
 
         return specific;
     }
@@ -173,24 +188,26 @@ public class DeviceMgr
         }
 
         // connect to detection events from this device
-        Observable<DetectionMessage> detects = device.getDetectionsStream();
-        if ( detects != null )
+        if ( device instanceof IDeviceDetector )
         {
-            detects.subscribe(
-                // on next
-                (DetectionMessage detection) -> {
-                    exchangeDeviceDetectionEvent(detection);
-                },
-                // on error
-                (Throwable error) -> {
-                    System.out.println("ERROR in detections stream: " + error);
-                },
-                // on completion
-                () -> {
-                    System.out.println("STREAM COMPLETE");
-                });
+            Observable<DetectionMessage> detects = ((IDeviceDetector)device).getDetectionsStream();
+            if ( detects != null )
+            {
+                detects.subscribe(
+                    // on next
+                    (DetectionMessage detection) -> {
+                        exchangeDeviceDetectionEvent(detection);
+                    },
+                    // on error
+                    (Throwable error) -> {
+                        System.out.println("ERROR in detections stream: " + error);
+                    },
+                    // on completion
+                    () -> {
+                        System.out.println("STREAM COMPLETE");
+                    });
+            }
         }
-
     }
 
     private void log(Priority p, String message) {
@@ -209,6 +226,7 @@ public class DeviceMgr
 
 
     public boolean addDevice(IDevice device) {
+
         if ( this.containsKey(device.getId()) ) {
             return false;
         }
@@ -230,7 +248,7 @@ public class DeviceMgr
         }
     }
 
-    public IDevice[] getDevicesByCapability(DeviceCapability cap) {
+    public List<IDevice> getDevicesByCapability(DeviceCapability cap) {
 
         // these 2 code blocks are the same - first with streams, second explicit
 
@@ -247,29 +265,39 @@ public class DeviceMgr
         }
          */
 
-        int count = list1.size();
-        _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Device cap " + cap + " lookup found: " + count);
-        return list1.toArray(new IDevice[count]);
+        return list1;
     }
 
-    public IDevice[] getAllDevices() {
+    public List<IDevice> getAllDevices() {
         _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Device list request: " + this.size());
-        return this.values().toArray(new IDevice[this.size()]);
+        return new ArrayList<>(this.values());
     }
 
-    // region HealthIndicator implementation
-    /*
-    @Override
-    public Health health() {
-        _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Health request received");
+    public boolean executeDeviceCommand(DeviceCommandBase command) {
 
-        return Health
-                .up()
-                .withDetail("device manager is happy", "smiley-face")
-                .build();
+        if ( command == null ) return false;
+
+        String id = command.getDeviceId();
+        if ( id == null || id.length() == 0 ) return false;
+
+        // TODO: validate client token
+
+
+
+        if ( this.containsKey(id) ) {
+            _logging.log(Priority.DEBUG, "DeviceMgrService::executeDeviceCommand", "Device lookup success: " + id);
+            IDevice device = this.get(id);
+            return device.executeDeviceCommand(command);
+        }
+        else {
+            _logging.log(Priority.WARNING, "DeviceMgrService::executeDeviceCommand", "Request for bad device id");
+            return false;
+        }
+
     }
-     */
-    // endregion
+
+
+
 
 
     // ApplicationEvents are for internal (in-process) event support

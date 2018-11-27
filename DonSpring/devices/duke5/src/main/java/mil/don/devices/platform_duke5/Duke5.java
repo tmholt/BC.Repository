@@ -5,20 +5,35 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import mil.don.common.configuration.DeviceConfiguration;
+import mil.don.common.conversions.ByteToTcut21EwDecoder;
+import mil.don.common.coordinates.CompositeCoordinate;
+import mil.don.common.coordinates.EcefCoordinate;
 import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
+import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.interfaces.IDevice;
 import mil.don.common.interfaces.IDeviceCamera;
+import mil.don.common.interfaces.IDeviceDetector;
 import mil.don.common.interfaces.IDeviceWeapon;
+import mil.don.common.logging.Priority;
+import mil.don.common.messages.tcut21.BitResultStatusE;
+import mil.don.common.messages.tcut21.EWMessage;
+import mil.don.common.messages.tcut21.EwMode;
+import mil.don.common.messages.tcut21.XYZPos;
+import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
 
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 
+import java.net.URI;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /*
  * What are the things that a device needs to do, and what does it need in order to do that job?
@@ -42,17 +57,30 @@ import java.util.List;
 @Scope("prototype")
 public class Duke5
     extends DeviceBase
-    implements IDeviceCamera, IDeviceWeapon
+    implements IDeviceCamera, IDeviceWeapon, IDeviceDetector
 {
 
     private final Subject<DetectionMessage> _rxDetections;
     private final Subject<DeviceStatusMessage> _rxStatus;
 
-    private long _id = 1;
+
+    // this is the UDP connection to a duke device for receiving detections and status
+    private DukeReponseTransport _responses;
+    private DukeCommandTransport _commands;
+
+    // we just keep up with one device status message, update this message as status comes
+    // in from the duke, and then send out status on a regular 1hz heartbeat.
+    private DeviceStatusMessage _status;
+
+    // counter to keep up with number of status messages sent
+    private long _messageId = 1;
+    private boolean _initialized = false;
+    private ScheduledExecutorService _statusPublisher;
 
 
+    public Duke5(ILoggingService logging) {
+        super(logging);
 
-    public Duke5() {
         _rxDetections = PublishSubject.create();
         _rxStatus = PublishSubject.create();
 
@@ -69,52 +97,176 @@ public class Duke5
         return _rxStatus;
     }
 
-
-
+    // part of being a device - the device type
     @Override
     public String getDeviceType() { return "DukeV5"; }
 
+    // set up this device based on the inbound configuration
     @Override
     public boolean configure(DeviceConfiguration deviceConfig) {
-
         boolean baseOk = super.configure(deviceConfig);
+        // custom reading of config properties for this specific device
         return baseOk;
     }
 
 
     @Override
-    public void run() {
+    public boolean start() {
 
-        int i = 0;
-        while ( true ) {
-            try
+        // set up our outbound status message
+        initializeDeviceStatus();
+
+        // open response port and start listening for inbound data
+        listenForResponseData();
+
+        // set up our scheduled publish of status
+        // (not using @scheduled so we can create device objects)
+        Runnable task = () -> sendDeviceStatus();
+        _statusPublisher = Executors.newScheduledThreadPool(1);
+        _statusPublisher.scheduleWithFixedDelay(task, 1, 1, TimeUnit.SECONDS);
+
+        return true;
+    }
+
+    @Override
+    public boolean stop()
+    {
+        if ( _statusPublisher != null ) {
+            _statusPublisher.shutdown();
+            _statusPublisher = null;
+        }
+
+        closeResponseConnection();
+        return true;
+    }
+
+    // sends a device status event back to the device manager every second
+    private void sendDeviceStatus()
+    {
+        if ( !_initialized ) return;
+
+        // check for timeout from device
+        if ( _status.getIsConnected() )
+        {
+            long diff = (new Date()).getTime() - _status.getTimestamp().getTime();
+            if ( diff > DEVICE_TIMEOUT_PERIOD )
             {
-                Thread.sleep(1000);
+                _status.setIsConnected(false);
+                _status.setIsConnectedChanged(true);
             }
-            catch ( InterruptedException e )
+        }
+
+
+        _rxStatus.onNext(_status);
+
+        // clear changed states
+        _status.setIsConnectedChanged(false);
+        _status.setIsOperationalChanged(false);
+        _status.setIsChanged(false);
+    }
+
+
+    // ability to send a command to a particular device
+    public boolean executeDeviceCommand(DeviceCommandBase command) {
+        return true;
+    }
+
+    private void initializeDeviceStatus()
+    {
+        _status = new DeviceStatusMessage(_name, _name, getDeviceType(), new Date(), false, false);
+        _initialized = true;
+    }
+
+    private void closeResponseConnection()
+    {
+    }
+
+    // start listening for response data on the defined port for duke outbound responses
+    private void listenForResponseData() {
+
+        // null check
+        String suri = _deviceConfig.getComms().getDataUri();
+        URI uri = URI.create(suri);
+        // TODO: null check
+        _responses = new DukeReponseTransport(uri.getPort());
+        _responses.getResponsesStream().subscribe((byte[] data) -> handleResponseData(data));
+        _responses.start();
+    }
+
+
+    private void handleResponseData(byte[] data) {
+        if ( data == null || data.length ==  0 ) return;
+
+        if ( loggingLevelIs(Priority.DEBUG) )
+        {
+            String result = new String(data, 0, data.length);
+            System.out.println(result);
+        }
+
+        // this is a tcut 2.1 ew message with either status or detection within
+/*
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <EWMessage revision="2.1" source_system="DukeV5">
+        <DataReport time="1542139077" time_is_valid="true" msg_count="599" receipt_required="false">
+            <SystemStatus sw_version="1.2.3" system_state="run" overall_status="Normal" gps_is_locked="true">
+                <XYZPos x="303083.0" y="-5241679.0" z="3609125.0"/>
+            </SystemStatus>
+            <EWTrack track_id="1" signal_type="Default Signal Type" update_time="1542139077000000"
+                affiliation="Hostile" affiliation_conf="1.0" approaching="true" azimuth="30.0" azimuth_err="1.0"
+                bandwidth="1.0" elevation="30.0" elevation_err="1.0" end_track="false" frequency="1.0" group_id="1"
+                mac_address="12:34:56:78:91:23" noise_strength="1.0" priority="1" quality="1" signal_conf="1.0"/>
+        </DataReport>
+    </EWMessage>
+
+    <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+    <EWMessage revision="2.1" source_system="DukeV51">
+        <DataReport time="1542690785" time_is_valid="true" msg_count="2850" receipt_required="false">
+            <EWTrack track_id="1" signal_type="Default Signal Type" update_time="1542690785000000"
+                affiliation="Hostile" affiliation_conf="1.0" approaching="true" azimuth="30.0"
+                azimuth_err="1.0" bandwidth="1.0" elevation="30.0" elevation_err="1.0" end_track="false"
+                frequency="1.0" group_id="1" mac_address="12:34:56:78:91:23" noise_strength="1.0"
+                priority="1" quality="1" signal_conf="1.0"/>
+        </DataReport>
+    </EWMessage>
+
+ */
+        try
+        {
+            ByteToTcut21EwDecoder decoder = new ByteToTcut21EwDecoder();
+            EWMessage ew = decoder.decode(data);
+
+            // could filter out messages that got to this device that are not from the actual named device
+            //String deviceName = ew.getSourceSystem();
+            //if ( deviceName != this._name ) return ...
+
+            // this message has a status and/or a detection inside
+
+            DeviceStatusMessage status = buildDeviceStatus(ew);
+            if ( status != null )
             {
-                break;
+                // set the values in our 'golden' status message from this one we
+                // just generated. returns if any of the essential values have changed
+                // (which does not include timestamp)
+                setGoldenStatus(status);
             }
 
-
-            i++;
-            _rxStatus.onNext(buildDeviceStatus());
-
-            if ( i % 2 == 0 ) {
-                _rxDetections.onNext(buildDeviceDetection());
+            DetectionMessage detection = buildDeviceDetection(ew);
+            if ( detection != null ) {
+                _rxDetections.onNext(detection);
             }
+
+        }
+        catch ( Exception ex ) {
+
         }
 
     }
 
-    private DeviceStatusMessage buildDeviceStatus() {
-        return new DeviceStatusMessage(_id++, _name, getDeviceType(), new Date(), true);
-    }
 
-    private DetectionMessage buildDeviceDetection() {
+    private DetectionMessage buildDeviceDetection(EWMessage ew) {
         DetectionMessage msg = new DetectionMessage()
             .setDetectionType("RADAR")
-            .setId(Long.toString(_id++))
+            .setId(Long.toString(_messageId++))
             .setSourceName(_name)
             .setSourceDeviceType(getDeviceType())
             .setTimestamp(new Date());
@@ -122,9 +274,103 @@ public class Duke5
         return msg;
     }
 
+    private DeviceStatusMessage buildDeviceStatus(EWMessage message)
+    {
+        List<EWMessage.DataReport> reports = message.getDataReport();
+        if ( reports == null || reports.isEmpty() ) {
+            //_logging.log("ERROR IN EWMessage::Report");
+            return null;
+        }
+
+        // note the current code loops, but just ooverwrites data if there are multiple.
+        // ditto for status or detections
+        EWMessage.DataReport dataReport = reports.get(0);
+
+        List<EWMessage.DataReport.SystemStatus> statuses = dataReport.getSystemStatus();
+        if ( statuses == null || statuses.isEmpty() ) {
+            // not a status message
+            return null;
+        }
+
+        DeviceStatusMessage msg = new DeviceStatusMessage();
+
+
+        // just taking the first one (again)
+        EWMessage.DataReport.SystemStatus systemStatus = statuses.get(0);
+
+
+        // Get the source system of the EW Message
+        String sourceSystem = message.getSourceSystem();
+        String isJamming = systemStatus.getSystemState() == EwMode.RUN ? "true" : "false";
+        msg.getProperties().put("JammingEnabled", isJamming);
+
+        msg.setTimestamp(new Date()); // TODO: timestamp from tcut message
+        msg.setId(getId());
+        msg.setIndex(_messageId++);
+        msg.setSourceName(sourceSystem);
+        msg.setIsConnected(true);
+        msg.setIsOperational(systemStatus.getOverallStatus() == BitResultStatusE.NORMAL);
+
+        // position information
+        XYZPos xyzPos = systemStatus.getXYZPos();
+        if ( xyzPos != null )
+        {
+            CompositeCoordinate position = msg.getPosition();
+            EcefCoordinate ecef = position.setEcef(xyzPos.getX(), xyzPos.getY(), xyzPos.getZ());
+            position.setLlaHaeFromEcef(ecef); // conversion
+        }
+
+        return msg;
+    }
+
+    // push the values from this inbound status into our golden one - the one
+    // that is sent on a timer.
+    // see if any of the key fields within our device status have changed.
+    // this does not include timestamp.
+    //
+    private boolean setGoldenStatus(DeviceStatusMessage status) {
+
+        boolean changed = false;
+
+        if ( _status.getIsConnected() != status.getIsConnected() ) {
+            _status.setIsConnected(status.getIsConnected());
+            _status.setIsConnectedChanged(true);
+            changed = true;
+        }
+        // else - changed values cleared after send
+
+
+        if ( _status.getIsOperational() != status.getIsOperational() ) {
+            _status.setIsOperational(status.getIsOperational());
+            _status.setIsOperationalChanged(true);
+            changed = true;
+        }
+        // else - changed values cleared after send
+
+
+        // TODO: check jamming custom property
+
+        // TODO: check position
+
+        // set to latest timestamp
+        _status.setTimestamp(status.getTimestamp());
+
+        // overall change status
+        _status.setIsChanged(changed);
+
+        return changed;
+    }
+
+    // is our current logging level (from config) less than or equal to the given value?
+    private boolean loggingLevelIs(Priority p)
+    {
+        Priority defined = _deviceConfig.getLoggingLevel();
+        return ( defined.ordinal() <= p.ordinal() );
+    }
+
     // cloneable (kinda)
     public IDevice copy() {
-        Duke5 d = new Duke5();
+        Duke5 d = new Duke5(_logging);
         // d._name = this._name; //?
         return d;
     }

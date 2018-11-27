@@ -22,22 +22,23 @@ package mil.don.common.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
-import mil.don.common.coordinates.Ecef;
-import mil.don.common.coordinates.Lla;
+import mil.don.common.coordinates.EcefCoordinate;
+import mil.don.common.coordinates.LlaCoordinate;
+import mil.don.common.logging.Priority;
 
 public class DeviceConfiguration
 {
 
     public static class DeviceConfigurationPosition
     {
-        private final Lla _lla = new Lla();
-        private final Ecef _ecef = new Ecef();
+        private final LlaCoordinate _lla = new LlaCoordinate();
+        private final EcefCoordinate _ecef = new EcefCoordinate();
 
-        public Lla getLla()
+        public LlaCoordinate getLla()
         {
             return _lla;
         }
-        public Ecef getEcef()
+        public EcefCoordinate getEcef()
         {
             return _ecef;
         }
@@ -70,6 +71,7 @@ public class DeviceConfiguration
     private String _type;
     private String _symbolCode;
     private double _range;
+    private Priority _loggingLevel = Priority.INFO;
     private final DeviceConfigurationPosition _position = new DeviceConfigurationPosition();
     private final DeviceConfigurationComms _comms = new DeviceConfigurationComms();
     private final Map<String, String> _options = new HashMap<>();
@@ -108,6 +110,9 @@ public class DeviceConfiguration
     {
         this._range = range;
     }
+
+    public Priority getLoggingLevel() { return _loggingLevel; }
+    public void setLoggingLevel(Priority loggingLevel) { _loggingLevel = loggingLevel; }
     public DeviceConfigurationPosition getPosition()
     {
         return _position;

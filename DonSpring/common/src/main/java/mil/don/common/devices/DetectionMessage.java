@@ -32,6 +32,7 @@ public class DetectionMessage implements Serializable
 
     private String _detectionType;
     private String _id;
+    private long _index = 1;
     private Date _timestamp;
     private String _sourceDeviceName;
     private String _sourceDeviceType;
@@ -80,6 +81,8 @@ public class DetectionMessage implements Serializable
     }
     public DetectionMessage setSourceDeviceType(String deviceType) { this._sourceDeviceType = deviceType; return this; }
 
+    public long getIndex() { return _index; }
+    public DetectionMessage setIndex(int index) { _index = index; return this; }
 
     public Map<String, String> getProperties()
     {
@@ -88,7 +91,7 @@ public class DetectionMessage implements Serializable
 
     @Override
     public String toString() {
-        return String.format("device.detection last='%tc', id='%s', type='%s', source='%s', source_type='%s'",
-            _timestamp, _id, _detectionType, _sourceDeviceName, _sourceDeviceType);
+        return String.format("device.detection last='%tc', idx='%d', type='%s', source='%s', source_type='%s'",
+            _timestamp, _index, _detectionType, _sourceDeviceName, _sourceDeviceType);
     }
 }
