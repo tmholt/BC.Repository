@@ -17,43 +17,40 @@
 | Software Engineering Directorate, Attn: RDMR-BAW, Redstone Arsenal, AL 35898.
 --------------------------------------------------------------------------------------------------*/
 
-package mil.don.common.devices;
+package mil.don.proxies.configuration;
+
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.cloud.openfeign.support.SpringEncoder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import feign.codec.Encoder;
 
 
-import java.io.Serializable;
-import java.util.Date;
-
-// base class for all device commands
-public class DeviceCommandBase implements Serializable
+@Configuration
+public class DeviceMgrProxyConfiguration
 {
-    private String _deviceId;
-    private String _clientName;
-    private String _clientToken;
-    private Date _timestamp;
 
-
-    public String getDeviceId() { return _deviceId; }
-    public DeviceCommandBase setDeviceId(String deviceId) { _deviceId = deviceId; return this; }
-
-    public String getClientName() { return _clientName; }
-    public DeviceCommandBase setClientName(String clientName) { _clientName = clientName; return this; }
-
-    public String getClientToken() { return _clientToken; }
-    public DeviceCommandBase setClientToken(String clientToken) { _clientToken = clientToken; return this; }
-
-    public Date getTimestamp() { return _timestamp; }
-    public DeviceCommandBase setTimestamp(Date timestamp) { _timestamp = timestamp; return this; }
-
-    // this is just here for testing. I think we want specific command classes.
-    // the question is: where would this live, so that both devices and clients could access it,
-    // and it could be added to as more commands and devices are added?
-    private String _command;
-
-    public String getCommand() { return _command; }
-    public DeviceCommandBase setCommand(String command) { _command = command; return this; }
-
-    @Override
-    public String toString() {
-        return "Command: '" + _command + "' to '" + _deviceId + "'.";
+    @Bean
+    public Encoder feignEncoder() {
+        HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter();
+        ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(jacksonConverter);
+        return new SpringEncoder(objectFactory);
     }
+
+/*    @Bean
+    public Decoder feignDecoder() {
+        //return new JacksonDecoder(customObjectMapper());
+        HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter(customObjectMapper());
+        ObjectFactory<HttpMessageConverters> objectFactory = () -> new HttpMessageConverters(jacksonConverter);
+        return new ResponseEntityDecoder(new SpringDecoder(objectFactory));
+    }
+
+    public ObjectMapper customObjectMapper(){
+        ObjectMapper objectMapper = new ObjectMapper();
+        //Customize as much as you want
+        return objectMapper;
+    }*/
 }

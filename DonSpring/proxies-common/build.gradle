@@ -34,6 +34,9 @@ dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-web')
 	implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
 	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
+
+    //compile group: 'com.netflix.feign', name: 'feign-jackson', version: '8.18.0'
+
 	runtimeOnly('org.springframework.boot:spring-boot-devtools')
 	runtimeOnly('javax.xml.bind:jaxb-api:2.3.0')
 	compile files('../lib/mil.don.common-0.0.1.jar')

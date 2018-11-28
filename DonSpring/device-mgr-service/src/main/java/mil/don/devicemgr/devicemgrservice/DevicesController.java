@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,14 +34,19 @@ public class DevicesController implements IDeviceManagerService
     private IDeviceMgr _repo;
 
     // this is the configuration for this device manager service
+    // we have a configuration file of the same name as this service in the
+    // configuration service, which gets auto-loaded and sent just to this service.
+    // pretty nifty.
     @Autowired
     private AppConfig _appConfig;
 
-    // this is the config everyone gets
+    // this is the config everyone gets. it is loaded from application.yml within
+    // the configuration service, and sent to any service requesting it.
     @Autowired
     private GlobalConfig _globalConfig;
 
     // the proxy to our logging service
+    // TODO: what is the standard within spring for doing logging?
     @Autowired
     private LoggingProxy _logging;
 
@@ -80,13 +86,14 @@ public class DevicesController implements IDeviceManagerService
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/device/command")
-    public String executeCommand(DeviceCommandBase command) {
-        _repo.executeDeviceCommand(command);
-        return "ok";
+    public String executeCommand(@RequestBody DeviceCommandBase command) {
+        boolean result = _repo.executeDeviceCommand(command);
+        return String.valueOf(result);
     }
-    public int getServicePort() {
-        return Integer.parseInt(_env.getProperty("local.server.port"));
-    }
+
+//    private int getServicePort() {
+//        return Integer.parseInt(_env.getProperty("local.server.port"));
+//    }
 
 
 

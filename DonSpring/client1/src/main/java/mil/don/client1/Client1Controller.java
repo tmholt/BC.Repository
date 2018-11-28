@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -30,7 +31,9 @@ import javax.annotation.PostConstruct;
 @RestController
 public class Client1Controller {
 
-    public static final String DEVICE_COMMAND_ROUTING_KEY = "device.command";
+    // not being used right now. this was for command routing via rabbitmq.
+    // all of these kind of definitions should go into common somewhere.
+    private static final String DEVICE_COMMAND_ROUTING_KEY = "device.command";
 
 
     @Autowired
@@ -118,6 +121,7 @@ public class Client1Controller {
         DeviceCommandBase msg = new DeviceCommandBase()
             .setClientName("client1")
             .setClientToken("abcd1234")
+            .setTimestamp(new Date())
             .setCommand(command)
             .setDeviceId(deviceId);
 
@@ -125,8 +129,7 @@ public class Client1Controller {
         //exchangeDeviceCommandEvent(msg);
 
         // this is the direct devicemgr api way
-        String ok = _deviceMgr.executeCommand(msg);
-        return ok;
+        return _deviceMgr.executeCommand(msg);
     }
 
 
