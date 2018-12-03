@@ -16,7 +16,7 @@ import mil.don.common.interfaces.IDevice;
 import mil.don.common.interfaces.IDeviceCamera;
 import mil.don.common.interfaces.IDeviceDetector;
 import mil.don.common.interfaces.IDeviceWeapon;
-import mil.don.common.logging.Priority;
+import mil.don.common.logging.LoggingLevel;
 import mil.don.common.messages.tcut21.BitResultStatusE;
 import mil.don.common.messages.tcut21.EWMessage;
 import mil.don.common.messages.tcut21.EwMode;
@@ -197,7 +197,7 @@ public class Duke5
     private void handleResponseData(byte[] data) {
         if ( data == null || data.length ==  0 ) return;
 
-        if ( loggingLevelIs(Priority.DEBUG) )
+        if ( loggingLevelIs(LoggingLevel.DEBUG) )
         {
             String result = new String(data, 0, data.length);
             System.out.println(result);
@@ -362,9 +362,9 @@ public class Duke5
     }
 
     // is our current logging level (from config) less than or equal to the given value?
-    private boolean loggingLevelIs(Priority p)
+    private boolean loggingLevelIs(LoggingLevel p)
     {
-        Priority defined = _deviceConfig.getLoggingLevel();
+        LoggingLevel defined = _deviceConfig.getLoggingLevel();
         return ( defined.ordinal() <= p.ordinal() );
     }
 

@@ -5,7 +5,6 @@ import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.interfaces.IDevice;
-import mil.don.common.logging.Priority;
 import mil.don.common.services.IDeviceManagerService;
 import mil.don.devicemgr.devicemgrservice.configuration.AppConfig;
 import mil.don.devicemgr.devicemgrservice.configuration.GlobalConfig;
@@ -61,7 +60,7 @@ public class DevicesController implements IDeviceManagerService
     public DeviceBase getDeviceById(@PathVariable String id) {
         DeviceBase device = (DeviceBase) _repo.getDeviceById(id);
 
-        _logging.log(Priority.DEBUG, "DevicesController::getDeviceById", "Device lookup for " + device);
+        _logging.debug("DevicesController::getDeviceById", "Device lookup for " + device);
         return device;
     }
 
@@ -70,7 +69,7 @@ public class DevicesController implements IDeviceManagerService
         List<IDevice> list = _repo.getDevicesByCapability(cap);
 
         int count = list.size();
-        _logging.log(Priority.DEBUG, "DevicesController::getDevicesByCapability", "Device cap " + cap + " lookup found: " + count);
+        _logging.debug("DevicesController::getDevicesByCapability", "Device cap " + cap + " lookup found: " + count);
 
         return list.toArray(new DeviceBase[count]);
     }
@@ -80,7 +79,7 @@ public class DevicesController implements IDeviceManagerService
         List<IDevice> list  = _repo.getAllDevices();
 
         int count = list.size();
-        _logging.log(Priority.DEBUG, "DevicesController::getAllDevices", "All devices found: " + count);
+        _logging.debug("DevicesController::getAllDevices", "All devices found: " + count);
 
         return list.toArray(new DeviceBase[count]);
     }

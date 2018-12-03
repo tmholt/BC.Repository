@@ -8,23 +8,20 @@ import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.interfaces.IDevice;
 import mil.don.common.interfaces.IDeviceDetector;
-import mil.don.common.logging.Priority;
+import mil.don.common.logging.LoggingEntry;
+import mil.don.common.logging.LoggingLevel;
 import mil.don.common.status.DeviceStatusMessage;
 import mil.don.common.status.ServiceStatusMessage;
 import mil.don.devicemgr.devicemgrservice.configuration.AppConfig;
 import mil.don.devicemgr.devicemgrservice.configuration.GlobalConfig;
 import mil.don.proxies.LoggingProxy;
 
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
+
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -85,9 +82,11 @@ public class DeviceMgr
 
     @PostConstruct
     public void initialize() {
+        log(LoggingLevel.TRACE, "DeviceMgr initialization");
         initializeExchanges();
         loadDevicesFromConfiguration();
-    }
+        log(LoggingLevel.TRACE, "DeviceMgr initialization complete");
+   }
 
 
     @RabbitListener(queues="device-commands-queue")
@@ -127,18 +126,18 @@ public class DeviceMgr
             String lookup = deviceConfig.getType();
             IDevice handler = findDeviceByType(lookup);
             if ( handler == null ) {
-                log(Priority.ERROR, "ERROR finding device type " + lookup);
+                log(LoggingLevel.ERROR, "ERROR finding device type " + lookup);
                 continue;
             }
 
             // create a specific copy of our template device and crank it up
             IDevice specific = createSpecificDevice(handler, deviceConfig);
             if ( specific == null ) {
-                log(Priority.ERROR, "ERROR creating device type " + lookup);
+                log(LoggingLevel.ERROR, "ERROR creating device type " + lookup);
                 continue;
             }
 
-            log(Priority.INFO, "created device: " + specific.getName());
+            log(LoggingLevel.INFO, "created device: " + specific.getName());
             addDevice(specific);
         }
     }
@@ -210,12 +209,9 @@ public class DeviceMgr
         }
     }
 
-    private void log(Priority p, String message) {
-        try {
-            _logging.log(p, "DeviceManagerService::DeviceMgr", message);
-        }
-        catch (Exception ex) {
-        }
+    private String log(LoggingLevel p, String message) {
+      LoggingEntry log = new LoggingEntry(new Date(), p, "DeviceManagerService::DeviceMgr", message);
+      return _logging.log(log);
     }
 
 
@@ -232,18 +228,18 @@ public class DeviceMgr
         }
         this.put(device.getId(), device);
 
-        _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Device added to configuration");
+        _logging.debug("DeviceMgrService::DeviceMgr", "Device added to configuration");
         return true;
     }
 
     public IDevice getDeviceById(String id) {
 
         if ( this.containsKey(id) ) {
-            _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Device lookup success: " + id);
+            _logging.debug("DeviceMgrService::DeviceMgr", "Device lookup success: " + id);
             return this.get(id);
         }
         else {
-            _logging.log(Priority.WARNING, "DeviceMgrService::DeviceMgr", "Request for bad device id");
+            _logging.warn("DeviceMgrService::DeviceMgr", "Request for bad device id");
             return null;
         }
     }
@@ -269,7 +265,7 @@ public class DeviceMgr
     }
 
     public List<IDevice> getAllDevices() {
-        _logging.log(Priority.DEBUG, "DeviceMgrService::DeviceMgr", "Device list request: " + this.size());
+        _logging.debug("DeviceMgrService::DeviceMgr", "Device list request: " + this.size());
         return new ArrayList<>(this.values());
     }
 
@@ -285,12 +281,12 @@ public class DeviceMgr
 
 
         if ( this.containsKey(id) ) {
-            _logging.log(Priority.DEBUG, "DeviceMgrService::executeDeviceCommand", "Device lookup success: " + id);
+            _logging.debug("DeviceMgrService::executeDeviceCommand", "Device lookup success: " + id);
             IDevice device = this.get(id);
             return device.executeDeviceCommand(command);
         }
         else {
-            _logging.log(Priority.WARNING, "DeviceMgrService::executeDeviceCommand", "Request for bad device id");
+            _logging.warn("DeviceMgrService::executeDeviceCommand", "Request for bad device id");
             return false;
         }
 

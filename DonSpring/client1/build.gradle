@@ -42,6 +42,8 @@ dependencies {
 	compile files('../lib/mil.don.common-0.0.1.jar')
     compile files('../lib/mil.don.proxies-0.0.1.jar')
 
+    compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.2'
+
     compile('org.springframework.boot:spring-boot-starter-amqp')
 }
 

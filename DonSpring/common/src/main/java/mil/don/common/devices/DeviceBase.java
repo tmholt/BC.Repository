@@ -8,7 +8,7 @@ import java.util.Map;
 import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.coordinates.CompositeCoordinate;
 import mil.don.common.interfaces.IDevice;
-import mil.don.common.logging.Priority;
+import mil.don.common.logging.LoggingLevel;
 import mil.don.common.services.ILoggingService;
 
 
@@ -27,7 +27,7 @@ public abstract class DeviceBase implements IDevice
     protected Map<String, String> _configOptions;
 
     protected DeviceConfiguration _deviceConfig;
-    protected Priority _loggingLevel = Priority.INFO;
+    protected LoggingLevel _loggingLevel = LoggingLevel.INFO;
     protected final ILoggingService _logging;
 
 

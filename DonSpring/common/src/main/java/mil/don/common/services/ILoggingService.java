@@ -19,11 +19,32 @@
 
 package mil.don.common.services;
 
-import mil.don.common.logging.LoggingEntity;
 
+import mil.don.common.logging.LoggingEntry;
+
+
+// interface for our logging service
 public interface ILoggingService
 {
-    String log(LoggingEntity log);
+  // send a log message
+  String log(LoggingEntry log);
 
-    LoggingEntity[] getRecent();
+  // send a trace level logging message
+  void trace(String source, String message);
+
+  // send a debug level logging message
+  void debug(String source, String message);
+
+  // send a info level logging message
+  void info(String source, String message);
+
+  // send a warning level logging message
+  void warn(String source, String message);
+
+  // send a error level logging message
+  void error(String source, String message);
+
+
+  // get recent set of logged entries
+  LoggingEntry[] getRecent();
 }

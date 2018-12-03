@@ -8,12 +8,10 @@ import mil.don.common.interfaces.IDevice;
 import mil.don.common.status.IStatusMessage;
 import mil.don.proxies.DeviceMgrProxy;
 import mil.don.proxies.LoggingProxy;
-import mil.don.common.logging.Priority;
 
-import org.springframework.amqp.core.DirectExchange;
+
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.core.TopicExchange;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.client.ServiceInstance;
@@ -95,7 +93,7 @@ public class Client1Controller {
 
     @RequestMapping("/testlog/{message}")
     public String testLoggingService(@PathVariable String message) {
-        _logging.log(Priority.INFO, "mil.don.client1", message);
+        _logging.info("mil.don.client1", message);
         return "ok";
     }
 

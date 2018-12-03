@@ -42,8 +42,10 @@ dependencies {
 	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
     implementation('org.springframework.cloud:spring-cloud-starter-config')
 	runtimeOnly('org.springframework.boot:spring-boot-devtools')
+
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("junit:junit")
+
     compile('org.springframework.boot:spring-boot-starter-amqp')
     compile group: 'io.reactivex.rxjava2', name: 'rxjava', version: '2.2.3'
 
