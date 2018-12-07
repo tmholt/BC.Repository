@@ -5,7 +5,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/client1" />
-        <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../Platforms/gradle-4.10" />
         <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
@@ -17,7 +17,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/common" />
-        <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../Platforms/gradle-4.10" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/common" />
@@ -28,7 +28,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/configuration-service" />
-        <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../Platforms/gradle-4.10" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/configuration-service" />
@@ -39,7 +39,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/device-mgr-service" />
-        <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../Platforms/gradle-4.10" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/device-mgr-service" />
@@ -50,7 +50,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/devices/duke5" />
-        <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../Platforms/gradle-4.10" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/devices/duke5" />
@@ -61,7 +61,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/devices/nighthawk" />
-        <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../Platforms/gradle-4.10" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/devices/nighthawk" />
@@ -72,7 +72,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/eureka-service" />
-        <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../Platforms/gradle-4.10" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/eureka-service" />
@@ -83,7 +83,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/logging-service" />
-        <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../Platforms/gradle-4.10" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/logging-service" />
@@ -94,7 +94,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/proxies-common" />
-        <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
+        <option name="gradleHome" value="$PROJECT_DIR$/../../../Platforms/gradle-4.10" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/proxies-common" />

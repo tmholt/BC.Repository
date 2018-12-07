@@ -87,6 +87,10 @@ public class DevicesController implements IDeviceManagerService
     @RequestMapping(method = RequestMethod.POST, value = "/device/command")
     public String executeCommand(@RequestBody DeviceCommandBase command) {
         boolean result = _repo.executeDeviceCommand(command);
+
+        String log = String.format("received '%s', result='%s'", command, result);
+        _logging.info("DeviceMgr::DevicesController", log);
+
         return String.valueOf(result);
     }
 

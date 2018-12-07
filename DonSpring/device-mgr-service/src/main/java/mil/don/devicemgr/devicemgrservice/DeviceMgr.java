@@ -89,10 +89,14 @@ public class DeviceMgr
    }
 
 
+   /**
+    * this was using a rabbitmq channel for receiving commands. changed to using a
+    * direct api command
     @RabbitListener(queues="device-commands-queue")
     public void receiveDeviceCommands(final DeviceCommandBase command) {
         System.out.println("received device command: " + command.toString());
     }
+    **/
 
     // sends a service status event every 5 seconds over rabbitmq
     @Scheduled(initialDelay = 5000, fixedRate = 5000)
@@ -113,8 +117,8 @@ public class DeviceMgr
     }
 
     private void initializeExchanges() {
-        _statusExchange = new FanoutExchange("status-events");
-        _detectionsExchange = new FanoutExchange("detection-events");
+        _statusExchange = new FanoutExchange("status-events", true, false);
+        _detectionsExchange = new FanoutExchange("detection-events", true, false);
 
     }
 

@@ -9,6 +9,7 @@ import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.coordinates.CompositeCoordinate;
 import mil.don.common.interfaces.IDevice;
 import mil.don.common.logging.LoggingLevel;
+import mil.don.common.logging.StdoutLogger;
 import mil.don.common.services.ILoggingService;
 
 
@@ -30,6 +31,11 @@ public abstract class DeviceBase implements IDevice
     protected LoggingLevel _loggingLevel = LoggingLevel.INFO;
     protected final ILoggingService _logging;
 
+
+    public DeviceBase()
+    {
+      _logging = new StdoutLogger();
+    }
 
     public DeviceBase(ILoggingService logging)
     {
