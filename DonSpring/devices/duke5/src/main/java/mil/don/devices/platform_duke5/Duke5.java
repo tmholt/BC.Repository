@@ -65,7 +65,7 @@ public class Duke5
 
 
     // this is the UDP connection to a duke device for receiving detections and status
-    private DukeReponseTransport _responses;
+    private UdpTransportReceiver _responses;
     private DukeCommandTransport _commands;
 
     // we just keep up with one device status message, update this message as status comes
@@ -188,7 +188,7 @@ public class Duke5
         String suri = _deviceConfig.getComms().getDataUri();
         URI uri = URI.create(suri);
         // TODO: null check
-        _responses = new DukeReponseTransport(uri.getPort());
+        _responses = new UdpTransportReceiver(uri.getPort());
         _responses.getResponsesStream().subscribe((byte[] data) -> handleResponseData(data));
         _responses.start();
     }

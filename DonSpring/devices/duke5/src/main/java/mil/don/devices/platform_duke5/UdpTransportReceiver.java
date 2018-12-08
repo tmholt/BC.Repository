@@ -27,14 +27,18 @@ import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 
-
-public class DukeReponseTransport extends Thread
+//
+// This class opens a UDP socket on the defined port and listens for data packets on that port.
+// It then fires that data packet out over a RX subject to any connected receivers.
+// NOTE: nothing business specific here; this could go somewhere common.
+//
+public class UdpTransportReceiver extends Thread
 {
     private final Subject<byte[]> _rxReceiver;
     private int _port;
 
 
-    public DukeReponseTransport(int port) {
+    public UdpTransportReceiver(int port) {
         _rxReceiver = PublishSubject.create();
         _port = port;
     }
@@ -44,6 +48,11 @@ public class DukeReponseTransport extends Thread
     }
 
 
+    // primary method in class. opens the socket and listens on a new thread.
+    // usage:
+    //         _responses = new UdpTransportReceiver(uri.getPort());
+    //        _responses.getResponsesStream().subscribe((byte[] data) -> handleResponseData(data));
+    //        _responses.start();
     @Override
     public void run()
     {
@@ -56,14 +65,12 @@ public class DukeReponseTransport extends Thread
             {
                 socket.receive(packet);
 
-                byte[] sdata = packet.getData();
-                _rxReceiver.onNext(sdata);
+                byte[] data = packet.getData();
+                _rxReceiver.onNext(data);
             }
             catch ( IOException ex ) {
-                System.out.println("ERROR receiving DUKE socket data: " + ex.getMessage());
+                System.out.println("ERROR receiving socket data: " + ex.getMessage());
             }
-
-
         }
     }
 
