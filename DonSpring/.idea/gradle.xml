@@ -93,6 +93,17 @@
       </GradleProjectSettings>
       <GradleProjectSettings>
         <option name="distributionType" value="LOCAL" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$/mas-service" />
+        <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$/mas-service" />
+          </set>
+        </option>
+        <option name="useAutoImport" value="true" />
+      </GradleProjectSettings>
+      <GradleProjectSettings>
+        <option name="distributionType" value="LOCAL" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/proxies-common" />
         <option name="gradleHome" value="C:/Program Files/gradle/gradle-4.9" />
         <option name="modules">

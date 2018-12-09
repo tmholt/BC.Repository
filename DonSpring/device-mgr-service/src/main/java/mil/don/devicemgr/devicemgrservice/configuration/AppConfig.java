@@ -40,7 +40,7 @@ public class AppConfig
 
 
     public AppConfig() {
-        System.out.println("ctor for AppConfig");
+        System.out.println("DeviceMgrService::AppConfig ctor");
     }
 
     public Map<String, String> getExchanges()
@@ -48,7 +48,7 @@ public class AppConfig
         return _exchanges;
     }
 
-    public List<mil.don.common.configuration.DeviceConfiguration> getDevices()
+    public List<DeviceConfiguration> getDevices()
     {
         return _devices;
     }
