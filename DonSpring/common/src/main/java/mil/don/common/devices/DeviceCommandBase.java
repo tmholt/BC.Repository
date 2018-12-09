@@ -54,6 +54,7 @@ public class DeviceCommandBase implements Serializable
 
     @Override
     public String toString() {
-        return "Command: '" + _command + "' to '" + _deviceId + "'.";
+        return String.format("device command time='%tc' from='%s', type='%s' to='%s'",
+          _timestamp, _clientName, _command, _deviceId);
     }
 }
