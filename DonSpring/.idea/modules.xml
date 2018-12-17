@@ -23,8 +23,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/logging-service.iml" filepath="$PROJECT_DIR$/.idea/modules/logging-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/logging-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/logging-service_main.iml" group="logging-service" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/logging-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/logging-service_test.iml" group="logging-service" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mas-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/mas-service_main.iml" group="mas-service" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mas-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/mas-service_test.iml" group="mas-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mas-service.iml" filepath="$PROJECT_DIR$/.idea/modules/mas-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/masio-service.iml" filepath="$PROJECT_DIR$/.idea/modules/masio-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/masio-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/masio-service_main.iml" group="masio-service" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/masio-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/masio-service_test.iml" group="masio-service" />

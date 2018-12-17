@@ -10,16 +10,27 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 
 import javax.annotation.PostConstruct;
 
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
+import mil.don.common.conversions.DeviceStatusToTcut30StatusConverter;
+import mil.don.common.conversions.XmlTranslator;
 import mil.don.common.devices.DetectionMessage;
 import mil.don.common.messages.tcut30.DataMessage;
+import mil.don.common.messages.tcut30.StatusMessage;
+import mil.don.common.status.DeviceStatusMessage;
 import mil.don.common.status.IStatusMessage;
+import mil.don.common.status.StatusType;
+import mil.don.common.utilities.GZipUtilities;
 import mil.don.masio.masioservice.configuration.AppConfig;
 import mil.don.proxies.LoggingProxy;
 
@@ -56,23 +67,61 @@ public class MasIoService {
 
 	// endregion
 
-  // region MasDetectionsSender class
+  // region DetectionsToMasSender class
 
   //
   // this is the class that will receive detections from connected devices
   // and push them to MAS
   //
-  class MasDetectionsSender {
+  private class DetectionsToMasSender
+  {
 
-	  public MasDetectionsSender(AppConfig appConfig) {
+    private DatagramSocket _socket;
+
+	  public DetectionsToMasSender(AppConfig appConfig) {
+	    // TODO: load up the MAS ports that we should send to
+      int port = 58822;
+      SocketAddress outbound = new InetSocketAddress(port);
+
+      try
+      {
+        _socket = new DatagramSocket(outbound);
+      }
+      catch (Exception ex) {
+      }
     }
 
     public boolean send(final DetectionMessage detection) {
 	    return false;
     }
 
-    public boolean send(final IStatusMessage status) {
-      return false;
+    public boolean send(final DeviceStatusMessage status) {
+	    if ( status == null ) return false;
+
+	    // convert into a TCUT3 message
+	    DeviceStatusToTcut30StatusConverter converter = new DeviceStatusToTcut30StatusConverter();
+      StatusMessage tcut = converter.convert(status);
+      if ( tcut == null ) return false;
+
+      // get the bytes to send
+      byte[] bytes =  XmlTranslator.getInstance().encode(StatusMessage.class, tcut);
+
+      try
+      {
+
+        // GZIP compress
+        byte[] zipped = GZipUtilities.compress(bytes);
+
+        // send to MAS
+        DatagramPacket packet = new DatagramPacket(zipped, zipped.length);
+        _socket.send(packet);
+        return true;
+
+      }
+      catch ( IOException ex ) {
+        return false;
+      }
+
     }
 
 
@@ -87,7 +136,7 @@ public class MasIoService {
   // ports and receive data from these ports. it will then pass them back up
   // to the controller for processing.
   //
-  class MasReceiver {
+  private class MasReceiver {
 
 
     public MasReceiver(AppConfig appConfig) {
@@ -106,17 +155,6 @@ public class MasIoService {
 
   // endregion
 
-  // region MasMessageConverter class
-
-  //
-  // this is the class that will receive the native messages from
-  // MAS and convert them into our internal format for transfer.
-  //
-  class MasMessageConverter {
-
-  }
-
-  // endregion
 
   // region ThreatSender class
 
@@ -124,7 +162,7 @@ public class MasIoService {
   // this is the class that will receive messages in our internal format
   // and push them out to the appropriate endpoint (exchange or whatever)
   //
-  class ThreatSender {
+  private class ThreatSender {
 
 
     // plan is to add threats received from MAS back onto the detections exchange,
@@ -161,10 +199,9 @@ public class MasIoService {
   private RabbitTemplate _rabbitTemplate;
 
 
-  private MasMessageConverter _converter;
 	private MasReceiver _masReceiver;
 	private ThreatSender _sender;
-	private MasDetectionsSender _masSender;
+	private DetectionsToMasSender _masSender;
 	private MasIoCountResults _counts = new MasIoCountResults();
 
 
@@ -179,11 +216,10 @@ public class MasIoService {
       _detectionsExchange = new FanoutExchange("detection-events");
 
       // config should exist in _appConfig at this point.
-        _converter = new MasMessageConverter();
-        _sender = new ThreatSender();
+      _sender = new ThreatSender();
 
-        _masSender = new MasDetectionsSender(_appConfig);
-        _masReceiver = new MasReceiver(_appConfig);
+      _masSender = new DetectionsToMasSender(_appConfig);
+      _masReceiver = new MasReceiver(_appConfig);
 
       // _masReceiver will fire out threats as they are received
       // do the same for detections / tracks
@@ -213,8 +249,11 @@ public class MasIoService {
   {
     System.out.println("received inbound status event: " + status.toString());
 
+    // only care about device status messages
+    if ( status.getStatusType() != StatusType.DEVICE ) return;
+
     _counts.statusIn++;
-    boolean sent = _masSender.send(status);
+    boolean sent = _masSender.send((DeviceStatusMessage)status);
     if ( sent ) _counts.statusInSent++;
 
   }
@@ -230,9 +269,8 @@ public class MasIoService {
   }
 
 
-
-
-
-  public MasIoCountResults getCounts() { return _counts; }
+  public MasIoCountResults getCounts() {
+      return _counts;
+  }
 
 }
