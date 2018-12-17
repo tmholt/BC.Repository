@@ -21,6 +21,8 @@
       <module name="logging-service_test" target="1.8" />
       <module name="mas-service_main" target="1.8" />
       <module name="mas-service_test" target="1.8" />
+      <module name="masio-service_main" target="1.8" />
+      <module name="masio-service_test" target="1.8" />
       <module name="nighthawk_main" target="1.8" />
       <module name="nighthawk_test" target="1.8" />
       <module name="proxies-common_main" target="1.8" />

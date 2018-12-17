@@ -12,10 +12,10 @@ import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceCommandBase;
-import mil.don.common.interfaces.IDevice;
-import mil.don.common.interfaces.IDeviceCamera;
-import mil.don.common.interfaces.IDeviceDetector;
-import mil.don.common.interfaces.IDeviceWeapon;
+import mil.don.common.devices.IDevice;
+import mil.don.common.devices.IDeviceCamera;
+import mil.don.common.devices.IDeviceDetector;
+import mil.don.common.devices.IDeviceWeapon;
 import mil.don.common.logging.LoggingLevel;
 import mil.don.common.messages.tcut21.BitResultStatusE;
 import mil.don.common.messages.tcut21.EWMessage;
@@ -60,8 +60,8 @@ public class Duke5
     implements IDeviceCamera, IDeviceWeapon, IDeviceDetector
 {
 
+    // outbound stream of detection events
     private final Subject<DetectionMessage> _rxDetections;
-    private final Subject<DeviceStatusMessage> _rxStatus;
 
 
     // this is the UDP connection to a duke device for receiving detections and status
@@ -82,20 +82,17 @@ public class Duke5
         super(logging);
 
         _rxDetections = PublishSubject.create();
-        _rxStatus = PublishSubject.create();
 
         List<DeviceCapability> caps = this.getCapabilities();
         caps.add(DeviceCapability.CAMERA);
         caps.add(DeviceCapability.WEAPON);
     }
 
+    // outbound stream of detection events
     public Observable<DetectionMessage> getDetectionsStream() {
         return _rxDetections;
     }
 
-    public Observable<DeviceStatusMessage> getStatusStream() {
-        return _rxStatus;
-    }
 
     // part of being a device - the device type
     @Override
@@ -110,6 +107,11 @@ public class Duke5
     }
 
 
+    // called at initialization. start anything for this device that needs
+    // to be started. NOTE that the caller is NOT wrapping this in a thread,
+    // as maybe this device doesn't need any. So it is up to the individual
+    // device to decide what threading is needed.
+    // should be @Overridden by actual device
     @Override
     public boolean start() {
 
@@ -128,6 +130,9 @@ public class Duke5
         return true;
     }
 
+    // stop operation - called on termination of device manager service.
+    // close any threads and connections to actual device.
+    // should be @Overridden by actual device implementation
     @Override
     public boolean stop()
     {
@@ -167,6 +172,8 @@ public class Duke5
 
 
     // ability to send a command to a particular device
+    // should be overridden for a specific device type
+    @Override
     public boolean executeDeviceCommand(DeviceCommandBase command) {
         return true;
     }
@@ -369,6 +376,7 @@ public class Duke5
     }
 
     // cloneable (kinda)
+    @Override
     public IDevice copy() {
         Duke5 d = new Duke5(_logging);
         // d._name = this._name; //?

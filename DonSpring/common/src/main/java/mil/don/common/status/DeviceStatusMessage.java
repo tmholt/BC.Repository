@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import mil.don.common.coordinates.CompositeCoordinate;
-import mil.don.common.interfaces.IDevice;
 
 public class DeviceStatusMessage implements IStatusMessage, Serializable
 {

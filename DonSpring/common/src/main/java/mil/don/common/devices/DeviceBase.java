@@ -1,20 +1,27 @@
 package mil.don.common.devices;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.Subject;
 import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.coordinates.CompositeCoordinate;
-import mil.don.common.interfaces.IDevice;
 import mil.don.common.logging.LoggingLevel;
 import mil.don.common.logging.StdoutLogger;
 import mil.don.common.services.ILoggingService;
+import mil.don.common.status.DeviceStatusMessage;
 
 
 // base data values and implementation for a device
-public abstract class DeviceBase implements IDevice
+// NOTE: this is not abstract, as this is being used in a service contract by
+// the device manager service. Maybe there should be a different class for the
+// public device-manager-service API that is not the base class for actual devices.
+public class DeviceBase implements IDevice, Serializable
 {
     // if we don't hear from a device in this time (milliseconds) then time out
     protected static final int DEVICE_TIMEOUT_PERIOD = 10000;
@@ -29,17 +36,22 @@ public abstract class DeviceBase implements IDevice
 
     protected DeviceConfiguration _deviceConfig;
     protected LoggingLevel _loggingLevel = LoggingLevel.INFO;
-    protected final ILoggingService _logging;
+    protected final transient ILoggingService _logging;
+
+    // outbound stream of status events
+    protected final transient Subject<DeviceStatusMessage> _rxStatus;
+
 
 
     public DeviceBase()
     {
-      _logging = new StdoutLogger();
+      this(new StdoutLogger());
     }
 
     public DeviceBase(ILoggingService logging)
     {
         _logging = logging;
+        _rxStatus = PublishSubject.create();
     }
 
     public String getId() {
@@ -51,7 +63,10 @@ public abstract class DeviceBase implements IDevice
     public String getSymbolCode() {
         return _symbolCode;
     }
-    // deviceType implemented by subclass
+
+    // deviceType should be implemented by subclass
+    public String getDeviceType() { return "UNKNOWN"; }
+
     public double getRange() {
         return _range;
     }
@@ -60,7 +75,11 @@ public abstract class DeviceBase implements IDevice
     }
     public List<DeviceCapability> getCapabilities() { return _capabilities; }
 
-    // base implementation for configure. pulls all common values from the given
+    // outbound stream of status events
+    public Observable<DeviceStatusMessage> getStatusStream() { return _rxStatus; }
+
+
+  // base implementation for configure. pulls all common values from the given
     // config. if a specific device has configuration just for it, then this should
     // over overridden and then called from that implementation.
     public boolean configure(DeviceConfiguration deviceConfig) {
@@ -83,18 +102,67 @@ public abstract class DeviceBase implements IDevice
         return true;
     }
 
+    // called at initialization. start anything for this device that needs
+    // to be started. NOTE that the caller is NOT wrapping this in a thread,
+    // as maybe this device doesn't need any. So it is up to the individual
+    // device to decide what threading is needed.
+    // should be @Overridden by actual device
+    @Override
+    public boolean start() {
+        return false;
+    }
+
+    // stop operation - called on termination of device manager service.
+    // close any threads and connections to actual device.
+    // should be @Overridden by actual device implementation
+    @Override
+    public boolean stop()
+    {
+      return false;
+    }
+
+    // cloneable (kinda)
+    // need to decide how to actually do this. can't reuse in subclasses
+  // currently, and @Override would have to copy code.
+    public IDevice copy() {
+      DeviceBase d = new DeviceBase(_logging);
+      d._id = _id;
+      d._name = _name;
+      d._symbolCode = _symbolCode;
+      d._range = _range;
+      // .. more
+      return d;
+    }
+
+    // ability to send a command to a particular device
+    // should be overridden for a specific device type
+    @Override
+    public boolean executeDeviceCommand(DeviceCommandBase command) {
+        return false;
+    }
+
     // start/stop - to be implemented by subclass
     // copy - to be implemented by subclass
 
-    private void setPositionFromConfig(DeviceConfiguration.DeviceConfigurationPosition pos) {
+    //
+    // load up the position for this device from configuration
+    //
+    protected void setPositionFromConfig(DeviceConfiguration.DeviceConfigurationPosition pos) {
 
     }
 
-    private void setCommsFromConfig(DeviceConfiguration.DeviceConfigurationComms comms) {
+    //
+    // load up any URIs for comms from configuration
+    //
+    protected void setCommsFromConfig(DeviceConfiguration.DeviceConfigurationComms comms) {
 
     }
 
-    private void setOptionsFromConfig(Map<String, String> options) {
+    //
+    // load any configuration values specific to this device. @Override this for a specific
+    // device type.
+    //
+    protected void setOptionsFromConfig(Map<String, String> options) {
         _configOptions = new HashMap<>(options);
     }
 

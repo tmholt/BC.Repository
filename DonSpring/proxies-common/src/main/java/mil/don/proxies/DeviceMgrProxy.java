@@ -5,9 +5,7 @@ import feign.Headers;
 import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceCommandBase;
-import mil.don.common.interfaces.IDevice;
 import mil.don.common.services.IDeviceManagerService;
-import mil.don.proxies.configuration.DeviceMgrProxyConfiguration;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;

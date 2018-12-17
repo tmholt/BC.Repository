@@ -8,8 +8,8 @@ import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceCommandBase;
-import mil.don.common.interfaces.IDevice;
-import mil.don.common.interfaces.IDeviceCamera;
+import mil.don.common.devices.IDevice;
+import mil.don.common.devices.IDeviceCamera;
 import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
 import org.springframework.context.annotation.Scope;
@@ -47,7 +47,6 @@ public class Nighthawk
     implements IDeviceCamera
 {
 
-    private final Subject<DeviceStatusMessage> _rxStatus = PublishSubject.create();
     private long _id = 100;
 
     private boolean _initialized = false;
@@ -67,11 +66,6 @@ public class Nighthawk
         boolean baseOk = super.configure(deviceConfig);
         return baseOk;
     }
-
-    public Observable<DeviceStatusMessage> getStatusStream() {
-        return _rxStatus;
-    }
-
 
     @Override
     public boolean start() {
@@ -96,6 +90,7 @@ public class Nighthawk
     }
 
     // ability to send a command to a particular device
+    @Override
     public boolean executeDeviceCommand(DeviceCommandBase command) {
         return true;
     }
@@ -116,6 +111,7 @@ public class Nighthawk
     }
 
     // cloneable (kinda)
+    @Override
     public IDevice copy() {
         Nighthawk d = new Nighthawk(_logging);
         // d._name = this._name; //?

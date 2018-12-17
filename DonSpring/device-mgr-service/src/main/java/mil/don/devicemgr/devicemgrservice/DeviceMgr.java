@@ -6,8 +6,8 @@ import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceCommandBase;
-import mil.don.common.interfaces.IDevice;
-import mil.don.common.interfaces.IDeviceDetector;
+import mil.don.common.devices.IDevice;
+import mil.don.common.devices.IDeviceDetector;
 import mil.don.common.logging.LoggingEntry;
 import mil.don.common.logging.LoggingLevel;
 import mil.don.common.status.DeviceStatusMessage;
@@ -19,7 +19,6 @@ import mil.don.proxies.LoggingProxy;
 
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.FanoutExchange;
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;

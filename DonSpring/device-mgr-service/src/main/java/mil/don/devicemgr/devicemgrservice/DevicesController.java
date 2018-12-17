@@ -4,7 +4,7 @@ package mil.don.devicemgr.devicemgrservice;
 import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceCommandBase;
-import mil.don.common.interfaces.IDevice;
+import mil.don.common.devices.IDevice;
 import mil.don.common.services.IDeviceManagerService;
 import mil.don.devicemgr.devicemgrservice.configuration.AppConfig;
 import mil.don.devicemgr.devicemgrservice.configuration.GlobalConfig;

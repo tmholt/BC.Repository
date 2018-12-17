@@ -3,10 +3,7 @@
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
     <output url="file://$MODULE_DIR$/../../mas-service/out/production/classes" />
     <exclude-output />
-    <content url="file://$MODULE_DIR$/../../mas-service/src/main">
-      <sourceFolder url="file://$MODULE_DIR$/../../mas-service/src/main/java" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/../../mas-service/src/main/resources" type="java-resource" />
-    </content>
+    <content url="file://$MODULE_DIR$/../../mas-service/src/main" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library">
@@ -98,7 +95,6 @@
     <orderEntry type="library" name="Gradle: org.springframework.cloud:spring-cloud-context:2.0.1.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.security:spring-security-rsa:1.0.5.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: org.springframework.cloud:spring-cloud-netflix-ribbon:2.0.1.RELEASE" level="project" />
-    <orderEntry type="library" name="Gradle: org.springframework.security:spring-security-crypto:5.0.8.RELEASE" level="project" />
     <orderEntry type="library" name="Gradle: ch.qos.logback:logback-classic:1.2.3" level="project" />
     <orderEntry type="library" name="Gradle: org.apache.logging.log4j:log4j-to-slf4j:2.10.0" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:jul-to-slf4j:1.7.25" level="project" />
@@ -159,5 +155,10 @@
     <orderEntry type="library" name="Gradle: io.netty:netty-buffer:4.1.29.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-resolver:4.1.29.Final" level="project" />
     <orderEntry type="library" name="Gradle: io.netty:netty-common:4.1.29.Final" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework.cloud:spring-cloud-config-server:2.0.1.RELEASE" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework.security:spring-security-web:5.0.8.RELEASE" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework.security:spring-security-config:5.0.8.RELEASE" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework.security:spring-security-core:5.0.8.RELEASE" level="project" />
+    <orderEntry type="library" name="Gradle: org.springframework.security:spring-security-crypto:5.0.8.RELEASE" level="project" />
   </component>
 </module>

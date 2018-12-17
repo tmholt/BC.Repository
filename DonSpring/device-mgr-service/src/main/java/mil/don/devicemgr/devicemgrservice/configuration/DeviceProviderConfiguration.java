@@ -24,8 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
-import mil.don.common.interfaces.IDevice;
-import mil.don.common.services.ILoggingService;
+import mil.don.common.devices.IDevice;
 import mil.don.devices.platform_duke5.Duke5;
 import mil.don.devices.platform_nighthawk.Nighthawk;
 import mil.don.proxies.LoggingProxy;
