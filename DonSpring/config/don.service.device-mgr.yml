@@ -21,6 +21,20 @@ devices:
         command-uri: udp://127.0.0.1:30055
         data-uri: udp://127.0.0.1:30056
   -
+    name: Q50
+    type: CTC
+    symbol-code: SFGPESE---*****
+    range: 10000
+    debug-level: DEBUG
+    position: 
+        lla: { latitude: 34.61, longitude: -86.68, altitude: 11 }
+        ecef: { x: 302543.4355281, y: -5243872.413, z: 3605987.6639 }
+    comms:
+        command-uri: udp://127.0.0.1:17000
+        data-uri: udp://127.0.0.1:14312
+    options:
+        CTC-ID: 1        
+  -
     name: Nighthawk1
     type: Nighthawk
     symbol-code: SFGPUCFTF-*****

@@ -53,6 +53,7 @@ dependencies {
     compile files('../lib/mil.don.proxies-0.0.1.jar')
     compile files('../lib/mil.don.devices.nighthawk-0.0.1.jar')
     compile files('../lib/mil.don.devices.duke5-0.0.1.jar')
+    compile files('../lib/mil.don.devices.ctc-0.0.1.jar')
 }
 
 dependencyManagement {

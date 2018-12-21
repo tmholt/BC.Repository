@@ -21,6 +21,7 @@ import mil.don.common.messages.tcut21.BitResultStatusE;
 import mil.don.common.messages.tcut21.EWMessage;
 import mil.don.common.messages.tcut21.EwMode;
 import mil.don.common.messages.tcut21.XYZPos;
+import mil.don.common.networking.UdpTransportReceiver;
 import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
 
@@ -178,14 +179,13 @@ public class Duke5
         return true;
     }
 
-    private void initializeDeviceStatus()
-    {
+    private void initializeDeviceStatus() {
         _status = new DeviceStatusMessage(_name, _name, getDeviceType(), new Date(), false, false);
         _initialized = true;
     }
 
-    private void closeResponseConnection()
-    {
+    // close our connection to the device that is receiving detections
+    private void closeResponseConnection() {
     }
 
     // start listening for response data on the defined port for duke outbound responses
@@ -201,6 +201,9 @@ public class Duke5
     }
 
 
+    // this is the method that gets called any time we receive response data from the device
+    // that we are connected to. In this case, it will either be a status message or a ew track
+    // message.
     private void handleResponseData(byte[] data) {
         if ( data == null || data.length ==  0 ) return;
 
@@ -366,13 +369,6 @@ public class Duke5
         _status.setIsChanged(changed);
 
         return changed;
-    }
-
-    // is our current logging level (from config) less than or equal to the given value?
-    private boolean loggingLevelIs(LoggingLevel p)
-    {
-        LoggingLevel defined = _deviceConfig.getLoggingLevel();
-        return ( defined.ordinal() <= p.ordinal() );
     }
 
     // cloneable (kinda)

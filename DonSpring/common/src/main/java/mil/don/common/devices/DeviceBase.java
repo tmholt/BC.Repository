@@ -158,6 +158,12 @@ public class DeviceBase implements IDevice, Serializable
 
     }
 
+    // is our current logging level (from config) less than or equal to the given value?
+    protected boolean loggingLevelIs(LoggingLevel p) {
+        LoggingLevel defined = _deviceConfig.getLoggingLevel();
+        return ( defined.ordinal() <= p.ordinal() );
+    }
+
     //
     // load any configuration values specific to this device. @Override this for a specific
     // device type.

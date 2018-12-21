@@ -25,6 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
 import mil.don.common.devices.IDevice;
+import mil.don.devices.platform_ctc.Ctc;
 import mil.don.devices.platform_duke5.Duke5;
 import mil.don.devices.platform_nighthawk.Nighthawk;
 import mil.don.proxies.LoggingProxy;
@@ -50,4 +51,10 @@ public class DeviceProviderConfiguration
     public IDevice createDuke5() {
         return new Duke5(_logging);
     }
+	
+    @Bean
+    @Scope("prototype")
+    public IDevice createCtc() {
+        return new Ctc(_logging);
+    }	
 }

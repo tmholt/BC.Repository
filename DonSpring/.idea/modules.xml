@@ -11,6 +11,9 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/configuration-service.iml" filepath="$PROJECT_DIR$/.idea/modules/configuration-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/configuration-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/configuration-service_main.iml" group="configuration-service" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/configuration-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/configuration-service_test.iml" group="configuration-service" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ctc.iml" filepath="$PROJECT_DIR$/.idea/modules/ctc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ctc_main.iml" filepath="$PROJECT_DIR$/.idea/modules/ctc_main.iml" group="ctc" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ctc_test.iml" filepath="$PROJECT_DIR$/.idea/modules/ctc_test.iml" group="ctc" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/device-mgr-service.iml" filepath="$PROJECT_DIR$/.idea/modules/device-mgr-service.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/device-mgr-service_main.iml" filepath="$PROJECT_DIR$/.idea/modules/device-mgr-service_main.iml" group="device-mgr-service" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/device-mgr-service_test.iml" filepath="$PROJECT_DIR$/.idea/modules/device-mgr-service_test.iml" group="device-mgr-service" />

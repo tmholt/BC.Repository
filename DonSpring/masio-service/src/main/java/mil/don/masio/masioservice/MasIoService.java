@@ -95,6 +95,9 @@ public class MasIoService {
 	    return false;
     }
 
+    //
+    // take this device status message and forward it along to MAS
+    //
     public boolean send(final DeviceStatusMessage status) {
 	    if ( status == null ) return false;
 
@@ -249,7 +252,7 @@ public class MasIoService {
   {
     System.out.println("received inbound status event: " + status.toString());
 
-    // only care about device status messages
+    // we only care about device status messages
     if ( status.getStatusType() != StatusType.DEVICE ) return;
 
     _counts.statusIn++;

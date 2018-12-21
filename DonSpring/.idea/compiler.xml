@@ -11,6 +11,8 @@
       <module name="common_test" target="1.8" />
       <module name="configuration-service_main" target="1.8" />
       <module name="configuration-service_test" target="1.8" />
+      <module name="ctc_main" target="1.8" />
+      <module name="ctc_test" target="1.8" />
       <module name="device-mgr-service_main" target="1.8" />
       <module name="device-mgr-service_test" target="1.8" />
       <module name="duke5_main" target="1.8" />
