@@ -17,12 +17,12 @@ import javax.xml.bind.annotation.XmlType;
 )
 public class LineOfBearing {
   @XmlAttribute(
-      name = "azimuth",
+      name = "_azimuth",
       required = true
   )
   protected float azimuth;
   @XmlAttribute(
-      name = "elevation"
+      name = "_elevation"
   )
   protected Float elevation;
   @XmlAttribute(

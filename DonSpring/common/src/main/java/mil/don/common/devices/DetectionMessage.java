@@ -30,10 +30,93 @@ import java.util.Map;
 public class DetectionMessage implements Serializable
 {
 
-    private String _detectionType;
+    // region LineOfBearing internal class ////////////////////////////////////
+
+    public class LineOfBearing {
+
+      protected float _azimuth;
+      protected Float _elevation;
+      protected Float _azimuthErr;
+      protected Float _elevationErr;
+      protected Float _minRange;
+      protected Float _maxRange;
+
+      public float getAzimuth() {
+        return this._azimuth;
+      }
+      public void setAzimuth(float value) {
+        this._azimuth = value;
+      }
+      public Float getElevation() {
+        return this._elevation;
+      }
+      public void setElevation(Float value) {
+        this._elevation = value;
+      }
+      public Float getAzimuthErr() {
+        return this._azimuthErr;
+      }
+      public void setAzimuthErr(Float value) {
+        this._azimuthErr = value;
+      }
+      public Float getElevationErr() {
+        return this._elevationErr;
+      }
+      public void setElevationErr(Float value) {
+        this._elevationErr = value;
+      }
+      public Float getMinRange() {
+        return this._minRange;
+      }
+      public void setMinRange(Float value) {
+        this._minRange = value;
+      }
+      public Float getMaxRange() {
+        return this._maxRange;
+      }
+      public void setMaxRange(Float value) {
+        this._maxRange = value;
+      }
+    }
+
+    // endregion //////////////////////////////////////////////////////////////
+
+    // region DetectionType enumeration ////////////////////////////////////////////
+
+    public enum DetectionType {
+        OTHER,
+        ACOUSTIC,
+        RADAR,
+        EW,
+        CAMERA,
+        THREAT
+    }
+
+    // endregion //////////////////////////////////////////////////////////////
+
+
+    // region Track internal class ////////////////////////////////////////////
+
+    public class Track {
+
+      private LineOfBearing _lineOfBearing;
+      
+
+    }
+
+    // endregion //////////////////////////////////////////////////////////////
+
+    // region Threat internal class ///////////////////////////////////////////
+
+    // endregion //////////////////////////////////////////////////////////////
+
+    private String _revision;
+    private String _sourceSystem;
+    private DetectionType _detectionType;
     private String _id;
     private long _index = 1;
     private Date _timestamp;
+    private boolean _isTimestampValid;
     private String _sourceDeviceName;
     private String _sourceDeviceType;
 
@@ -43,33 +126,29 @@ public class DetectionMessage implements Serializable
 
 
 
-    public String getDetectionType()
+    public DetectionType getDetectionType()
     {
         return _detectionType;
     }
-
-    public DetectionMessage setDetectionType(String detectionType)
-    {
-        this._detectionType = detectionType;
-        return this;
-    }
+    public DetectionMessage setDetectionType(DetectionType detectionType) { this._detectionType = detectionType; return this; }
 
     public String getId()
     {
         return _id;
     }
-
-    public DetectionMessage setId(String id)
-    {
-        this._id = id;
-        return this;
-    }
+    public DetectionMessage setId(String id) { this._id = id; return this; }
 
     public Date getTimestamp()
     {
         return _timestamp;
     }
     public DetectionMessage setTimestamp(Date timestamp) { this._timestamp = timestamp; return this; }
+
+    public boolean getIsTimestampValid()
+  {
+    return _isTimestampValid;
+  }
+    public DetectionMessage setIsTimestampValid(boolean isTimestampValid) { this._isTimestampValid = isTimestampValid; return this; }
 
     public String getSourceName() {
         return _sourceDeviceName;

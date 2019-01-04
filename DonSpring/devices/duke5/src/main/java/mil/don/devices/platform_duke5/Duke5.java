@@ -292,7 +292,7 @@ public class Duke5
             return null;
         }
 
-        // note the current code loops, but just ooverwrites data if there are multiple.
+        // note the current code loops, but just overwrites data if there are multiple.
         // ditto for status or detections
         EWMessage.DataReport dataReport = reports.get(0);
 

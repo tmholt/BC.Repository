@@ -352,12 +352,12 @@ public class StatusMessage {
       )
       public static class Orientation {
         @XmlAttribute(
-            name = "azimuth",
+            name = "_azimuth",
             required = true
         )
         protected float azimuth;
         @XmlAttribute(
-            name = "elevation",
+            name = "_elevation",
             required = true
         )
         protected float elevation;

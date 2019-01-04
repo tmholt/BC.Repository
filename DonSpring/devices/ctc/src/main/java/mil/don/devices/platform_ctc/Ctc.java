@@ -15,6 +15,7 @@ import mil.don.common.devices.IDeviceCamera;
 import mil.don.common.devices.IDeviceDetector;
 import mil.don.common.logging.LoggingLevel;
 import mil.don.common.messages.Ctc.CtcMessage;
+import mil.don.common.messages.Ctc.VeTrackUpdateMessage;
 import mil.don.common.networking.UdpTransportReceiver;
 import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
@@ -177,6 +178,9 @@ public class Ctc
 
         if ( message.isTrackUpdate() ) {
 
+          VeTrackUpdateMessage.VeTrackUpdateMessageBuilder builder = new VeTrackUpdateMessage.VeTrackUpdateMessageBuilder(message);
+          VeTrackUpdateMessage trackUpdateMsg = builder.build();
+          if ( trackUpdateMsg != null ) {
           /*
            * conversion code to TCUT 3
       track = new DataMessage.Track();
@@ -201,6 +205,9 @@ public class Ctc
 
            *
            */
+          }
+
+
 
         }
         else if ( message.isTrackDrop() ) {
@@ -221,10 +228,12 @@ public class Ctc
       track.setEnd(true);
            *
            */
-        }
+          }
 
         // Update the status of the sensor (Q50) since we received a track from it
 
+
+      return null;
     }
 
     private DeviceStatusMessage buildDeviceStatus() {

@@ -164,8 +164,7 @@ public class DeviceMgr
         wireupDeviceEvents(specific);
 
         boolean started = specific.start();
-
-        return specific;
+        return started ? specific : null;
     }
 
     private void wireupDeviceEvents(IDevice device) {

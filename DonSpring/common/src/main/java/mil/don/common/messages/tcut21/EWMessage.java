@@ -58,10 +58,10 @@ import javax.xml.bind.annotation.XmlType;
  *                           &lt;attribute name="affiliation" type="{}affiliation" />
  *                           &lt;attribute name="affiliation_conf" type="{}confidence" />
  *                           &lt;attribute name="approaching" type="{http://www.w3.org/2001/XMLSchema}boolean" />
- *                           &lt;attribute name="azimuth" type="{}azimuth_angle" />
+ *                           &lt;attribute name="_azimuth" type="{}azimuth_angle" />
  *                           &lt;attribute name="azimuth_err" type="{http://www.w3.org/2001/XMLSchema}float" />
  *                           &lt;attribute name="bandwidth" type="{http://www.w3.org/2001/XMLSchema}double" />
- *                           &lt;attribute name="elevation" type="{}elevation_angle" />
+ *                           &lt;attribute name="_elevation" type="{}elevation_angle" />
  *                           &lt;attribute name="elevation_err" type="{http://www.w3.org/2001/XMLSchema}float" />
  *                           &lt;attribute name="end_track" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *                           &lt;attribute name="frequency" type="{http://www.w3.org/2001/XMLSchema}double" />
@@ -447,10 +447,10 @@ public class EWMessage {
      *                 &lt;attribute name="affiliation" type="{}affiliation" />
      *                 &lt;attribute name="affiliation_conf" type="{}confidence" />
      *                 &lt;attribute name="approaching" type="{http://www.w3.org/2001/XMLSchema}boolean" />
-     *                 &lt;attribute name="azimuth" type="{}azimuth_angle" />
+     *                 &lt;attribute name="_azimuth" type="{}azimuth_angle" />
      *                 &lt;attribute name="azimuth_err" type="{http://www.w3.org/2001/XMLSchema}float" />
      *                 &lt;attribute name="bandwidth" type="{http://www.w3.org/2001/XMLSchema}double" />
-     *                 &lt;attribute name="elevation" type="{}elevation_angle" />
+     *                 &lt;attribute name="_elevation" type="{}elevation_angle" />
      *                 &lt;attribute name="elevation_err" type="{http://www.w3.org/2001/XMLSchema}float" />
      *                 &lt;attribute name="end_track" type="{http://www.w3.org/2001/XMLSchema}boolean" />
      *                 &lt;attribute name="frequency" type="{http://www.w3.org/2001/XMLSchema}double" />
@@ -656,10 +656,10 @@ public class EWMessage {
          *       &lt;attribute name="affiliation" type="{}affiliation" />
          *       &lt;attribute name="affiliation_conf" type="{}confidence" />
          *       &lt;attribute name="approaching" type="{http://www.w3.org/2001/XMLSchema}boolean" />
-         *       &lt;attribute name="azimuth" type="{}azimuth_angle" />
+         *       &lt;attribute name="_azimuth" type="{}azimuth_angle" />
          *       &lt;attribute name="azimuth_err" type="{http://www.w3.org/2001/XMLSchema}float" />
          *       &lt;attribute name="bandwidth" type="{http://www.w3.org/2001/XMLSchema}double" />
-         *       &lt;attribute name="elevation" type="{}elevation_angle" />
+         *       &lt;attribute name="_elevation" type="{}elevation_angle" />
          *       &lt;attribute name="elevation_err" type="{http://www.w3.org/2001/XMLSchema}float" />
          *       &lt;attribute name="end_track" type="{http://www.w3.org/2001/XMLSchema}boolean" />
          *       &lt;attribute name="frequency" type="{http://www.w3.org/2001/XMLSchema}double" />
@@ -701,13 +701,13 @@ public class EWMessage {
             protected Float affiliationConf;
             @XmlAttribute(name = "approaching")
             protected Boolean approaching;
-            @XmlAttribute(name = "azimuth")
+            @XmlAttribute(name = "_azimuth")
             protected Float azimuth;
             @XmlAttribute(name = "azimuth_err")
             protected Float azimuthErr;
             @XmlAttribute(name = "bandwidth")
             protected Double bandwidth;
-            @XmlAttribute(name = "elevation")
+            @XmlAttribute(name = "_elevation")
             protected Float elevation;
             @XmlAttribute(name = "elevation_err")
             protected Float elevationErr;
@@ -918,7 +918,7 @@ public class EWMessage {
             }
 
             /**
-             * Gets the value of the azimuth property.
+             * Gets the value of the _azimuth property.
              *
              * @return
              *     possible object is
@@ -930,7 +930,7 @@ public class EWMessage {
             }
 
             /**
-             * Sets the value of the azimuth property.
+             * Sets the value of the _azimuth property.
              *
              * @param value
              *     allowed object is
@@ -942,7 +942,7 @@ public class EWMessage {
             }
 
             /**
-             * Gets the value of the azimuthErr property.
+             * Gets the value of the _azimuthErr property.
              *
              * @return
              *     possible object is
@@ -954,7 +954,7 @@ public class EWMessage {
             }
 
             /**
-             * Sets the value of the azimuthErr property.
+             * Sets the value of the _azimuthErr property.
              *
              * @param value
              *     allowed object is
@@ -990,7 +990,7 @@ public class EWMessage {
             }
 
             /**
-             * Gets the value of the elevation property.
+             * Gets the value of the _elevation property.
              *
              * @return
              *     possible object is
@@ -1002,7 +1002,7 @@ public class EWMessage {
             }
 
             /**
-             * Sets the value of the elevation property.
+             * Sets the value of the _elevation property.
              *
              * @param value
              *     allowed object is
@@ -1014,7 +1014,7 @@ public class EWMessage {
             }
 
             /**
-             * Gets the value of the elevationErr property.
+             * Gets the value of the _elevationErr property.
              *
              * @return
              *     possible object is
@@ -1026,7 +1026,7 @@ public class EWMessage {
             }
 
             /**
-             * Sets the value of the elevationErr property.
+             * Sets the value of the _elevationErr property.
              *
              * @param value
              *     allowed object is
