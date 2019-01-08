@@ -91,7 +91,7 @@ public class MasIoService {
       }
     }
 
-    public boolean send(final DetectionMessage detection) {
+    public boolean send(final DataMessage detection) {
 	    return false;
     }
 
@@ -262,7 +262,7 @@ public class MasIoService {
   }
 
   @RabbitListener(queues = "#{detectionMessagesQueue.name}")
-  public void receiveDetections(final DetectionMessage detection)
+  public void receiveDetections(final DataMessage detection)
   {
     System.out.println("received inbound detection event: " + detection.toString());
 

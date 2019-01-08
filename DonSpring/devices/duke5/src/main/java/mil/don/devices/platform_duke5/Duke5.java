@@ -6,6 +6,8 @@ import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.conversions.ByteToTcut21EwDecoder;
+import mil.don.common.conversions.Tcut21ToTcut30Converter;
+import mil.don.common.conversions.Tcut3DataAndStatusMessageWrapper;
 import mil.don.common.coordinates.CompositeCoordinate;
 import mil.don.common.coordinates.EcefCoordinate;
 import mil.don.common.devices.DetectionMessage;
@@ -21,6 +23,7 @@ import mil.don.common.messages.tcut21.BitResultStatusE;
 import mil.don.common.messages.tcut21.EWMessage;
 import mil.don.common.messages.tcut21.EwMode;
 import mil.don.common.messages.tcut21.XYZPos;
+import mil.don.common.messages.tcut30.DataMessage;
 import mil.don.common.networking.UdpTransportReceiver;
 import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
@@ -62,7 +65,7 @@ public class Duke5
 {
 
     // outbound stream of detection events
-    private final Subject<DetectionMessage> _rxDetections;
+    private final Subject<DataMessage> _rxDetections;
 
 
     // this is the UDP connection to a duke device for receiving detections and status
@@ -74,7 +77,7 @@ public class Duke5
     private DeviceStatusMessage _status;
 
     // counter to keep up with number of status messages sent
-    private long _messageId = 1;
+    private int _messageId = 1;
     private boolean _initialized = false;
     private ScheduledExecutorService _statusPublisher;
 
@@ -90,7 +93,7 @@ public class Duke5
     }
 
     // outbound stream of detection events
-    public Observable<DetectionMessage> getDetectionsStream() {
+    public Observable<DataMessage> getDetectionsStream() {
         return _rxDetections;
     }
 
@@ -251,6 +254,9 @@ public class Duke5
 
             // this message has a status and/or a detection inside
 
+            Tcut21ToTcut30Converter converter = new Tcut21ToTcut30Converter();
+            Tcut3DataAndStatusMessageWrapper wrapper = converter.convert(ew);
+
             DeviceStatusMessage status = buildDeviceStatus(ew);
             if ( status != null )
             {
@@ -260,9 +266,9 @@ public class Duke5
                 setGoldenStatus(status);
             }
 
-            DetectionMessage detection = buildDeviceDetection(ew);
-            if ( detection != null ) {
-                _rxDetections.onNext(detection);
+            for ( DataMessage dataMsg : wrapper.getDataMessage() ) {
+              dataMsg.setMsgCount(_messageId++); // TODO: wrap at 65535
+              _rxDetections.onNext(dataMsg);
             }
 
         }
@@ -273,7 +279,7 @@ public class Duke5
     }
 
 
-    private DetectionMessage buildDeviceDetection(EWMessage ew) {
+/*    private DetectionMessage buildDeviceDetection(EWMessage ew) {
         DetectionMessage msg = new DetectionMessage()
             .setDetectionType("RADAR")
             .setId(Long.toString(_messageId++))
@@ -282,7 +288,7 @@ public class Duke5
             .setTimestamp(new Date());
 
         return msg;
-    }
+    }*/
 
     private DeviceStatusMessage buildDeviceStatus(EWMessage message)
     {

@@ -6,6 +6,7 @@ import io.reactivex.subjects.PublishSubject;
 import io.reactivex.subjects.Subject;
 import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.conversions.ByteToCtcMessageDecoder;
+import mil.don.common.conversions.CtcToTcutTrackConverter;
 import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
@@ -15,7 +16,12 @@ import mil.don.common.devices.IDeviceCamera;
 import mil.don.common.devices.IDeviceDetector;
 import mil.don.common.logging.LoggingLevel;
 import mil.don.common.messages.Ctc.CtcMessage;
+import mil.don.common.messages.Ctc.VeDropMessage;
 import mil.don.common.messages.Ctc.VeTrackUpdateMessage;
+import mil.don.common.messages.tcut30.DataMessage;
+import mil.don.common.messages.tcut30.SystemTypeE;
+import mil.don.common.messages.tcut30.XYZPos;
+import mil.don.common.messages.tcut30.XYZVel;
 import mil.don.common.networking.UdpTransportReceiver;
 import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
@@ -23,7 +29,10 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 
+import java.math.BigInteger;
 import java.net.URI;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -55,7 +64,7 @@ public class Ctc
     implements IDeviceDetector
 {
     // outbound stream of detection events
-    private final Subject<DetectionMessage> _rxDetections;
+    private final Subject<DataMessage> _rxDetections;
 
     // this is the UDP connection to a duke device for receiving detections and status
     private UdpTransportReceiver _responses;
@@ -79,7 +88,7 @@ public class Ctc
     }
 
     // outbound stream of detection events
-    public Observable<DetectionMessage> getDetectionsStream() {
+    public Observable<DataMessage> getDetectionsStream() {
       return _rxDetections;
     }
 
@@ -159,10 +168,29 @@ public class Ctc
         ByteToCtcMessageDecoder decoder = new ByteToCtcMessageDecoder();
         CtcMessage message = decoder.decode(data);
 
-        DetectionMessage detection = buildDeviceDetection(message);
-        if ( detection != null ) {
-            _rxDetections.onNext(detection);
+        CtcToTcutTrackConverter converter = new CtcToTcutTrackConverter();
+        DataMessage.Track track = converter.convert(message);
+
+
+        if ( track != null ) {
+          Instant instant = Instant.now();
+          long now = (instant.getEpochSecond() * 1000 * 1000) + (instant.getNano() / 1000);
+
+          DataMessage dataMessage = new DataMessage();
+          dataMessage.setRevision("3.0");
+          dataMessage.setSourceSystem("CTC");
+          dataMessage.setSourceType(SystemTypeE.RADAR);
+          dataMessage.setTime(BigInteger.valueOf(now));
+          dataMessage.setTimeIsValid(true);
+
+          dataMessage.getTrack().add(track);
+
+          _rxDetections.onNext(dataMessage);
         }
+
+        // Update the status of the sensor (Q50) since we received a track from it
+        // sensorTimeStamps.put(id.toString(), seconds);
+
 
     }
 
@@ -174,67 +202,7 @@ public class Ctc
         _rxStatus.onNext(buildDeviceStatus());
     }
 
-    private DetectionMessage buildDeviceDetection(CtcMessage message) {
 
-        if ( message.isTrackUpdate() ) {
-
-          VeTrackUpdateMessage.VeTrackUpdateMessageBuilder builder = new VeTrackUpdateMessage.VeTrackUpdateMessageBuilder(message);
-          VeTrackUpdateMessage trackUpdateMsg = builder.build();
-          if ( trackUpdateMsg != null ) {
-          /*
-           * conversion code to TCUT 3
-      track = new DataMessage.Track();
-      DataMessage.Track.PositionECEF positionECEF = new DataMessage.Track.PositionECEF();
-
-      VeTrackUpdateMessage ve = (VeTrackUpdateMessage) veMessage;
-
-      Integer trackId = ve.getCTTrackId();
-      XYZPos xyzPos = convertXyz(ve.getX(), ve.getY(), ve.getZ());
-      XYZVel xyzVel = convertVel(ve.getXDot(), ve.getYDot(), ve.getZDot());
-      positionECEF.setXYZPos(xyzPos);
-      positionECEF.setXYZVel(xyzVel);
-
-      long timeSinceMidnight = (long) (ve.getTimeSinceMidnight() * 1000 * 1000);
-      long midnight = Instant.now().truncatedTo(ChronoUnit.DAYS).getEpochSecond() * 1000 * 1000;
-      BigInteger updateTime = BigInteger.valueOf(midnight + timeSinceMidnight);
-
-      track.setTrackId(trackId);
-      track.setEnd(false);
-      track.setUpdateTime(updateTime);
-      track.setPositionECEF(positionECEF);
-
-           *
-           */
-          }
-
-
-
-        }
-        else if ( message.isTrackDrop() ) {
-          /*
-           * conversion code to TCUT 3
-      track = new DataMessage.Track();
-
-      VeDropMessage ve = (VeDropMessage) veMessage;
-
-      Integer trackId = ve.getCTTrackId();
-
-      long timeSinceMidnight = (long) (ve.getTimeSinceMidnight() * 1000 * 1000);
-      long midnight = Instant.now().truncatedTo(ChronoUnit.DAYS).getEpochSecond() * 1000 * 1000;
-      BigInteger updateTime = BigInteger.valueOf(midnight + timeSinceMidnight);
-
-      track.setTrackId(trackId);
-      track.setUpdateTime(updateTime);
-      track.setEnd(true);
-           *
-           */
-          }
-
-        // Update the status of the sensor (Q50) since we received a track from it
-
-
-      return null;
-    }
 
     private DeviceStatusMessage buildDeviceStatus() {
         DeviceStatusMessage msg = new DeviceStatusMessage();
@@ -246,6 +214,8 @@ public class Ctc
         msg.setIsOperational(true);
         return msg;
     }
+
+
 
     // cloneable (kinda)
     @Override

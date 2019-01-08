@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 
 import mil.don.common.devices.DetectionMessage;
+import mil.don.common.messages.tcut30.DataMessage;
 import mil.don.common.status.IStatusMessage;
 
 
@@ -42,7 +43,7 @@ public class Client1StatusListener
 
 
     // save the last 100 detection events that we receive
-    CircularFifoQueue<DetectionMessage> _detectionEvents = new CircularFifoQueue<>(100);
+    CircularFifoQueue<DataMessage> _detectionEvents = new CircularFifoQueue<>(100);
 
 
     public Client1StatusListener() {
@@ -62,7 +63,7 @@ public class Client1StatusListener
     }
 
     @RabbitListener(queues="#{detectionMessagesQueue.name}")
-    public void receiveDetections(final DetectionMessage detection) {
+    public void receiveDetections(final DataMessage detection) {
         System.out.println("received detection event: " + detection.toString());
         _detectionEvents.add(detection);
     }
@@ -72,7 +73,7 @@ public class Client1StatusListener
     }
 
 
-    public DetectionMessage[] getRecentDetectionEvents() {
-        return _detectionEvents.toArray(new DetectionMessage[_detectionEvents.size()]);
+    public DataMessage[] getRecentDetectionEvents() {
+        return _detectionEvents.toArray(new DataMessage[_detectionEvents.size()]);
     }
 }

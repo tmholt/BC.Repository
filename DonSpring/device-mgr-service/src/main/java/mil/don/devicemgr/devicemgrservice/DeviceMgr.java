@@ -10,6 +10,7 @@ import mil.don.common.devices.IDevice;
 import mil.don.common.devices.IDeviceDetector;
 import mil.don.common.logging.LoggingEntry;
 import mil.don.common.logging.LoggingLevel;
+import mil.don.common.messages.tcut30.DataMessage;
 import mil.don.common.status.DeviceStatusMessage;
 import mil.don.common.status.ServiceStatusMessage;
 import mil.don.devicemgr.devicemgrservice.configuration.AppConfig;
@@ -110,7 +111,7 @@ public class DeviceMgr
         System.out.println("sent device status event: " + status.toString());
     }
 
-    void exchangeDeviceDetectionEvent(DetectionMessage detection) {
+    void exchangeDeviceDetectionEvent(DataMessage detection) {
         _rabbitTemplate.convertAndSend(_detectionsExchange.getName(), DEVICE_DETECTION_ROUTING_KEY, detection);
         System.out.println("sent device detection event: " + detection.toString());
     }
@@ -191,12 +192,12 @@ public class DeviceMgr
         // connect to detection events from this device
         if ( device instanceof IDeviceDetector )
         {
-            Observable<DetectionMessage> detects = ((IDeviceDetector)device).getDetectionsStream();
+            Observable<DataMessage> detects = ((IDeviceDetector)device).getDetectionsStream();
             if ( detects != null )
             {
                 detects.subscribe(
                     // on next
-                    (DetectionMessage detection) -> {
+                    (DataMessage detection) -> {
                         exchangeDeviceDetectionEvent(detection);
                     },
                     // on error

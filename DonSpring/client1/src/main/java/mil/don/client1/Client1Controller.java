@@ -5,6 +5,7 @@ package mil.don.client1;
 import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.devices.IDevice;
+import mil.don.common.messages.tcut30.DataMessage;
 import mil.don.common.status.IStatusMessage;
 import mil.don.proxies.DeviceMgrProxy;
 import mil.don.proxies.LoggingProxy;
@@ -108,7 +109,7 @@ public class Client1Controller {
     }
 
     @RequestMapping("/detection-events")
-    public DetectionMessage[] getRecentDetectionEvents() {
+    public DataMessage[] getRecentDetectionEvents() {
         return _statusListener.getRecentDetectionEvents();
     }
 
