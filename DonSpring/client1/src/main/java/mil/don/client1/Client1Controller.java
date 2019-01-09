@@ -6,7 +6,9 @@ import mil.don.common.devices.DetectionMessage;
 import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.devices.IDevice;
 import mil.don.common.messages.tcut30.DataMessage;
+import mil.don.common.messages.tcut30.StatusMessage;
 import mil.don.common.status.IStatusMessage;
+import mil.don.common.status.ServiceStatusMessage;
 import mil.don.proxies.DeviceMgrProxy;
 import mil.don.proxies.LoggingProxy;
 
@@ -103,9 +105,14 @@ public class Client1Controller {
 	    return _deviceMgr.getAllDevices();
     }
 
-    @RequestMapping("/status-events")
-    public IStatusMessage[] getRecentStatusEvents() {
-        return _statusListener.getRecentStatusEvents();
+    @RequestMapping("/device-status")
+    public StatusMessage[] getRecentDeviceStatusEvents() {
+        return _statusListener.getRecentDeviceStatusEvents();
+    }
+
+    @RequestMapping("/system-status")
+    public ServiceStatusMessage[] getRecentSystemStatusEvents() {
+      return _statusListener.getRecentSystemStatusEvents();
     }
 
     @RequestMapping("/detection-events")

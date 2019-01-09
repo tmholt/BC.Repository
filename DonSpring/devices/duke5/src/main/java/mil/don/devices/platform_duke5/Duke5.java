@@ -24,6 +24,7 @@ import mil.don.common.messages.tcut21.EWMessage;
 import mil.don.common.messages.tcut21.EwMode;
 import mil.don.common.messages.tcut21.XYZPos;
 import mil.don.common.messages.tcut30.DataMessage;
+import mil.don.common.messages.tcut30.StatusMessage;
 import mil.don.common.networking.UdpTransportReceiver;
 import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Component;
 
 
 import java.net.URI;
+import java.security.PublicKey;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -68,18 +70,19 @@ public class Duke5
     private final Subject<DataMessage> _rxDetections;
 
 
+
     // this is the UDP connection to a duke device for receiving detections and status
     private UdpTransportReceiver _responses;
     private DukeCommandTransport _commands;
 
-    // we just keep up with one device status message, update this message as status comes
-    // in from the duke, and then send out status on a regular 1hz heartbeat.
+    // idea of a "golden" status, to check for changes of status coming in from the duke.
+    // not currently using
     private DeviceStatusMessage _status;
 
     // counter to keep up with number of status messages sent
     private int _messageId = 1;
     private boolean _initialized = false;
-    private ScheduledExecutorService _statusPublisher;
+
 
 
     public Duke5(ILoggingService logging) {
@@ -119,17 +122,11 @@ public class Duke5
     @Override
     public boolean start() {
 
-        // set up our outbound status message
+        // set up our golden outbound status message
         initializeDeviceStatus();
 
         // open response port and start listening for inbound data
         listenForResponseData();
-
-        // set up our scheduled publish of status
-        // (not using @scheduled so we can create device objects)
-        Runnable task = () -> sendDeviceStatus();
-        _statusPublisher = Executors.newScheduledThreadPool(1);
-        _statusPublisher.scheduleWithFixedDelay(task, 1, 1, TimeUnit.SECONDS);
 
         return true;
     }
@@ -140,39 +137,11 @@ public class Duke5
     @Override
     public boolean stop()
     {
-        if ( _statusPublisher != null ) {
-            _statusPublisher.shutdown();
-            _statusPublisher = null;
-        }
-
         closeResponseConnection();
         return true;
     }
 
-    // sends a device status event back to the device manager every second
-    private void sendDeviceStatus()
-    {
-        if ( !_initialized ) return;
 
-        // check for timeout from device
-        if ( _status.getIsConnected() )
-        {
-            long diff = (new Date()).getTime() - _status.getTimestamp().getTime();
-            if ( diff > DEVICE_TIMEOUT_PERIOD )
-            {
-                _status.setIsConnected(false);
-                _status.setIsConnectedChanged(true);
-            }
-        }
-
-
-        _rxStatus.onNext(_status);
-
-        // clear changed states
-        _status.setIsConnectedChanged(false);
-        _status.setIsOperationalChanged(false);
-        _status.setIsChanged(false);
-    }
 
 
     // ability to send a command to a particular device
@@ -257,17 +226,17 @@ public class Duke5
             Tcut21ToTcut30Converter converter = new Tcut21ToTcut30Converter();
             Tcut3DataAndStatusMessageWrapper wrapper = converter.convert(ew);
 
-            DeviceStatusMessage status = buildDeviceStatus(ew);
-            if ( status != null )
-            {
-                // set the values in our 'golden' status message from this one we
-                // just generated. returns if any of the essential values have changed
-                // (which does not include timestamp)
-                setGoldenStatus(status);
+            // status
+            for ( StatusMessage statusMsg : wrapper.getStatusMessage()) {
+              _messageId = (_messageId + 1) % 65535;
+              statusMsg.setMsgCount(_messageId);
+              _rxStatus.onNext(statusMsg);
             }
 
+
             for ( DataMessage dataMsg : wrapper.getDataMessage() ) {
-              dataMsg.setMsgCount(_messageId++); // TODO: wrap at 65535
+              _messageId = (_messageId + 1) % 65535;
+              dataMsg.setMsgCount(_messageId);
               _rxDetections.onNext(dataMsg);
             }
 
@@ -279,7 +248,27 @@ public class Duke5
     }
 
 
-/*    private DetectionMessage buildDeviceDetection(EWMessage ew) {
+/*
+
+    // we just keep up with one device status message, update this message as status comes
+    // in from the duke, and then send out status on a regular 1hz heartbeat.
+
+    private ScheduledExecutorService _statusPublisher;
+
+    // code from start()
+    // set up our scheduled publish of status
+    // (not using @scheduled so we can create device objects)
+    Runnable task = () -> sendDeviceStatus();
+    _statusPublisher = Executors.newScheduledThreadPool(1);
+    _statusPublisher.scheduleWithFixedDelay(task, 1, 1, TimeUnit.SECONDS);
+
+    // code from stop()
+    if ( _statusPublisher != null ) {
+        _statusPublisher.shutdown();
+        _statusPublisher = null;
+    }
+
+    private DetectionMessage buildDeviceDetection(EWMessage ew) {
         DetectionMessage msg = new DetectionMessage()
             .setDetectionType("RADAR")
             .setId(Long.toString(_messageId++))
@@ -288,7 +277,32 @@ public class Duke5
             .setTimestamp(new Date());
 
         return msg;
-    }*/
+    }
+
+    // sends a device status event back to the device manager every second
+    private void sendDeviceStatus()
+    {
+        if ( !_initialized ) return;
+
+        // check for timeout from device
+        if ( _status.getIsConnected() )
+        {
+            long diff = (new Date()).getTime() - _status.getTimestamp().getTime();
+            if ( diff > DEVICE_TIMEOUT_PERIOD )
+            {
+                _status.setIsConnected(false);
+                _status.setIsConnectedChanged(true);
+            }
+        }
+
+
+        _rxStatus.onNext(_status);
+
+        // clear changed states
+        _status.setIsConnectedChanged(false);
+        _status.setIsOperationalChanged(false);
+        _status.setIsChanged(false);
+    }
 
     private DeviceStatusMessage buildDeviceStatus(EWMessage message)
     {
@@ -376,6 +390,8 @@ public class Duke5
 
         return changed;
     }
+    *
+    */
 
     // cloneable (kinda)
     @Override

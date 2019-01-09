@@ -13,6 +13,7 @@ import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.coordinates.CompositeCoordinate;
 import mil.don.common.logging.LoggingLevel;
 import mil.don.common.logging.StdoutLogger;
+import mil.don.common.messages.tcut30.StatusMessage;
 import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
 
@@ -38,8 +39,8 @@ public class DeviceBase implements IDevice, Serializable
     protected LoggingLevel _loggingLevel = LoggingLevel.INFO;
     protected final transient ILoggingService _logging;
 
-    // outbound stream of status events
-    protected final transient Subject<DeviceStatusMessage> _rxStatus;
+    // outbound stream of device status events
+    protected final transient Subject<StatusMessage> _rxStatus;
 
 
 
@@ -76,7 +77,7 @@ public class DeviceBase implements IDevice, Serializable
     public List<DeviceCapability> getCapabilities() { return _capabilities; }
 
     // outbound stream of status events
-    public Observable<DeviceStatusMessage> getStatusStream() { return _rxStatus; }
+    public Observable<StatusMessage> getStatusStream() { return _rxStatus; }
 
 
   // base implementation for configure. pulls all common values from the given

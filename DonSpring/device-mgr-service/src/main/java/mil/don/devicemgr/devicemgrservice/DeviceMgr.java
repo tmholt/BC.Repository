@@ -11,6 +11,7 @@ import mil.don.common.devices.IDeviceDetector;
 import mil.don.common.logging.LoggingEntry;
 import mil.don.common.logging.LoggingLevel;
 import mil.don.common.messages.tcut30.DataMessage;
+import mil.don.common.messages.tcut30.StatusMessage;
 import mil.don.common.status.DeviceStatusMessage;
 import mil.don.common.status.ServiceStatusMessage;
 import mil.don.devicemgr.devicemgrservice.configuration.AppConfig;
@@ -106,7 +107,7 @@ public class DeviceMgr
         System.out.println("sent service status event: " + status.toString());
     }
 
-    void exchangeDeviceStatusEvent(DeviceStatusMessage status) {
+    void exchangeDeviceStatusEvent(StatusMessage status) {
         _rabbitTemplate.convertAndSend(_statusExchange.getName(), DEVICE_STATUS_ROUTING_KEY, status);
         System.out.println("sent device status event: " + status.toString());
     }
@@ -171,12 +172,12 @@ public class DeviceMgr
     private void wireupDeviceEvents(IDevice device) {
 
         // connect to status events from this device
-        Observable<DeviceStatusMessage> statuses = device.getStatusStream();
+        Observable<StatusMessage> statuses = device.getStatusStream();
         if ( statuses != null )
         {
             statuses.subscribe(
                 // on next
-                (DeviceStatusMessage status) -> {
+                (StatusMessage status) -> {
                     exchangeDeviceStatusEvent(status);
                 },
                 // on error

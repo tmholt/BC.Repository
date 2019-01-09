@@ -69,14 +69,11 @@ public class Ctc
     // this is the UDP connection to a duke device for receiving detections and status
     private UdpTransportReceiver _responses;
 
-    // we just keep up with one device status message, update this message as status comes
-    // in from the duke, and then send out status on a regular 1hz heartbeat.
-    private DeviceStatusMessage _status;
 
     private long _index = 100;
 
     private boolean _initialized = false;
-    private ScheduledExecutorService _statusPublisher;
+
 
     public Ctc(ILoggingService logging) {
         super(logging);
@@ -104,17 +101,8 @@ public class Ctc
     @Override
     public boolean start() {
 
-        // set up our outbound status message
-        _status = new DeviceStatusMessage(_name, _name, getDeviceType(), new Date(), false, false);
-
         // open response port and start listening for inbound data
         listenForResponseData();
-
-        // set up our scheduled publish of status
-        // (not using @scheduled so we can create device objects)
-        Runnable task = () -> sendDeviceStatus();
-        _statusPublisher = Executors.newScheduledThreadPool(1);
-        _statusPublisher.scheduleWithFixedDelay(task, 1, 1, TimeUnit.SECONDS);
 
         _initialized = true;
 
@@ -124,10 +112,6 @@ public class Ctc
     @Override
     public boolean stop()
     {
-        if ( _statusPublisher != null ) {
-            _statusPublisher.shutdown();
-            _statusPublisher = null;
-        }
 
         closeResponseConnection();
         return true;
@@ -173,36 +157,38 @@ public class Ctc
 
 
         if ( track != null ) {
-          Instant instant = Instant.now();
-          long now = (instant.getEpochSecond() * 1000 * 1000) + (instant.getNano() / 1000);
-
-          DataMessage dataMessage = new DataMessage();
-          dataMessage.setRevision("3.0");
-          dataMessage.setSourceSystem("CTC");
-          dataMessage.setSourceType(SystemTypeE.RADAR);
-          dataMessage.setTime(BigInteger.valueOf(now));
-          dataMessage.setTimeIsValid(true);
-
-          dataMessage.getTrack().add(track);
-
-          _rxDetections.onNext(dataMessage);
+          DataMessage dataMsg = buildDataMessageFromTrack(track);
+          _rxDetections.onNext(dataMsg);
         }
 
         // Update the status of the sensor (Q50) since we received a track from it
         // sensorTimeStamps.put(id.toString(), seconds);
 
+        // for now just fire out a status
 
+
+
+    }
+
+    private DataMessage buildDataMessageFromTrack(DataMessage.Track track) {
+
+      Instant instant = Instant.now();
+      long now = (instant.getEpochSecond() * 1000 * 1000) + (instant.getNano() / 1000);
+
+      DataMessage dataMessage = new DataMessage();
+      dataMessage.setRevision("3.0");
+      dataMessage.setSourceSystem("CTC");
+      dataMessage.setSourceType(SystemTypeE.RADAR);
+      dataMessage.setTime(BigInteger.valueOf(now));
+      dataMessage.setTimeIsValid(true);
+
+      dataMessage.getTrack().add(track);
+      return dataMessage;
     }
 
     // close our connection to the device that is receiving detections
     private void closeResponseConnection() {
     }
-
-    private void sendDeviceStatus() {
-        _rxStatus.onNext(buildDeviceStatus());
-    }
-
-
 
     private DeviceStatusMessage buildDeviceStatus() {
         DeviceStatusMessage msg = new DeviceStatusMessage();

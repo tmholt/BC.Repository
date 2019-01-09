@@ -32,58 +32,64 @@ import mil.don.common.messages.tcut30.XYZVel;
 
 public class CtcToTcutTrackConverter
 {
+
+  public DataMessage.Track convert(VeTrackUpdateMessage trackUpdateMsg) {
+
+    if ( trackUpdateMsg == null ) return null;
+
+    /*
+     * conversion code to TCUT 3
+     */
+    DataMessage.Track track = new DataMessage.Track();
+    DataMessage.Track.PositionECEF positionECEF = new DataMessage.Track.PositionECEF();
+
+
+    Integer trackId = trackUpdateMsg.getCTTrackId();
+    XYZPos xyzPos = convertXyz(trackUpdateMsg.getX(), trackUpdateMsg.getY(), trackUpdateMsg.getZ());
+    XYZVel xyzVel = convertVel(trackUpdateMsg.getXDot(), trackUpdateMsg.getYDot(), trackUpdateMsg.getZDot());
+    positionECEF.setXYZPos(xyzPos);
+    positionECEF.setXYZVel(xyzVel);
+
+    long timeSinceMidnight = (long) (trackUpdateMsg.getTimeSinceMidnight() * 1000 * 1000);
+    long midnight = Instant.now().truncatedTo(ChronoUnit.DAYS).getEpochSecond() * 1000 * 1000;
+    BigInteger updateTime = BigInteger.valueOf(midnight + timeSinceMidnight);
+
+    track.setTrackId(trackId);
+    track.setEnd(false);
+    track.setUpdateTime(updateTime);
+    track.setPositionECEF(positionECEF);
+    return track;
+  }
+
+  public DataMessage.Track convert(VeDropMessage trackDropMsg) {
+    if ( trackDropMsg == null ) return null;
+
+    DataMessage.Track track = new DataMessage.Track();
+
+    Integer trackId = trackDropMsg.getCTTrackId();
+    long timeSinceMidnight = (long) (trackDropMsg.getTimeSinceMidnight() * 1000 * 1000);
+    long midnight = Instant.now().truncatedTo(ChronoUnit.DAYS).getEpochSecond() * 1000 * 1000;
+    BigInteger updateTime = BigInteger.valueOf(midnight + timeSinceMidnight);
+
+    track.setTrackId(trackId);
+    track.setUpdateTime(updateTime);
+    track.setEnd(true);
+    return track;
+  }
+
   public DataMessage.Track convert(CtcMessage message) {
+    if ( message == null ) return null;
 
     DataMessage.Track track = null;
     if ( message.isTrackUpdate() ) {
-
       VeTrackUpdateMessage.VeTrackUpdateMessageBuilder builder = new VeTrackUpdateMessage.VeTrackUpdateMessageBuilder(message);
       VeTrackUpdateMessage trackUpdateMsg = builder.build();
-      if ( trackUpdateMsg != null )
-      {
-        /*
-         * conversion code to TCUT 3
-         */
-        track = new DataMessage.Track();
-        DataMessage.Track.PositionECEF positionECEF = new DataMessage.Track.PositionECEF();
-
-
-        Integer trackId = trackUpdateMsg.getCTTrackId();
-        XYZPos xyzPos = convertXyz(trackUpdateMsg.getX(), trackUpdateMsg.getY(), trackUpdateMsg.getZ());
-        XYZVel xyzVel = convertVel(trackUpdateMsg.getXDot(), trackUpdateMsg.getYDot(), trackUpdateMsg.getZDot());
-        positionECEF.setXYZPos(xyzPos);
-        positionECEF.setXYZVel(xyzVel);
-
-        long timeSinceMidnight = (long) (trackUpdateMsg.getTimeSinceMidnight() * 1000 * 1000);
-        long midnight = Instant.now().truncatedTo(ChronoUnit.DAYS).getEpochSecond() * 1000 * 1000;
-        BigInteger updateTime = BigInteger.valueOf(midnight + timeSinceMidnight);
-
-        track.setTrackId(trackId);
-        track.setEnd(false);
-        track.setUpdateTime(updateTime);
-        track.setPositionECEF(positionECEF);
-      }
-
+      track = convert(trackUpdateMsg);
     }
     else if ( message.isTrackDrop() ) {
       VeDropMessage.VeDropMessageBuilder builder = new VeDropMessage.VeDropMessageBuilder(message);
       VeDropMessage trackDropMsg = builder.build();
-      if ( trackDropMsg != null )
-      {
-        /*
-         * conversion code to TCUT 3
-         */
-        track = new DataMessage.Track();
-
-        Integer trackId = trackDropMsg.getCTTrackId();
-        long timeSinceMidnight = (long) (trackDropMsg.getTimeSinceMidnight() * 1000 * 1000);
-        long midnight = Instant.now().truncatedTo(ChronoUnit.DAYS).getEpochSecond() * 1000 * 1000;
-        BigInteger updateTime = BigInteger.valueOf(midnight + timeSinceMidnight);
-
-        track.setTrackId(trackId);
-        track.setUpdateTime(updateTime);
-        track.setEnd(true);
-      }
+      track = convert(trackDropMsg);
     }
 
     return track;

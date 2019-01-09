@@ -33,7 +33,7 @@ public class CtcToTcutStatusConverter
    *
    * @return status TCUT 3.0 StatusMessage.Status. Populated child node of StatusMessage containing sensor (radar) status data.
    */
-  public StatusMessage.Status convertVeToStatus(CtcMessage message)
+  public StatusMessage.Status convertCtcToStatus(CtcMessage message)
   {
     StatusMessage.Status status = null;
 
