@@ -395,9 +395,10 @@ public class Duke5
 
     // cloneable (kinda)
     @Override
-    public IDevice copy() {
+    public DeviceBase copy() {
         Duke5 d = new Duke5(_logging);
-        // d._name = this._name; //?
+        copyBase(d);
+        // copy anything specific to duke
         return d;
     }
 

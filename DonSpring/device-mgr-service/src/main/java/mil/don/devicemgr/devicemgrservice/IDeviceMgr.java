@@ -2,6 +2,7 @@ package mil.don.devicemgr.devicemgrservice;
 
 import java.util.List;
 
+import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.devices.IDevice;
@@ -9,13 +10,13 @@ import mil.don.common.devices.IDevice;
 
 public interface IDeviceMgr {
 
-    boolean addDevice(IDevice device);
+    boolean addDevice(DeviceBase device);
 
-    IDevice getDeviceById(String id);
+    DeviceBase getDeviceById(String id);
 
-    List<IDevice> getDevicesByCapability(DeviceCapability type);
+    List<DeviceBase> getDevicesByCapability(DeviceCapability type);
 
-    List<IDevice> getAllDevices();
+    List<DeviceBase> getAllDevices();
 
     boolean executeDeviceCommand(DeviceCommandBase command);
 }

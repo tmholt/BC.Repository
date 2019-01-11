@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Active device list</title>
+</head>
+<body>
+
+<h1>Device List</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th> ID </th>
+        <th> Name </th>
+        <th> Type </th>
+        <th> Position </th>
+        <th> CAPS </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="device : ${devices}">
+        <td><span th:text="${device._id}"> ID </span></td>
+        <td><span th:text="${device._name}"> Name </span></td>
+
+
+        <td>hi</td>
+        <td>hi</td>
+
+    </tr>
+    </tbody>
+</table>
+
+
+</body>
+</html>

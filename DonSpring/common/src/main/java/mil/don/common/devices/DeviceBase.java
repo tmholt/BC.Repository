@@ -124,15 +124,20 @@ public class DeviceBase implements IDevice, Serializable
 
     // cloneable (kinda)
     // need to decide how to actually do this. can't reuse in subclasses
-  // currently, and @Override would have to copy code.
-    public IDevice copy() {
+    // currently, and @Override would have to copy code.
+    public DeviceBase copy() {
       DeviceBase d = new DeviceBase(_logging);
-      d._id = _id;
-      d._name = _name;
-      d._symbolCode = _symbolCode;
-      d._range = _range;
-      // .. more
+      copyBase(d);
       return d;
+    }
+
+    protected void copyBase(DeviceBase to) {
+      to._id = _id;
+      to._name = _name;
+      to._symbolCode = _symbolCode;
+      to._range = _range;
+      to._position.set(_position);
+      // .. more
     }
 
     // ability to send a command to a particular device

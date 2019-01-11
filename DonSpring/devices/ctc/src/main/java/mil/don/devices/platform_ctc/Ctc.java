@@ -205,9 +205,10 @@ public class Ctc
 
     // cloneable (kinda)
     @Override
-    public IDevice copy() {
+    public DeviceBase copy() {
         Ctc d = new Ctc(_logging);
-        // d._name = this._name; //?
+        copyBase(d);
+        // copy anything specific to ctc
         return d;
     }
 

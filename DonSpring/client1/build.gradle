@@ -34,10 +34,11 @@ ext {
 
 dependencies {
 	implementation('org.springframework.boot:spring-boot-starter-actuator')
-	implementation('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-thymeleaf')
 	implementation('org.springframework.cloud:spring-cloud-starter-openfeign')
 	implementation('org.springframework.cloud:spring-cloud-starter-netflix-eureka-client')
-	runtimeOnly('org.springframework.boot:spring-boot-devtools')
+	compile('org.springframework.boot:spring-boot-devtools')
 	runtimeOnly('javax.xml.bind:jaxb-api:2.3.0')
 	compile files('../lib/mil.don.common-0.0.1.jar')
     compile files('../lib/mil.don.proxies-0.0.1.jar')

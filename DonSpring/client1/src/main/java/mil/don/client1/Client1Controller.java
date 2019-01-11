@@ -2,16 +2,18 @@ package mil.don.client1;
 
 
 
-import mil.don.common.devices.DetectionMessage;
+
+import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.devices.IDevice;
 import mil.don.common.messages.tcut30.DataMessage;
 import mil.don.common.messages.tcut30.StatusMessage;
-import mil.don.common.status.IStatusMessage;
 import mil.don.common.status.ServiceStatusMessage;
 import mil.don.proxies.DeviceMgrProxy;
 import mil.don.proxies.LoggingProxy;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.FanoutExchange;
@@ -29,7 +31,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 
 
-@RestController
+@Controller
 public class Client1Controller {
 
     // not being used right now. this was for command routing via rabbitmq.
@@ -68,13 +70,24 @@ public class Client1Controller {
         _commandExchange = new FanoutExchange("device-commands");
     }
 
+    // NOTE: not using this right now; instead we send commands directly to the device manager
+    // service, who then passes it along to the appropriate device.
     void exchangeDeviceCommandEvent(DeviceCommandBase command) {
         _rabbitTemplate.convertAndSend(_commandExchange.getName(), DEVICE_COMMAND_ROUTING_KEY, command);
         System.out.println("sent device command event: " + command.toString());
     }
 
+    @GetMapping("/hello")
+    public String hello(
+        @RequestParam(name="name", required=false, defaultValue = "world")
+        String name, Model model) {
 
-	@RequestMapping("/services/{serviceId}")
+        model.addAttribute("name", name);
+        return "hello"; // name of the html template (view) to use
+    }
+
+
+	  @RequestMapping("/services/{serviceId}")
     public List<ServiceInstance> serviceInstancesByApplicationName(
             @PathVariable String serviceId) {
         return _discoveryClient.getInstances(serviceId);
@@ -82,10 +95,8 @@ public class Client1Controller {
 
     @RequestMapping("/services")
     public List<ServiceInstance> serviceInstances() {
-
-	    List<ServiceInstance> instances = new ArrayList<>();
-
-	    List<String> services = _discoveryClient.getServices();
+	      List<ServiceInstance> instances = new ArrayList<>();
+  	    List<String> services = _discoveryClient.getServices();
 
         for ( String service : services) {
             instances.addAll(_discoveryClient.getInstances(service));
@@ -100,9 +111,11 @@ public class Client1Controller {
         return "ok";
     }
 
-    @RequestMapping("/testdevices")
-    public IDevice[] testDeviceMgrService() {
-	    return _deviceMgr.getAllDevices();
+    @GetMapping("/testdevices")
+    public String testDeviceMgrService(Model model) {
+      DeviceBase[] devices = _deviceMgr.getAllDevices();
+      model.addAttribute("devices", devices);
+	    return "device-list";
     }
 
     @RequestMapping("/device-status")
