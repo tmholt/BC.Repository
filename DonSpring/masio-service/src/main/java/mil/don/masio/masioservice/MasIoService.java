@@ -3,6 +3,8 @@
 package mil.don.masio.masioservice;
 
 
+import com.sun.jndi.toolkit.url.Uri;
+
 import org.springframework.amqp.core.Exchange;
 import org.springframework.amqp.core.FanoutExchange;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -79,27 +81,41 @@ public class MasIoService {
     private DatagramSocket _socket;
 
 	  public DetectionsToMasSender(AppConfig appConfig) {
-	    // TODO: load up the MAS ports that we should send to
-      int port = 58822;
-      SocketAddress outbound = new InetSocketAddress(port);
 
+	    // TODO: this is wrong and assumes localhost for the uri
+      SocketAddress outbound = null;
       try
       {
+        Uri send2Mas = new Uri(appConfig.getMasInUri());
+        int port = send2Mas.getPort();
+        outbound = new InetSocketAddress(port);
+
+        if ( outbound == null ) return;
+
         _socket = new DatagramSocket(outbound);
+
       }
       catch (Exception ex) {
+        // log and set flags appropriately
       }
+
     }
 
     public boolean send(final DetectionMessage detection) {
-	    return false;
+
+	    if ( _socket == null ) return false;
+      if ( detection == null ) return false;
+
+      return false;
     }
 
     //
     // take this device status message and forward it along to MAS
     //
     public boolean send(final DeviceStatusMessage status) {
-	    if ( status == null ) return false;
+
+      if ( _socket == null ) return false;
+      if ( status == null ) return false;
 
 	    // convert into a TCUT3 message
 	    DeviceStatusToTcut30StatusConverter converter = new DeviceStatusToTcut30StatusConverter();
