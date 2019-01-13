@@ -41,27 +41,17 @@ public class EcefCoordinate implements Serializable
     {
         return _x;
     }
-    public EcefCoordinate setX(double x)
-    {
-        this._x = x;
-        return this;
-    }
+    public EcefCoordinate setX(double x) { this._x = x; return this; }
+
     public double getY()
     {
         return _y;
     }
-    public EcefCoordinate setY(double y)
-    {
-        this._y = y;
-        return this;
-    }
+    public EcefCoordinate setY(double y) { this._y = y; return this; }
+
     public double getZ()
     {
         return _z;
     }
-    public EcefCoordinate setZ(double z)
-    {
-        this._z = z;
-        return this;
-    }
+    public EcefCoordinate setZ(double z) { this._z = z; return this; }
 }

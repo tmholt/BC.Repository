@@ -3,6 +3,7 @@
 package mil.don.common.messages.tcut30;
 
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(
     name = "DataMessage"
 )
-public class DataMessage {
+public class DataMessage
+{
   @XmlElement(
       name = "Track"
   )
@@ -137,7 +139,7 @@ public class DataMessage {
       name = "",
       propOrder = {"lineOfBearing", "positionECEF", "ballisticSolution", "classifications", "acousticQualities", "rfQualities"}
   )
-  public static class Track {
+  public static class Track  {
     @XmlElement(
         name = "LineOfBearing"
     )
@@ -747,7 +749,7 @@ public class DataMessage {
       name = "",
       propOrder = {"component", "parent", "lob", "ecef", "classifications"}
   )
-  public static class Threat {
+  public static class Threat  {
     @XmlElement(
         name = "Component"
     )

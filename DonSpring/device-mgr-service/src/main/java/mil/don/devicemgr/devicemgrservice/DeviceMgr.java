@@ -4,12 +4,15 @@ package mil.don.devicemgr.devicemgrservice;
 import io.reactivex.Observable;
 import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.devices.DetectionMessage;
+import mil.don.common.devices.DeviceBase;
 import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.devices.IDevice;
 import mil.don.common.devices.IDeviceDetector;
 import mil.don.common.logging.LoggingEntry;
 import mil.don.common.logging.LoggingLevel;
+import mil.don.common.messages.tcut30.DataMessage;
+import mil.don.common.messages.tcut30.StatusMessage;
 import mil.don.common.status.DeviceStatusMessage;
 import mil.don.common.status.ServiceStatusMessage;
 import mil.don.devicemgr.devicemgrservice.configuration.AppConfig;
@@ -35,7 +38,7 @@ import javax.annotation.PostConstruct;
 
 @Service
 public class DeviceMgr
-        extends HashMap<String, IDevice>
+        extends HashMap<String, DeviceBase>
         implements IDeviceMgr { // HealthIndicator
 
 
@@ -63,7 +66,7 @@ public class DeviceMgr
 
     // list of all registered (discovery) IDevices
     @Autowired
-    private List<IDevice> _availableDevices;
+    private List<DeviceBase> _availableDevices;
 
     // rabbitmq template
     @Autowired
@@ -105,12 +108,12 @@ public class DeviceMgr
         System.out.println("sent service status event: " + status.toString());
     }
 
-    void exchangeDeviceStatusEvent(DeviceStatusMessage status) {
+    void exchangeDeviceStatusEvent(StatusMessage status) {
         _rabbitTemplate.convertAndSend(_statusExchange.getName(), DEVICE_STATUS_ROUTING_KEY, status);
         System.out.println("sent device status event: " + status.toString());
     }
 
-    void exchangeDeviceDetectionEvent(DetectionMessage detection) {
+    void exchangeDeviceDetectionEvent(DataMessage detection) {
         _rabbitTemplate.convertAndSend(_detectionsExchange.getName(), DEVICE_DETECTION_ROUTING_KEY, detection);
         System.out.println("sent device detection event: " + detection.toString());
     }
@@ -121,20 +124,20 @@ public class DeviceMgr
 
     }
 
-    // go through our config file and create the correct IDevice
+    // go through our config file and create the correct DeviceBase
     // for it.
     private void loadDevicesFromConfiguration() {
         for ( DeviceConfiguration deviceConfig : _appConfig.getDevices() ) {
 
             String lookup = deviceConfig.getType();
-            IDevice handler = findDeviceByType(lookup);
+            DeviceBase handler = findDeviceByType(lookup);
             if ( handler == null ) {
                 log(LoggingLevel.ERROR, "ERROR finding device type " + lookup);
                 continue;
             }
 
             // create a specific copy of our template device and crank it up
-            IDevice specific = createSpecificDevice(handler, deviceConfig);
+            DeviceBase specific = createSpecificDevice(handler, deviceConfig);
             if ( specific == null ) {
                 log(LoggingLevel.ERROR, "ERROR creating device type " + lookup);
                 continue;
@@ -146,7 +149,7 @@ public class DeviceMgr
     }
 
     // go through our "template" devices looking for one with the given type
-    private IDevice findDeviceByType(String deviceType) {
+    private DeviceBase findDeviceByType(String deviceType) {
         // I miss c# .firstOrDefault
         return _availableDevices.stream()
             .filter(dvc -> dvc.getDeviceType().equalsIgnoreCase(deviceType))
@@ -156,27 +159,26 @@ public class DeviceMgr
 
     // create our new device, hook to events from it, and start its
     // run method in a new thread.
-    private IDevice createSpecificDevice(IDevice source,
+    private DeviceBase createSpecificDevice(DeviceBase source,
          DeviceConfiguration config) {
 
-        IDevice specific = source.copy();
+        DeviceBase specific = source.copy();
         specific.configure(config);
         wireupDeviceEvents(specific);
 
         boolean started = specific.start();
-
-        return specific;
+        return started ? specific : null;
     }
 
-    private void wireupDeviceEvents(IDevice device) {
+    private void wireupDeviceEvents(DeviceBase device) {
 
         // connect to status events from this device
-        Observable<DeviceStatusMessage> statuses = device.getStatusStream();
+        Observable<StatusMessage> statuses = device.getStatusStream();
         if ( statuses != null )
         {
             statuses.subscribe(
                 // on next
-                (DeviceStatusMessage status) -> {
+                (StatusMessage status) -> {
                     exchangeDeviceStatusEvent(status);
                 },
                 // on error
@@ -192,12 +194,12 @@ public class DeviceMgr
         // connect to detection events from this device
         if ( device instanceof IDeviceDetector )
         {
-            Observable<DetectionMessage> detects = ((IDeviceDetector)device).getDetectionsStream();
+            Observable<DataMessage> detects = ((IDeviceDetector)device).getDetectionsStream();
             if ( detects != null )
             {
                 detects.subscribe(
                     // on next
-                    (DetectionMessage detection) -> {
+                    (DataMessage detection) -> {
                         exchangeDeviceDetectionEvent(detection);
                     },
                     // on error
@@ -224,7 +226,7 @@ public class DeviceMgr
     }
 
 
-    public boolean addDevice(IDevice device) {
+    public boolean addDevice(DeviceBase device) {
 
         if ( this.containsKey(device.getId()) ) {
             return false;
@@ -235,7 +237,7 @@ public class DeviceMgr
         return true;
     }
 
-    public IDevice getDeviceById(String id) {
+    public DeviceBase getDeviceById(String id) {
 
         if ( this.containsKey(id) ) {
             _logging.debug("DeviceMgrService::DeviceMgr", "Device lookup success: " + id);
@@ -247,11 +249,11 @@ public class DeviceMgr
         }
     }
 
-    public List<IDevice> getDevicesByCapability(DeviceCapability cap) {
+    public List<DeviceBase> getDevicesByCapability(DeviceCapability cap) {
 
         // these 2 code blocks are the same - first with streams, second explicit
 
-        List<IDevice> list1 = this.entrySet().stream()
+        List<DeviceBase> list1 = this.entrySet().stream()
             .map(entry -> entry.getValue())
             .filter(entity -> entity.getCapabilities().contains(cap))
             .collect(Collectors.toList());
@@ -267,7 +269,7 @@ public class DeviceMgr
         return list1;
     }
 
-    public List<IDevice> getAllDevices() {
+    public List<DeviceBase> getAllDevices() {
         _logging.debug("DeviceMgrService::DeviceMgr", "Device list request: " + this.size());
         return new ArrayList<>(this.values());
     }

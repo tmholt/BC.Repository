@@ -66,7 +66,7 @@ public class DevicesController implements IDeviceManagerService
 
     @GetMapping("/devices/bycap/{cap}")
     public DeviceBase[] getDevicesByCapability(@PathVariable DeviceCapability cap) {
-        List<IDevice> list = _repo.getDevicesByCapability(cap);
+        List<DeviceBase> list = _repo.getDevicesByCapability(cap);
 
         int count = list.size();
         _logging.debug("DevicesController::getDevicesByCapability", "Device cap " + cap + " lookup found: " + count);
@@ -76,7 +76,7 @@ public class DevicesController implements IDeviceManagerService
 
     @GetMapping("/devices")
     public DeviceBase[] getAllDevices() {
-        List<IDevice> list  = _repo.getAllDevices();
+        List<DeviceBase> list  = _repo.getAllDevices();
 
         int count = list.size();
         _logging.debug("DevicesController::getAllDevices", "All devices found: " + count);

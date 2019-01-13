@@ -101,12 +101,17 @@ public class MasIoService {
 
     }
 
+<<<<<<< HEAD
     public boolean send(final DetectionMessage detection) {
 
 	    if ( _socket == null ) return false;
       if ( detection == null ) return false;
 
       return false;
+=======
+    public boolean send(final DataMessage detection) {
+	    return false;
+>>>>>>> 8c20b693d94f71123854714eee439e6521666a26
     }
 
     //
@@ -278,7 +283,7 @@ public class MasIoService {
   }
 
   @RabbitListener(queues = "#{detectionMessagesQueue.name}")
-  public void receiveDetections(final DetectionMessage detection)
+  public void receiveDetections(final DataMessage detection)
   {
     System.out.println("received inbound detection event: " + detection.toString());
 

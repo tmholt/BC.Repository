@@ -27,8 +27,10 @@ import org.springframework.stereotype.Service;
 import javax.annotation.PostConstruct;
 
 import mil.don.common.devices.DetectionMessage;
+import mil.don.common.messages.tcut30.DataMessage;
+import mil.don.common.messages.tcut30.StatusMessage;
 import mil.don.common.status.IStatusMessage;
-
+import mil.don.common.status.ServiceStatusMessage;
 
 
 // don't need to do this because a bean in configuration will create it for us.
@@ -37,12 +39,15 @@ import mil.don.common.status.IStatusMessage;
 public class Client1StatusListener
 {
 
-    // save the last 100 status events that we receive
-    CircularFifoQueue<IStatusMessage> _statusEvents = new CircularFifoQueue<>(100);
+    // save the last 100 device status events that we receive
+    CircularFifoQueue<StatusMessage> _deviceStatusEvents = new CircularFifoQueue<>(100);
+
+    // save the last 100 system status events that we receive
+    CircularFifoQueue<ServiceStatusMessage> _systemStatusEvents = new CircularFifoQueue<>(100);
 
 
     // save the last 100 detection events that we receive
-    CircularFifoQueue<DetectionMessage> _detectionEvents = new CircularFifoQueue<>(100);
+    CircularFifoQueue<DataMessage> _detectionEvents = new CircularFifoQueue<>(100);
 
 
     public Client1StatusListener() {
@@ -56,23 +61,32 @@ public class Client1StatusListener
 
 
     @RabbitListener(queues="#{statusMessagesQueue.name}")
-    public void receiveStatus(final IStatusMessage status) {
+    public void receiveDeviceStatus(final StatusMessage status) {
         System.out.println("received status event: " + status.toString());
-        _statusEvents.add(status);
+      _deviceStatusEvents.add(status);
+    }
+
+    @RabbitListener(queues="#{statusMessagesQueue.name}")
+    public void receiveSystemStatus(final ServiceStatusMessage status) {
+      System.out.println("received status event: " + status.toString());
+      _systemStatusEvents.add(status);
     }
 
     @RabbitListener(queues="#{detectionMessagesQueue.name}")
-    public void receiveDetections(final DetectionMessage detection) {
+    public void receiveDetections(final DataMessage detection) {
         System.out.println("received detection event: " + detection.toString());
         _detectionEvents.add(detection);
     }
 
-    public IStatusMessage[] getRecentStatusEvents() {
-        return _statusEvents.toArray(new IStatusMessage[_statusEvents.size()]);
+    public StatusMessage[] getRecentDeviceStatusEvents() {
+        return _deviceStatusEvents.toArray(new StatusMessage[_deviceStatusEvents.size()]);
     }
 
+    public ServiceStatusMessage[] getRecentSystemStatusEvents() {
+      return _systemStatusEvents.toArray(new ServiceStatusMessage[_systemStatusEvents.size()]);
+    }
 
-    public DetectionMessage[] getRecentDetectionEvents() {
-        return _detectionEvents.toArray(new DetectionMessage[_detectionEvents.size()]);
+    public DataMessage[] getRecentDetectionEvents() {
+        return _detectionEvents.toArray(new DataMessage[_detectionEvents.size()]);
     }
 }

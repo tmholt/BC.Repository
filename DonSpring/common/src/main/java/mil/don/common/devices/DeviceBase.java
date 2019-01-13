@@ -13,6 +13,7 @@ import mil.don.common.configuration.DeviceConfiguration;
 import mil.don.common.coordinates.CompositeCoordinate;
 import mil.don.common.logging.LoggingLevel;
 import mil.don.common.logging.StdoutLogger;
+import mil.don.common.messages.tcut30.StatusMessage;
 import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
 
@@ -38,8 +39,8 @@ public class DeviceBase implements IDevice, Serializable
     protected LoggingLevel _loggingLevel = LoggingLevel.INFO;
     protected final transient ILoggingService _logging;
 
-    // outbound stream of status events
-    protected final transient Subject<DeviceStatusMessage> _rxStatus;
+    // outbound stream of device status events
+    protected final transient Subject<StatusMessage> _rxStatus;
 
 
 
@@ -76,7 +77,7 @@ public class DeviceBase implements IDevice, Serializable
     public List<DeviceCapability> getCapabilities() { return _capabilities; }
 
     // outbound stream of status events
-    public Observable<DeviceStatusMessage> getStatusStream() { return _rxStatus; }
+    public Observable<StatusMessage> getStatusStream() { return _rxStatus; }
 
 
   // base implementation for configure. pulls all common values from the given
@@ -123,15 +124,20 @@ public class DeviceBase implements IDevice, Serializable
 
     // cloneable (kinda)
     // need to decide how to actually do this. can't reuse in subclasses
-  // currently, and @Override would have to copy code.
-    public IDevice copy() {
+    // currently, and @Override would have to copy code.
+    public DeviceBase copy() {
       DeviceBase d = new DeviceBase(_logging);
-      d._id = _id;
-      d._name = _name;
-      d._symbolCode = _symbolCode;
-      d._range = _range;
-      // .. more
+      copyBase(d);
       return d;
+    }
+
+    protected void copyBase(DeviceBase to) {
+      to._id = _id;
+      to._name = _name;
+      to._symbolCode = _symbolCode;
+      to._range = _range;
+      to._position.set(_position);
+      // .. more
     }
 
     // ability to send a command to a particular device

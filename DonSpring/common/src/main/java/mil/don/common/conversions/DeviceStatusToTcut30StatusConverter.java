@@ -30,8 +30,8 @@ import mil.don.common.status.DeviceStatusMessage;
 public class DeviceStatusToTcut30StatusConverter
 {
 
-  private static final String SYSTEM_SW_VERSION = "1.0.0.0";
-  private static final String SYSTEM_MISSION_NAME = "MEDUSA"; // required for TCUT3 status. no idea
+  public static final String SYSTEM_SW_VERSION = "1.0.0.0";
+  public static final String SYSTEM_MISSION_NAME = "MEDUSA"; // required for TCUT3 status. no idea
 
 
   public StatusMessage convert(DeviceStatusMessage message) {

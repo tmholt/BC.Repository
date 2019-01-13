@@ -45,6 +45,14 @@ public class CompositeCoordinate implements Serializable
     private LlaCoordinate _lla;
     private MgrsCoordinate _mgrs;
 
+    public CompositeCoordinate() {
+    }
+
+    // copy constructor
+    public CompositeCoordinate(CompositeCoordinate source) {
+      set(source);
+    }
+
     // region properties
 
     public EcefCoordinate getEcef()
@@ -79,6 +87,10 @@ public class CompositeCoordinate implements Serializable
     }
 
     // endregion
+
+    // copy from source
+    public void set(CompositeCoordinate source) {
+    }
 
     public LlaCoordinate setLlaHae(double lat, double lon, double alt)
     {

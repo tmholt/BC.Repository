@@ -10,17 +10,25 @@ import mil.don.common.devices.DeviceCapability;
 import mil.don.common.devices.DeviceCommandBase;
 import mil.don.common.devices.IDevice;
 import mil.don.common.devices.IDeviceCamera;
+import mil.don.common.messages.tcut30.BitResultStatusE;
+import mil.don.common.messages.tcut30.EwMode;
+import mil.don.common.messages.tcut30.StatusMessage;
+import mil.don.common.messages.tcut30.SystemTypeE;
 import mil.don.common.services.ILoggingService;
 import mil.don.common.status.DeviceStatusMessage;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static mil.don.common.conversions.DeviceStatusToTcut30StatusConverter.SYSTEM_MISSION_NAME;
+import static mil.don.common.conversions.DeviceStatusToTcut30StatusConverter.SYSTEM_SW_VERSION;
 
 /*
  * What are the things that a device needs to do, and what does it need in order to do that job?
@@ -99,22 +107,41 @@ public class Nighthawk
         _rxStatus.onNext(buildDeviceStatus());
     }
 
-    private DeviceStatusMessage buildDeviceStatus() {
-        DeviceStatusMessage msg = new DeviceStatusMessage();
-        msg.setTimestamp(new Date());
-        msg.setId(getId());
-        msg.setIndex(_id++);
-        msg.setSourceName(getName());
-        msg.setIsConnected(true);
-        msg.setIsOperational(true);
-        return msg;
+    private StatusMessage buildDeviceStatus() {
+
+      StatusMessage result = new StatusMessage();
+      result.setRevision("3.0");
+      result.setSourceSystem(this.getName());
+      result.setSourceType(SystemTypeE.CAMERA);
+
+      result.setTime(BigInteger.valueOf(System.currentTimeMillis()));
+      result.setTimeIsValid(false);
+
+      // message count. expected to be 0 for status
+      result.setMsgCount(0);
+
+      // set up the internal StatusMessage subclass
+      StatusMessage.Status internalStatus = new StatusMessage.Status();
+      internalStatus.setSwVersion(SYSTEM_SW_VERSION);
+      internalStatus.setOverallStatus(BitResultStatusE.NORMAL);
+      internalStatus.setMission(SYSTEM_MISSION_NAME); // NOTE: REQUIRED
+      internalStatus.setSystemState(EwMode.HALT); // taken from 21 conversion. why HALT??
+      // no spacial factors
+      // no optical factors
+      // no mission
+      // no coordination factors
+      // no rf factors
+      // no hardware version
+      result.setStatus(internalStatus);
+      return result;
     }
 
     // cloneable (kinda)
     @Override
-    public IDevice copy() {
+    public DeviceBase copy() {
         Nighthawk d = new Nighthawk(_logging);
-        // d._name = this._name; //?
+        copyBase(d);
+        // copy anything specific to nighthawk
         return d;
     }
 

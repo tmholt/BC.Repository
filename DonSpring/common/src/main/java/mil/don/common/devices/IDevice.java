@@ -4,6 +4,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import mil.don.common.configuration.DeviceConfiguration;
+import mil.don.common.messages.tcut30.StatusMessage;
 import mil.don.common.status.DeviceStatusMessage;
 
 // base functionality for a device interface within DON.
@@ -25,7 +26,7 @@ public interface IDevice  {
     // region events
 
 
-    Observable<DeviceStatusMessage> getStatusStream();
+    Observable<StatusMessage> getStatusStream();
 
     // endregion
 
