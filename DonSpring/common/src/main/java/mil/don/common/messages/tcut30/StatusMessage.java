@@ -2,6 +2,7 @@
 package mil.don.common.messages.tcut30;
 
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,8 @@ import javax.xml.bind.annotation.XmlValue;
 @XmlRootElement(
     name = "StatusMessage"
 )
-public class StatusMessage {
+public class StatusMessage implements Serializable
+{
   @XmlElement(
       name = "Status"
   )
@@ -137,7 +139,7 @@ public class StatusMessage {
       name = "",
       propOrder = {"spatialFactors", "opticalFactors", "rfFactors", "coordinationFactors"}
   )
-  public static class Status {
+  public static class Status implements Serializable {
     @XmlElement(
         name = "SpatialFactors"
     )
@@ -892,7 +894,7 @@ public class StatusMessage {
       name = "",
       propOrder = {"value"}
   )
-  public static class Log {
+  public static class Log implements Serializable {
     @XmlValue
     protected String value;
     @XmlAttribute(

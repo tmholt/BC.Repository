@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(
     name = "DataMessage"
 )
-public class DataMessage
+public class DataMessage implements Serializable
 {
   @XmlElement(
       name = "Track"
@@ -139,7 +139,7 @@ public class DataMessage
       name = "",
       propOrder = {"lineOfBearing", "positionECEF", "ballisticSolution", "classifications", "acousticQualities", "rfQualities"}
   )
-  public static class Track  {
+  public static class Track implements Serializable {
     @XmlElement(
         name = "LineOfBearing"
     )
@@ -486,7 +486,7 @@ public class DataMessage
         name = "",
         propOrder = {"xyzPos", "xyzVel", "posCovariance", "posVelCovariance"}
     )
-    public static class PositionECEF {
+    public static class PositionECEF implements Serializable {
       @XmlElement(
           name = "XYZPos",
           required = true
@@ -546,7 +546,7 @@ public class DataMessage
         name = "",
         propOrder = {"poi", "poo"}
     )
-    public static class BallisticSolution {
+    public static class BallisticSolution implements Serializable {
       @XmlElement(
           name = "POI"
       )
@@ -749,7 +749,7 @@ public class DataMessage
       name = "",
       propOrder = {"component", "parent", "lob", "ecef", "classifications"}
   )
-  public static class Threat  {
+  public static class Threat implements Serializable  {
     @XmlElement(
         name = "Component"
     )
@@ -907,7 +907,7 @@ public class DataMessage
     @XmlType(
         name = ""
     )
-    public static class Parent {
+    public static class Parent implements Serializable {
       @XmlAttribute(
           name = "threat_id",
           required = true
@@ -934,7 +934,7 @@ public class DataMessage
         name = "",
         propOrder = {"lineOfBearing", "originPos"}
     )
-    public static class LOB {
+    public static class LOB implements Serializable {
       @XmlElement(
           name = "LineOfBearing",
           required = true
@@ -971,7 +971,7 @@ public class DataMessage
         name = "",
         propOrder = {"xyzPos", "posError"}
     )
-    public static class ECEF {
+    public static class ECEF implements Serializable {
       @XmlElement(
           name = "XYZPos",
           required = true
@@ -1006,7 +1006,7 @@ public class DataMessage
     @XmlType(
         name = ""
     )
-    public static class Component {
+    public static class Component implements Serializable {
       @XmlAttribute(
           name = "sensor",
           required = true

@@ -5,6 +5,7 @@
     <content url="file://$MODULE_DIR$/../../mas-service">
       <excludeFolder url="file://$MODULE_DIR$/../../mas-service/.gradle" />
       <excludeFolder url="file://$MODULE_DIR$/../../mas-service/build" />
+      <excludeFolder url="file://$MODULE_DIR$/../../mas-service/out" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

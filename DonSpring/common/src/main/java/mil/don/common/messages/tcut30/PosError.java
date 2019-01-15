@@ -2,6 +2,8 @@
 
 package mil.don.common.messages.tcut30;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -15,7 +17,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(
     name = "PosError"
 )
-public class PosError {
+public class PosError implements Serializable
+{
   @XmlAttribute(
       name = "xx",
       required = true

@@ -3,6 +3,7 @@
 package mil.don.common.messages.tcut30;
 
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -20,7 +21,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(
     name = "Classifications"
 )
-public class Classifications {
+public class Classifications implements Serializable
+{
   @XmlElement(
       name = "Discrimination"
   )

@@ -2,6 +2,8 @@
 package mil.don.common.messages.tcut30;
 
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -15,7 +17,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement(
     name = "LineOfBearing"
 )
-public class LineOfBearing {
+public class LineOfBearing implements Serializable
+{
   @XmlAttribute(
       name = "_azimuth",
       required = true
