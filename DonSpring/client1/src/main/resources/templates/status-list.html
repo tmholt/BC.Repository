@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Current device status</title>
+</head>
+<body>
+
+<h1>Device Status</h1>
+
+<table>
+    <thead>
+    <tr>
+        <th> Status </th>
+        <th> Source </th>
+        <th> Type </th>
+        <th> Time </th>
+        <th> Log </th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="item : ${status}">
+        <td><span th:text="${item.status}"> Status </span></td>
+        <td><span th:text="${device.sourceSystem}"> Source </span></td>
+        <td><span th:text="${device.sourceType}"> Type </span></td>
+        <td><span th:text="${device.time}"> Time </span></td>
+        <td><span th:text="${device.log}"> Log </span></td>
+
+    </tr>
+    </tbody>
+</table>
+
+
+</body>
+</html>

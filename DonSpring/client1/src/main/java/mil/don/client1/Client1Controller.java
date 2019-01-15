@@ -119,8 +119,11 @@ public class Client1Controller {
     }
 
     @RequestMapping("/device-status")
-    public StatusMessage[] getRecentDeviceStatusEvents() {
-        return _statusListener.getRecentDeviceStatusEvents();
+    public String getRecentDeviceStatusEvents(Model model) {
+      StatusMessage[] status = _statusListener.getRecentDeviceStatusEvents();
+      model.addAttribute("status", status);
+      return "status-list";
+
     }
 
     @RequestMapping("/system-status")

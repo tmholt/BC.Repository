@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 
-import mil.don.common.devices.IDevice;
+import mil.don.common.devices.DeviceBase;
 import mil.don.devices.platform_ctc.Ctc;
 import mil.don.devices.platform_duke5.Duke5;
 import mil.don.devices.platform_nighthawk.Nighthawk;
@@ -42,19 +42,19 @@ public class DeviceProviderConfiguration
 
     @Bean
     @Scope("prototype")
-    public IDevice createNighthawk() {
+    public DeviceBase createNighthawk() {
         return new Nighthawk(_logging);
     }
 
     @Bean
     @Scope("prototype")
-    public IDevice createDuke5() {
+    public DeviceBase createDuke5() {
         return new Duke5(_logging);
     }
 	
     @Bean
     @Scope("prototype")
-    public IDevice createCtc() {
+    public DeviceBase createCtc() {
         return new Ctc(_logging);
     }	
 }
