@@ -1,0 +1,92 @@
+
+syntax = "proto3";
+
+import "Common.proto";
+import "SystemConfiguration.proto";
+
+package saic.valkyrie.sdk.generated;
+option java_package = "saic.valkyrie.sdk.generated";
+option java_outer_classname = "DevicesStatusProto";
+option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+
+
+//
+// DeviceWarningTypeEnum
+// device warning message type
+// These items are ordered in a priority such that 0 is the least priority and the last entry is the highest priority
+//
+enum DeviceWarningTypeEnum {
+  DEVICE_WARNING_OTHER = 0[(description)="Other"]; // OTHER warnings
+  DEVICE_WARNING_NEVER_CONNECTED = 1[(description)="Never Connected"]; // the device has never connected
+  DEVICE_WARNING_STANDBY = 2[(description)="Standby"]; // the device is in standby mode
+  DEVICE_WARNING_DEVICE_TIMEOUT = 3[(description)="Device Timeout"]; // the device timed out
+  DEVICE_WARNING_TRANSPORT_ERROR = 4[(description)="Transport Error"]; // a transport failed to open
+  DEVICE_WARNING_CONFIGURATION_ERROR = 5[(description)="Configuration Error"]; // the device was configured incorrectly
+  DEVICE_WARNING_HARDWARE_LOGGING_ERROR = 6[(description)="Hardware Logging Error"]; // a critical log was received
+  DEVICE_WARNING_STOW_ERROR = 7[(description)="Stow Error"]; // Device failed to stow
+  DEVICE_WARNING_TEMPERATURE_WARNING = 8[(description)="Temperature Warning"]; // High or low temperature warning
+  DEVICE_WARNING_COMMAND_ERROR = 9[(description)="Command Error"]; // a faulty command was received
+  DEVICE_WARNING_HARDWARE_ERROR = 10[(description)="Hardware Error"]; // the device reports a hardware error
+}
+
+
+
+
+//
+// DeviceWarningMessage
+// device warning message
+//
+message DeviceWarningInfo {
+  DeviceWarningTypeEnum warningType = 1; // The type of warning like timeout or hardware-reported error
+  string warningMessage = 2; // User-friendly warning message to display and indicate the problem
+}
+
+//
+// DeviceStatus
+// Details about one device in the system, and its current status
+//
+message DeviceStatus {
+  int64 timestamp = 1; // status update timestamp (milliseconds since epoch)
+  OperationalStatus operationalStatus = 2; // operational status for this device
+  string sourceDevice = 3; // unique identifier for this device
+  string sourceSystem = 4; // the application/system that is managing this device
+  DeviceSpatialFactors spatial = 5; // positional information for this device
+  string mission = 6; // name of the current operating mode
+  repeated DeviceStatus subDeviceStatus = 7; // additional Sub devices for status
+  repeated DeviceWarningInfo warnings = 8; // warning messages from the hardware
+
+  // The current operational state for the supported capabilities or capability options of this device.
+  // There should be one message per supported capability unless that capability has options. If options are present,
+  // then there should be one message per option instead of the message for that capability.
+  repeated DeviceOperationalState operationalStates = 9;
+}
+
+//
+// DeviceOperationState
+// The active state for one operational capability or capability option for a given device.
+//
+enum DeviceOperationState {
+  OP_STATE_UNKNOWN = 0; // unknown state
+  OP_STATE_PENDING = 1; // command sent but not responded to yet
+  OP_STATE_ACTIVE = 2; // this capability is currently being performed
+  OP_STATE_INACTIVE = 3; // this capability is not currently being performed
+  OP_STATE_UNAVAILABLE = 4; // this means this capability is not available and should be greyed out in UI
+}
+
+//
+// DeviceOperationalState
+// Details for the current operational state for one capability for a device. Every capability, including repeated
+// capabilities such as EW, should be present with a state as separate DeviceOperationalState messages.
+//
+message DeviceOperationalState {
+  DeviceOperationType operation = 1; // the operational capability for this device
+  DeviceOperationState state = 2; // the state for this operational capability
+  string displayName = 3; // a string value representing the name of this capability
+
+  // an optional target id that represents the threat this operation is running against. null for non-threat-specific
+  // operations (like fire or deploy). Primarily for energize|probe|slew -to-cue commands
+  TargetIdentifier target = 4;
+}
+
+
+

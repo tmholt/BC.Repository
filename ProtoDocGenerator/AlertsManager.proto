@@ -1,0 +1,78 @@
+
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "Common.proto";
+import "SystemAlerts.proto";
+
+package saic.valkyrie.sdk.generated;
+option java_package = "saic.valkyrie.sdk.generated";
+option java_outer_classname = "AlertsManagerProto";
+option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+//
+// AlertsManager
+// Service used to publish SystemAlerts to subscribers
+//
+service AlertsManager {
+
+  //
+  // getVersion
+  // Get the version of the Configuration manager. this is a unary blocking call.
+  //
+  rpc getVersion (google.protobuf.Empty) returns (VersionInfo);
+
+  //
+  // getRecentAlerts
+  // Ability to request the list of recent alerts.
+  //
+  // Output: A stream of SystemAlert objects.
+  //
+  rpc getRecentAlerts (google.protobuf.Empty) returns (stream SystemAlert);
+
+  //
+  // dismissAlert
+  // Ability to dismiss an alert from the alerts manager.
+  // NOTE: This call is intended to completely dismiss (remove) an alert from the alert manager.
+  //
+  rpc dismissAlert (AlertDismissalRequest) returns (ResponseInfo);
+
+  //
+  // sendAlert
+  // Ability to send a system-wide alert from a SDK client to all subscribed clients.
+  // NOTE: does not send out across VALKYRIE as an alert.
+  //
+  rpc sendAlert (SystemAlert) returns (ResponseInfo);
+
+  //
+  // subscribe
+  // Ability for a client to receive status, heartbeats, and alerts as they occur within the system
+  // from DON services.
+  //
+  rpc subscribe (ClientAlertsSubscription) returns (stream AlertsSubscriptionResponse);
+}
+
+//
+// ClientAlertsSubscription
+// Message used to subscribe a client to the AlertsManager
+//
+message ClientAlertsSubscription {
+  bool subscribeToDeviceAlerts = 1;
+  bool subscribeToServiceAlerts = 2;
+  bool subscribeToClientAlerts = 3;
+}
+
+//
+// AlertsSubscriptionResponse
+// Message used to send SystemAlerts to subscribers
+//
+message AlertsSubscriptionResponse {
+  SystemAlert alert = 1;
+}
+
+//
+// AlertDismissalRequest
+// Message used to dismiss a SystemAlert from the alerts manager
+//
+message AlertDismissalRequest {
+  string alertId = 1;
+}

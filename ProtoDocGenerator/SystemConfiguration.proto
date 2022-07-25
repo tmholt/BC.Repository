@@ -1,0 +1,360 @@
+
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+import "Common.proto";
+import "Filter.proto";
+
+package saic.valkyrie.sdk.generated;
+option java_package = "saic.valkyrie.sdk.generated";
+option java_outer_classname = "SystemConfigurationProto";
+option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+
+//
+// SystemConfiguration
+// Contains the complete configuration suite
+//
+message SystemConfiguration {
+  string version = 1; // The version of this file
+  repeated ServiceConfiguration services = 2; // the list of our SDK services
+  repeated DeviceConfiguration devices = 3; // the list of the configured devices
+  repeated ProtectedAreaConfiguration protectedAreas = 4; // the list of the protected areas that are configured
+  GlobalSettingsConfiguration globalSettings = 5; // the set of global settings
+  repeated FilterConfig availableFilters = 7; // a set of filters available for use by clients
+}
+
+//
+// ServiceConfiguration
+// Contains the necessary information for an SDK service
+//
+message ServiceConfiguration {
+  SdkServiceType type = 1; // SDK Service type
+  TransportConfiguration transport = 2; // Service transport details
+}
+
+//
+// SdkServiceType
+// Defines the available SDK service types.
+//
+enum SdkServiceType {
+  SDK_SERVICE_UNKNOWN = 0[(description) = "Unknown"]; // Error / unset
+  SDK_SERVICE_DEVICES_MANAGER = 1 [(description) = "Devices Manager"];
+  SDK_SERVICE_THREATS_MANAGER = 2 [(description) = "Threats Manager"];
+  SDK_SERVICE_SYSTEMS_MANAGER = 3 [(description) = "Systems Manager"];
+  SDK_SERVICE_CONFIGURATION_MANAGER = 4 [(description) = "Configuration Manager"];
+  SDK_SERVICE_ALERTS_MANAGER = 5 [(description) = "Alerts Manager"];
+  SDK_SERVICE_CAPABILITY_STATE_SERVICE = 6 [(description) = "Capability State Service"];
+}
+
+//
+// GlobalSettingsConfiguration
+// Contains the global settings
+//
+message GlobalSettingsConfiguration{
+  ClassificationLevel classification = 1; // Classification
+  bool stopJamOnDisconnect = 2; // Flag for behavior upon client disconnect
+}
+
+
+//
+// ProtectedAreaConfiguration
+// Details about one defined protected area within the system
+//
+message ProtectedAreaConfiguration {
+  string name = 1; // unique identifier for this protected area
+  oneof data {
+    CircleShape circle = 2; // this protected area is a circle
+    PolygonShape polygon = 3; // this protected area is a polygon
+  }
+}
+
+//
+// ClassificationLevel
+// enumeration of available classification levels for the system
+//
+enum ClassificationLevel {
+  CLASSIFICATION_UNKNOWN = 0; // unknown / unset
+  CLASSIFICATION_UNCLASSIFIED = 1;
+  CLASSIFICATION_SECRET = 2;
+  CLASSIFICATION_TOP_SECRET = 3;
+}
+
+//
+// DeviceConfiguration
+// Top level configuration message for devices configured within the system. These are
+// values that are defined in configuration and will not change over time with
+// device status.
+//
+message DeviceConfiguration {
+  string deviceName = 1; // User-friendly name for this device
+  string deviceId = 2; // The unique id for this device
+
+  // The id of the container application that is managing this device. This ID should match the
+  // client name presented to DevicesManager when registering this device as being handled; otherwise
+  // the registration will fail.
+  string deviceOwner = 3;
+
+  string description = 4; // Field for holding a human-friendly description of the device
+  string serialNumber = 5; // serial number for this device
+  DeviceVisualsConfiguration visual = 6; // Options for visually displaying a device
+  DeviceSpatialFactors spatial = 7; // Spatial info for a device like orientation
+  DeviceCapabilitiesConfiguration capabilities = 8; // The capabilities a device supports
+  SubDeviceInfo subDeviceDetails = 9; // details IF this is a sub-device
+  repeated DeviceConfiguration subDevices = 10; // if this device has sub-devices, those child devices
+  repeated DeviceTransportInfo transports = 11; // the URL connections for this device
+  DeviceHandlerType handlerType = 12; // The message protocol the device uses
+  bool compressMessages = 13; // Flag for determining if the messages are compressed for this device.
+}
+
+//
+// DeviceHandlerType
+// This enumeration defines the protocol that a device speaks; this critical enumeration defines how to communicate
+// with the device in its native language.
+//
+enum DeviceHandlerType {
+  HANDLER_UNKNOWN = 0 [(description) = "Unknown"]; // UNDEFINED value
+  HANDLER_GENERIC_TCUT_3_0 = 1 [(description) = "Generic TCUT 3.0"]; // The Device is a Generic TCUT 3.0 Device
+  HANDLER_SDK = 2 [(description) = "SDK"]; // The Device is an SDK Device
+  HANDLER_LEGACY = 3 [(description) = "Legacy"]; // The Device is a legacy Device
+  HANDLER_DRONESHIELD = 4 [(description) = "DroneShield RFOne and DS-X"];
+  HANDLER_DRONECANNON = 5 [(description) = "DroneShield DroneCannon"];
+  HANDLER_OCTAGON = 6 [(description) = "Infinity EO Octagon"];
+  HANDLER_LEONIDAS = 7 [(description) = "Leonidas Microwave Device"];
+  HANDLER_ENFORCEAIR = 8 [(description) = "D-FEND EW device"];
+  HANDLER_AEROGUARD = 9 [(description) = "SCI Blue Force Interceptor"];
+  HANDLER_PELCO_D = 10 [(description) = "Pelco-D Camera communication"];
+}
+
+//
+// SubDeviceInfo
+// The specific fields for a device that is a sub-device - ie it has a parent device
+//
+message SubDeviceInfo {
+  string parentId = 1; // device id for parent
+  bool parentAggregatesCapabilities = 2; //boolean to control whether this devices capabilities will be displayed under the parent on the HMI
+}
+
+//
+// DeviceVisualsConfiguration
+// Contains info about how the device should be displayed
+//
+message DeviceVisualsConfiguration {
+  string symbolCode = 1; // 15 character MIL-STD 2525C representing a symbol to display the symbol.
+  bool displayOnClient = 2; // Controls displaying on the client
+}
+
+//
+// DeviceOperationType
+// The set of operational capabilities that are available to be active or inactive
+// for a given device.
+//
+enum DeviceOperationType {
+  OP_TYPE_UNKNOWN = 0;
+  OP_TYPE_FIRE = 1;
+  OP_TYPE_DEPLOY = 2;
+  OP_TYPE_ENERGIZE = 3;
+  OP_TYPE_PROBE = 4;
+  OP_TYPE_EW = 5; // EW and EW options/countermeasures
+  OP_TYPE_SLEW = 6; // Device is performing an automated/continuous slew
+  OP_TYPE_CAMERA = 7; // more of a marker for camera coverage sectors
+}
+
+//
+// CoverageSector
+// Message for representing one of a devices' coverage sectors (range fan/ring). Notes:
+//   - A start/stop azimuth of 0/360 represents a device with 360 FOV.
+//   - A start/stop az of 355/5 would be a valid 10 degree FOV centered at 0 degrees.
+//   - If a device doesn't have a start/stop azimuth, then start and stop should be set to 0 and 360 for a range fan to be visible.
+//   - startElevation should be less than or equal to endElevation
+//   - If a device doesn't have a start/stop elevation, then start and stop should be set to -90/90
+//   - initial CoverageSectors are defined in configuration, overwritten by DeviceStatus
+//
+message CoverageSector {
+  // defines the operation associated with this coverage sector for a device
+  // if set to UNKNOWN, never turn "on", otherwise turn on when associated type==ACTIVE
+  DeviceOperationType associatedOperation = 1;
+  SectorShape sector = 2; // the shape of the coverage sector
+}
+
+//
+// DeviceCapabilitiesConfiguration
+// All of the capabilities a device supports like supported commands.
+//
+message DeviceCapabilitiesConfiguration {
+  bool sendsTracks = 1; // if the device send tracks
+  ThreatCapabilitiesConfiguration threatCapabilities = 2; // Support for receiving threats
+  repeated PointingCapabilitiesConfiguration slewCapabilities = 3; // Support for slew commands
+  repeated GenericCameraConfiguration cameraCapabilities = 4; // Support for video streams/camera commands
+  repeated EwCapabilityConfiguration ewCapabilities = 5; // Support for EW commands
+  repeated CapabilityProperties fireCapabilities = 6; // Capability describing support for fire command.
+  repeated CapabilityProperties energizeCapabilities = 7; // Think laser commands
+  repeated CapabilityProperties deployCapabilities = 8; // Support for deploy. This one might vary between devices.
+  repeated PointingCapabilitiesConfiguration probeCapabilities = 9; // Capabilities for devices probing a threat/location
+  google.protobuf.StringValue collocatedCamera = 10; // Name of a possible co-located camera
+  bool registrationRequired = 11; // The flag for if registration command is required for the device
+}
+
+//Defines the specific rules for receiving threats
+message ThreatCapabilitiesConfiguration {
+  bool receivesThreats = 1; //If the device receives threats
+  FilterConfig threatFilter = 2; //How the threats should be filtered
+}
+
+//
+// Properties on every capability
+//
+message CapabilityProperties {
+  string displayName = 1; // User-friendly name for SLEW command on a UI. Required
+  CapabilityGroup group = 2; // Group this command belongs to
+  Priority groupPriority = 3; // Ordering of this capability within its group
+  bool excludeFromEngagements = 4; // Should this command show up as an active engagement
+  CapabilityConstraints constraints = 5; // Constraints on this specific capability
+  bool requireConfirmation = 6; // If this capability should be confirmed by the operator before turning on
+}
+
+//
+// Used for grouping commands together, in order of kill chain
+//
+enum CapabilityGroup {
+  CAP_GROUP_UNKNOWN = 0;
+  CAP_GROUP_ENABLE = 1; // NUC
+  CAP_GROUP_DETECT = 2; // deploy, radiate
+  CAP_GROUP_TRACK = 3; // probe
+  CAP_GROUP_IDENTIFY = 4; // slew
+  CAP_GROUP_DEFEAT = 5; // EW, fire, energize, kinetic, hpm, laze, scary things
+}
+
+//
+// GenericCameraConfiguration
+// Info about a camera attached to a device such as video stream info and accepted commands.
+//
+message GenericCameraConfiguration {
+  string cameraName = 1; //A name associated with this camera. Useful for commanding a specific camera on a device.
+  CameraTypeEnum cameraType = 2; //The type of camera such as EO or IR
+  bool acceptFocus = 3; //Whether or not this camera accepts focus commands.
+  bool acceptZoom = 4; //Whether or not this camera accepts zoom commands.
+  repeated CameraVideoConfiguration videos = 5; //Not all cameras have video and some might have more than one stream being output.
+}
+
+//
+// CameraVideoConfiguration
+// Info about a video stream associated with a camera such as the name and stream url.
+//
+message CameraVideoConfiguration {
+  string displayName = 1; // A user-friendly name associated with the stream.
+  VideoFormatEnum videoType = 2;  // type of video produced
+  VideoTransportInfo url = 3; // A URL for the video feed and where to save it to
+  bool record = 4; // If this video should this be recorded
+  bool display = 5; // Should this be displayed
+}
+
+//
+// CameraTypeEnum
+// The type of camera attached to a device.
+//
+enum CameraTypeEnum {
+  CAMERA_TYPE_DEFAULT = 0; // Unknown
+  CAMERA_TYPE_EO = 1; // EO camera
+  CAMERA_TYPE_IR = 2; // IR camera
+}
+
+//
+// VideoFormatEnum
+// The type of video a given camera produces.
+//
+enum VideoFormatEnum {
+  VIDEO_FORMAT_DEFAULT = 0; //Unknown / default
+  VIDEO_FORMAT_MPEG_TS = 1;
+  VIDEO_FORMAT_H_264 = 2;
+  VIDEO_FORMAT_H_265 = 3;
+}
+
+//
+// PointingCapabilitiesConfiguration
+// The slew capabilities of a device. Details about what slew commands a device can perform.
+//
+message PointingCapabilitiesConfiguration {
+  CapabilityProperties properties = 1;
+  bool requiresSlewToAngle = 2;
+}
+
+//
+// EwCapabilityConfiguration
+// Specific details for the EW countering capability for a device
+//
+message EwCapabilityConfiguration {
+  CapabilityProperties properties = 1; // Properties for this capability
+  bool isBarrageOption = 2; // If this capability should be used as part of Barrage(JAM_ALL)
+  bool isPnt = 3; // If this capability affects GPS
+  repeated double frequencies = 4; // The set of frequencies this EW command affects.
+}
+
+//
+// CapabilityConstraints
+// The defined set of constraints on what it takes to execute a given command/capability
+//
+message CapabilityConstraints {
+  // means this can always run, no point or threat needed
+  bool requiresNothing = 1;
+  // slew|probe -to-position AND to a repeated set of points from the SDK (usually for a threat)
+  bool requiresPoint = 2;
+  // automatically follows a threat id by itself (slew-auto command)
+  bool requiresTarget = 3;
+  // filtering constraints – additional constraints on top of requiresPoint
+  FilterConfig threatFilters = 4;
+}
+
+
+//
+// DeviceSpatialFactors
+// Spatial data for a device, as a child of device configuration/status. This contains active position information for this
+// device over time.
+// Child of DeviceStatus and DeviceConfiguration
+//
+message DeviceSpatialFactors {
+  CoordinateLla emplacement = 1; // The location of the device. Altitude should only be in HAE.
+  Orientation orientation = 2; // The direction a device is facing.
+  CoordinateLla homePosition = 3; // The home position for a device.
+  repeated CoverageSector coverageSectors = 4; // The list of range fans/rings supported by the device.
+  SpatialFactorsStatusUsage spatialFactorsStatusUsage = 5; // Collection of flags for the usages of various spacial factors in status messages
+}
+
+//
+//Collection of flags for the usages of various spacial factors in status messages
+//
+message SpatialFactorsStatusUsage{
+  bool ignoreStatusCoverageSectors = 1; //Flag to determine whether to use the configured vs reported Coverage Sectors
+  bool ignoreStatusOrientation = 2; //Flag to determine whether to use the configured vs reported Orientation
+  bool ignoreStatusEmplacement = 3; //Flag to determine whether to use the configured vs reported Emplacement
+  bool ignoreStatusHomePosition = 4; //Flag to determine whether to use the configured vs reported Reference Position
+}
+
+//
+// DeviceTransportInfo
+// Transport details for a device
+//
+message DeviceTransportInfo {
+  DeviceTransportType type = 1; // the kind of transport this is for our device
+  TransportConfiguration configuration = 2; //the specific details of the transports network type, destination, and port.
+}
+
+//
+// VideoTransportInfo
+// Transport details for a device
+//
+message VideoTransportInfo {
+  TransportConfiguration configuration = 1; //the specific details of the transports network type, destination, and port.
+  string path = 2; // the path to record the video to
+}
+
+//
+// DeviceTransportType
+// The kind of data this transport is supporting for a device
+//
+enum DeviceTransportType {
+  TRANSPORT_TYPE_UNKNOWN = 0; // Error/unset value
+  TRANSPORT_TYPE_COMMAND = 1; // a command transport; receives inbound commands and directives
+  TRANSPORT_TYPE_RESPONSE = 2; // a response transport; sends device status and tracks
+  TRANSPORT_TYPE_CORRELATOR = 3; // forwarding transport to a correlator
+  TRANSPORT_TYPE_THREAT = 4; // a threat transport; receives inbound threats
+}

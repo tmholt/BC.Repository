@@ -1,0 +1,24 @@
+
+syntax = "proto3";
+
+import "SystemConfiguration.proto";
+
+package saic.valkyrie.sdk.generated;
+option java_package = "saic.valkyrie.sdk.generated";
+option java_outer_classname = "DeviceTemplatesProto";
+option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+
+
+//
+// DeviceTemplate
+// One definition of a device template, which is used as a baseline for a newly configured device
+//
+message DeviceTemplate {
+  string version = 1; // proto version for the DeviceConfiguration
+  string templateName = 2; // the name for this device template
+  string templateDescription = 3; // a description for this device template
+  bool allowDuplicates = 4; // if we should support multiple devices of this template type within a system configuration
+  string baseDeviceName = 5; // the base device name to use
+  bool incrementIndexOnName = 6; // if we should add 1/2/3 to the end of the base device name
+  DeviceConfiguration template = 7; // the actual template for the device configuration
+}

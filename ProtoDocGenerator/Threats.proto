@@ -1,0 +1,260 @@
+
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/descriptor.proto";
+import "Common.proto";
+
+package saic.valkyrie.sdk.generated;
+option java_package = "saic.valkyrie.sdk.generated";
+option java_outer_classname = "ThreatsProto";
+option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+
+//
+// DetectedCoordinate
+// Contains the detected coordinate along with optional error values for LLA.
+//
+message DetectedCoordinate {
+  CoordinateLla position = 1; // the detected position
+  google.protobuf.DoubleValue latitudeError = 2; // Error of the latitude (Units: degrees).
+  google.protobuf.DoubleValue longitudeError = 3; // Error of the longitude (Units: degrees).
+  google.protobuf.DoubleValue altitudeError = 4; // Error of the altitude (Units: meters).
+}
+
+//
+// DetectedLineOfBearing
+// Contains a line of bearing along with optioounal error information for Az/El/Range
+//
+message DetectedLineOfBearing {
+  LineOfBearing lob = 1;
+  google.protobuf.DoubleValue azimuthError = 2; // Error of the azimuth angle estimate (Units: degrees).
+  google.protobuf.DoubleValue elevationError = 3; // Error of the elevation angle estimate (Units: degrees).
+  google.protobuf.DoubleValue rangeError = 4; // Error of the Range of LOB (Units: meters)
+}
+
+//
+// TargetEtaInfo
+// The estimated time of arrival information for a target.
+//
+message TargetEtaInfo {
+  int32 eta = 1; // the ETA to the Protected Area
+  string paName = 2; // name of the Protected Area that this applies to
+}
+
+//
+// TargetDimension
+// The dimensionality of this (threat/track). If position is set then the threat has a lat/lon position. If lob is set
+// then the threat has az/el/range values. If neither of the values are set (None), then this is a 0D threat, and the
+// qualities field should be examined for known values.
+//
+message TargetDimension {
+  oneof spatial {
+    DetectedCoordinate position = 1; // the position of the target
+    DetectedLineOfBearing lob = 2; // the LoB to the target
+  }
+  oneof velocities {
+    Velocity velocity = 3; // speed and heading information (use with position)
+    AngularVelocity angularVelocity= 4; // speed and directional information (use with lob)
+  }
+}
+
+//
+// TargetLinkedComponentType
+// The type of the UAS component
+//
+enum TargetLinkedComponentType {
+  UNKNOWN = 0;
+  HOME_LOCATION = 1; // the home location of the drone
+  CONTROLLER = 2; // the location of the controller (and likely the pilot)
+}
+
+//
+// TargetLinkedComponent
+// Used for associating other components of a UAS with the Drone that was detected
+// This would typically be an associated location, such as the controller or home location for a drone
+//
+message TargetLinkedComponent {
+  string name = 1; // the name of the associated UAS component
+  TargetLinkedComponentType type = 2; // the type of the associated UAS component
+  CoordinateLla position = 3; // the position reported of the UAS component
+  google.protobuf.Int64Value timestamp = 4; // the last update time provided for the component.
+}
+
+//
+// TargetDeliveryState
+// The state of the delivery of a threat or a target to a client. Contains potential reason for
+// NOT receiving the threat or track as well.
+//
+enum TargetDeliveryState {
+  TARGET_STATE_UNKNOWN = 0; // unknown / unset state
+  // set if this is the first instance of a track or threat being sent from a device or from Valkyrie
+  TARGET_STATE_BEGIN = 1;
+
+  // set if a track or threat has stopped being received or timed out, and no more delivery of it will occur
+  TARGET_STATE_END = 2;
+
+  // set if a track or threat has entered a state in which it is filtered from a client, and will not be delivered to
+  // that client any more, while the filtering conditions remain. A threat may enter and leave this state multiple times
+  // during its life, while it will only reach a state of THREAT_STATE_END once.
+  TARGET_STATE_FILTERED = 3;
+
+  // standard state for a threat or track - not the first or last instance of this message
+  TARGET_STATE_STANDARD = 4;
+}
+
+//
+// ThreatInfo
+// Details for one threat propagated through the system
+//
+message ThreatInfo {
+  int64 threatId = 1; // Unique (temporarily) ID for this threat
+  string sourceSystem = 2; // the source system that generated this threat
+  string threatName = 3; // A friendly name for this threat
+  Priority priority = 4; // Priority rating for this threat
+  google.protobuf.StringValue description = 5; // optional descriptive field
+  TargetDimension dimension = 6; // the roll up of target dimension information.
+  int64 updateTime = 7; // latest track time, in milliseconds since epoch
+  TargetDeliveryState threatState = 8; // delivery state of this threat
+  TargetEtaInfo eta = 9; // optional ETA (estimated time of arrival) information for this threat
+  google.protobuf.DoubleValue signalConfidence = 10; // optional signal confidence, as a value from 0 to 1
+
+  // affiliation information. This can be set either procedurally by considering child track information, or manually
+  // selected by a client
+  TargetAffiliation affiliation = 11; // Affiliation of this threat
+  bool isClientAffiliated = 12; // if the threat has been affiliated by a client
+
+  // classification information. This can be set either procedurally by considering child track information, or manually
+  // selected by a client
+  TargetClassification classification = 13; // Classification information for this threat
+  bool isClientClassified = 14; // if the threat has been classified by a client
+
+  // tracks within our threat
+  repeated TrackInfo tracks = 15; // detail about the tracks that make up this threat
+  int64 originTime = 16; // time of detection, in milliseconds since epoch
+
+  repeated TargetLinkedComponent components = 17; // this is the aggregation of all components for the underlying tracks
+}
+
+//
+// TrackInfo
+// Details for one track within the system. This can be a standalone track coming from a
+// device, and it also is a repeated field within threats.
+//
+message TrackInfo {
+  int64 trackId = 1; // id used to tie the detection information to a threat
+  int64 timestamp = 2; // the time the information was generated (milliseconds since epoch)
+  string sourceSystem = 3; // id of the system/application that generated the information
+  string sourceDevice = 4; // id of the actual device that generated the information
+  TargetAffiliation affiliation = 5; // track affiliation (if provided)
+  TargetDimension dimension = 6; // the roll up of target dimension information.
+  TrackSystemType trackType = 7; // a categorization of the type of system this track is coming from
+  TargetDeliveryState trackState = 8; // delivery state of this track
+
+  google.protobuf.StringValue serialNumber = 9; // the serial number of the device, if provided.
+  TrackClassificationInfo classification = 10; // classification information about the track
+  TrackQualities qualities = 11; // extra qualities of this track that are mutually exclusive
+
+  // specific business logic and parsing from TrackClassification values
+  // NOTE: singular because only one is set for a track
+  TrackDiscriminationFeature feature = 12;
+
+  repeated TargetLinkedComponent components = 13; // UAS components related to this Track
+}
+
+//
+// TrackSystemType enum
+// Represents the rough type/category of device this track came from
+//
+enum TrackSystemType {
+  TRACK_SYSTEM_OTHER = 0[(description) = "Other"];
+  TRACK_SYSTEM_ACOUSTIC = 1[(description) = "Acoustic"];
+  TRACK_SYSTEM_RADAR = 2[(description) = "Radar"];
+  TRACK_SYSTEM_EW = 3[(description) = "EW"];
+  TRACK_SYSTEM_CAMERA = 4[(description) = "Camera"];
+  TRACK_SYSTEM_THREAT = 5[(description) = "Threat"];
+}
+
+//
+// ClassificationType
+// classification details for a track or threat
+//
+enum TargetClassification {
+  CLASS_TYPE_PENDING = 0[(description) = "Pending"];
+  CLASS_TYPE_AIRCRAFT = 1[(description) = "Aircraft"];
+  CLASS_TYPE_BIRD = 2[(description) = "Bird"];
+  CLASS_TYPE_DRONE = 3[(description) = "Drone"];
+  CLASS_TYPE_UNKNOWN = 4[(description) = "Unknown"];
+}
+
+
+//
+// TrackDiscriminationFeature
+// This class contains specific evaluations and business logic for information
+// contained within a repeated track discrimination value.
+//
+message TrackDiscriminationFeature {
+  //TODO: leaving type for possible future expansion. This comment left as part of VLKY-170 work.
+  /*
+  oneof data {
+    TrackXTypeFeature xType = 1; // feature of XType
+  }
+  */
+}
+
+//
+// TrackClassification
+// Classification information about a target
+//
+message TrackClassificationInfo {
+  TargetClassification type = 1; // The overall Classification of the track, if available.
+  google.protobuf.BoolValue isManMade = 2; // Whether the track is determined to be man-made (true) or biological (false). Absence indicates that this is unknown.
+  google.protobuf.DoubleValue confidence = 3; // 0 - 1  The confidence of overall_type.
+  repeated TrackDiscrimination discriminations = 4; // The current discriminations/types for this track.
+  google.protobuf.StringValue detectedDroneModel = 5; // The detected model of the drone, if available
+}
+
+//
+// TrackDiscrimination
+// A discriminating element of a track classification
+//
+message TrackDiscrimination {
+  google.protobuf.DoubleValue confidence = 1; // 0 - 1  The confidence of this one discrimination
+  google.protobuf.StringValue feature = 2; // The name (key) of the feature for which this is a discrimination.
+  google.protobuf.StringValue discrimination = 3; // The value of the feature which this is a discrimination.
+}
+
+//
+// TrackQualities
+// Qualities of a track that are mutually exclusive.
+//
+message TrackQualities {
+  oneof data {
+    TrackAcousticQualities acoustic = 1; // acoustic qualities for this track
+    TrackRfQualities rf = 2; // rf qualities for this track
+  }
+}
+
+//
+// TrackRfQualities
+// details for one RF track
+//
+message TrackRfQualities {
+  string signalType = 1; // A string indicating what kind of EW signal is present.
+  google.protobuf.DoubleValue frequency = 2; // Frequency of the track (Units: MHz)
+  google.protobuf.StringValue macAddress = 3; // MAC Address of the track in XX:XX:XX:XX:XX:XX format
+  google.protobuf.DoubleValue signalStrength = 4 ; // Indicates signal power level (Units: dB)
+  google.protobuf.StringValue video = 5; // Indicates the system is providing a stream for the target’s video feed, if available.
+}
+
+//
+// TrackAcousticQualities
+// details for one acoustic track
+//
+message TrackAcousticQualities {
+  string signalType = 1; // A string indicating what kind of audio signal is present
+  google.protobuf.DoubleValue signalConfidence = 2; // 0 - 1 Indicates the Confidence of the signal estimate
+  google.protobuf.DoubleValue absoluteAmplitude = 3; // Absolute amplitude of the track (Units: dB)
+  google.protobuf.DoubleValue relativeAmplitude = 4; // Relative amplitude of the track (Units: dB)
+  google.protobuf.DoubleValue frequency = 5; //  Frequency of the track (Units: Hz)
+  google.protobuf.DoubleValue fundamentalFrequency = 6; //  fundamental Frequency of the track (Units: Hz)
+}

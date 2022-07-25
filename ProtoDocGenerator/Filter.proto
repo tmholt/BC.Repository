@@ -1,0 +1,163 @@
+
+syntax = "proto3";
+
+import "Common.proto";
+import "Threats.proto";
+
+package saic.valkyrie.sdk.generated;
+option java_package = "saic.valkyrie.sdk.generated";
+option java_outer_classname = "FilterProto";
+option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+
+//
+// Filter configuration message containing rules to filter with, defined areas, and a default action to take
+//
+message FilterConfig {
+  string id = 1; // Unique id name for this filter config
+  // If all of the conditions are true for a rule, its action is applied and the remaining rules are skipped
+  repeated FilterRule rules = 2;
+  // Areas are separate so that they can be re-used between rules and conditions instead of being redefined a bunch
+  repeated FilterArea areas = 3;
+  FilterAction defaultAction = 4; // The action to do if none of the rules applied
+}
+
+//
+// Rules work as an OR operation like as series of ifs and else ifs.
+// If ALL of the conditions of the rule are TRUE then the rule is applied for this rule and the remaining rules are
+// skipped.
+//
+message FilterRule {
+  FilterAction action = 1; // The action to do if the conditions are true and the rule is applied
+  // The list of conditions that need to be met. FilterConditions act as AND operations
+  repeated FilterCondition conditions = 2;
+}
+
+//
+// A filter area containing an id and a shape
+//
+message FilterArea {
+  string id = 1; // Id to allow for re-use of shape within the FilterConfig
+  oneof shape {
+    CircleShape circle = 2; // Filter is a circle
+    PolygonShape polygon = 3; // Filter is a polygon
+  }
+}
+
+//
+// Defines what type of filter condition is used
+//
+message FilterCondition {
+  oneof data {
+    PriorityCondition priorityCondition = 1; // A priority based condition
+    ClassificationCondition classificationCondition = 2; // A classification based condition
+    AffiliationCondition affiliationCondition = 3; // An affiliation based condition
+    AreaCondition areaCondition = 4; // An area based condition
+    AltitudeCondition altitudeCondition = 5; // An altitude based condition
+    SpeedCondition speedCondition = 6; // A speed based condition
+    DevicesCondition deviceCondition = 7; // A track source id based condition
+    DimensionCondition dimensionCondition = 8; // A dimension based condition
+  }
+}
+
+//
+// Action to declare if the threat will be sent or not sent
+// If used for capability, action to declare if capability is able to be used or not.
+//
+enum FilterAction {
+  FILTER_ACTION_INCLUDE = 0;
+  FILTER_ACTION_EXCLUDE = 1;
+}
+
+//
+// Priority to compare against
+//
+message PriorityCondition {
+  Priority priority = 1; // The priority
+  // Comparison to use between the threat the the condition's priority. For example, is threat priority equal to HIGH?
+  NumericalComparison comparison = 2;
+}
+
+//
+// Dimension to compare against
+//
+message DimensionCondition {
+  DimensionType dimension = 1; // The dimension
+  NumericalComparison comparison = 2; // Comparison to use between the threat the the condition's dimension.
+}
+
+//
+// The type of dimensions possible
+//
+enum DimensionType {
+  ZERO_DIMENSIONAL = 0; // No dimensions available
+  ONE_DIMENSIONAL = 1; // Single dimension, example  a line of bearing with only an azimuth
+  TWO_DIMENSIONAL = 2; // Two dimensions, example is a line of bearing with an azimuth and elevation
+  THREE_DIMENSIONAL = 3; // Three dimensions, example is a lat, long, and alt.
+}
+
+//
+// The affiliation to compare against
+//
+message AffiliationCondition {
+  TargetAffiliation affiliation = 1; // The affiliation
+  NumericalComparison comparison = 2;// Comparison to use between the threat the the condition's affiliation.
+}
+
+//
+// The classification to compare against
+//
+message ClassificationCondition {
+  TargetClassification classification = 1; // The classification
+  NumericalComparison comparison = 2; // Comparison to use between the threat the the condition's classification.
+}
+
+//
+// The area to compare against
+//
+message AreaCondition {
+  string filterAreaId = 1; // The filter area's id to use in this condition
+  AreaConditionType type = 2; // Comparison to use between the threat the the condition's area.
+}
+
+//
+// The type of area condition.
+// On boundary of area is considered Inside
+//
+enum AreaConditionType {
+  AREA_CONDITION_IS_INSIDE = 0; // The comparison is inside the area
+  AREA_CONDITION_IS_OUTSIDE = 1;// The comparison is outside the area
+}
+
+//
+//The altitude to compare against
+//
+message AltitudeCondition {
+  double altitudeHae = 1; // meters
+  NumericalComparison comparison = 2; // Comparison to use between the threat the the condition's altitude.
+}
+
+//
+// The speed to compare against
+//
+message SpeedCondition {
+  double speed = 1; // meters/second
+  NumericalComparison comparison = 2; // Comparison to use between the threat the the condition's speed.
+}
+
+//
+// This condition is true if the threat has one of these devices as a track source.
+//
+message DevicesCondition {
+  //Repeated so that the rule can be applied to multiple of the same type of device easily
+  repeated string sourceDeviceIds = 1;
+}
+
+//
+// The type of numerical comparison to be used
+//
+enum NumericalComparison {
+  NUM_COMPARE_LESS_OR_EQUAL = 0; // Threat data is less than or equal to condition
+  NUM_COMPARE_MORE_OR_EQUAL = 1; // Threat data is greater than or equal to condition
+  NUM_COMPARE_EQUAL = 2; // Threat data is equal to condition
+  NUM_COMPARE_NOT_EQUAL = 3; // Threat data is not equal to condition
+}

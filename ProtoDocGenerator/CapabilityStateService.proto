@@ -1,0 +1,114 @@
+
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "Common.proto";
+import "DevicesStatus.proto";
+import "SystemConfiguration.proto";
+
+package saic.valkyrie.sdk.generated;
+option java_package = "saic.valkyrie.sdk.generated";
+option java_outer_classname = "CapabilityStateServiceProto";
+option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+
+//
+// CapabilityStateService
+// Service used to maintain and publish the operational state of the system
+//
+service CapabilityStateService {
+
+  //
+  // getVersion
+  // Get the version of the CountermeasureStateService. this is a unary blocking call.
+  //
+  rpc getVersion (google.protobuf.Empty) returns (VersionInfo);
+
+  //
+  // subscribe
+  // Allows the client to receive the countering state of the system.
+  //
+  rpc subscribe (google.protobuf.Empty) returns (stream CapabilityStateInfo);
+
+  ///
+  // setSelectedThreat
+  // Capabilities can require a selected threat in order to run, AND they can have
+  // filtering criteria defined for the ability to use that threat in order to run.
+  // This command sets an "active" threat, which will be used to determine the set
+  // of available commands. A null value clears the selected threat.
+  //
+  rpc setSelectedThreat (google.protobuf.Int64Value) returns (ResponseInfo);
+
+  ///
+  // getSelectedThreat
+  // Capabilities can require a selected threat in order to run, AND they can have
+  // filtering criteria defined for the ability to use that threat in order to run.
+  // This command gets the "active" threat being used to determine the set
+  // of available commands. A null value means no selected threat.
+  //
+  rpc getSelectedThreat (google.protobuf.Empty) returns (google.protobuf.Int64Value);
+
+  //
+  // getCapabilityStates
+  // Allows the client to receive the current operational status of the system.
+  //
+  rpc getCapabilityStates (google.protobuf.Empty) returns (CapabilityStateInfo);
+
+  //
+  // evaluateThreat
+  // Ability to evaluate a specific threat against system capabilities, and answer the
+  // question: what capabilities would be available to be run against this threat?
+  //
+  rpc evaluateThreat(EvaluateThreatRequest) returns (stream EvaluateThreatResponse);
+}
+
+//
+// EvaluateThreatRequest
+// Details for the evaluateThreat request
+//
+message EvaluateThreatRequest {
+  int64 threatId = 2; // the id of the threat to test the capability against
+}
+
+//
+// EvaluateThreatResponse
+// Details for one evaluateThreat response
+//
+message EvaluateThreatResponse {
+  int64 threatId = 1; // the id of the threat tested against
+  string deviceId = 2; // The ID of this device
+  string capability = 3; // The name for this capability
+  DeviceOperationState state = 4; // the current/active state for this operational capability
+  bool isAvailable = 5; // if this capability is available for running or not
+  google.protobuf.StringValue unavailableReason = 6; // if a capability is not available, the text giving the reason
+}
+
+//
+// CapabilityStateInfo
+// Message used to send the Counter state to subscribers
+//
+message CapabilityStateInfo {
+  // The overall operational status of the system.
+  // Overall status is the highest priority state of all devices.
+  // Priority order: Unknown < Inactive < Pending < Active
+  DeviceOperationState overallStatus = 1;
+  google.protobuf.Int64Value overallStartTime = 2; // Timestamp in milliseconds since epoch when the system started any operation
+  google.protobuf.Int64Value overallDuration = 3; // Duration in milliseconds since the system started any operation
+  repeated DeviceCapabilityState capabilities = 4; // list of device capabilities and their states
+}
+
+//
+// DeviceCapabilityState
+// the countering state of a specific device capability.
+//
+message DeviceCapabilityState {
+  string deviceId = 1; // The ID of this device
+  string displayName = 2; // The name for this capability
+  google.protobuf.Int64Value startTime = 3; // Timestamp in milliseconds since epoch when the device started performing this operation (if state=ACTIVE)
+  google.protobuf.Int64Value duration = 4; // Duration in milliseconds since the device started performing this operation (if state=ACTIVE)
+  DeviceOperationalState state = 5; // details about the current operational state of this capability
+  DeviceOperationType opType = 6; // the type of operation we are talking about
+  CapabilityConstraints constraints = 7; // constraints on the ability to run this capability
+  bool isAvailable = 8; // if this capability is available for running or not
+  google.protobuf.StringValue unavailableReason = 9; // if a capability is not available, the text giving the reason
+}

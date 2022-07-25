@@ -1,0 +1,343 @@
+
+syntax = "proto3";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/descriptor.proto";
+
+package saic.valkyrie.sdk.generated;
+option java_package = "saic.valkyrie.sdk.generated";
+option java_outer_classname = "CommonProto";
+option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+//
+// VersionInfo
+// version details for a API service
+//
+message VersionInfo {
+    string version = 1;
+    string buildDate = 2;
+}
+
+//
+// ResponseInfo
+// support for a response back for a specific request. with success/failure details
+//
+message ResponseInfo {
+    string requestId = 1; // an id that relates the request to this response
+    bool success    = 2; // if the request succeeded or not
+    string details  = 3; // details about this success or failure
+}
+
+//
+// CoordinateLla
+// A 3d position in lat/lon/alt (LLA)
+// BITWISE matches DON.CoordinateMsg
+//
+message CoordinateLla {
+    double latitude = 1;
+    double longitude = 2;
+    double altitude = 3; // HAE
+}
+
+//
+// Orientation
+// An AZ/EL pair
+//
+message Orientation {
+    float azimuth = 1; //A value of [0, 360]
+    float elevation = 2; //A value of [-90, 90]
+}
+
+//
+// CoordinatePolar
+// A az/el position.
+// NOT bitwise compatible with DON.PolarMsg
+//
+message CoordinatePolar {
+    Orientation actual = 1;
+    Orientation starting = 2;
+    Orientation ending = 3;
+    CoordinateLla referencePoint = 4;
+}
+
+//
+// LineOfBearing
+// This type defines a relative line of bearing.
+//
+message LineOfBearing {
+    double azimuth = 1; // Estimated azimuth angle of the track (Units: degrees).
+    google.protobuf.DoubleValue elevation = 2; //  Estimated elevation angle of the track (Units: degrees)
+    google.protobuf.DoubleValue range = 3; // Range of LOB (Units: meters)
+    CoordinateLla originPosition = 4; // origin point for LOB - this would generally be the device position
+}
+
+//
+// TargetingType enum
+// A generic representation of an identified target - which could be a track or a threat.
+// Used within TargetIdentifier message.
+//
+enum TargetingType {
+    TARGET_UNKNOWN = 0;
+    TARGET_THREAT = 1;
+    TARGET_TRACK = 2;
+}
+
+//
+// TargetIdentifier
+// The ability to identify the target of an action, when that target could be a threat
+// or a track.
+//
+message TargetIdentifier {
+    TargetingType type = 1; // targeting type
+    int64 targetId = 2; // target identifier
+    string sourceSystem = 3; // source of the target identification
+}
+
+//
+// TargetAffiliationInfo
+// Ability to get/set the affiliation level for a target given its ID.
+//
+message TargetAffiliationInfo {
+  TargetIdentifier target = 1; // the affiliated target
+  TargetAffiliation affiliation = 2; // the affiliation of the target
+}
+
+//
+// Velocity
+// The speed and heading information for a target
+//
+message Velocity {
+  google.protobuf.DoubleValue speed = 1; // speed of this target in meters/second
+  Orientation heading = 2; // Heading of this target in az/el
+}
+
+//
+// AngularVelocity
+// Azimuth and Elevation velocity information for a LoB
+//
+message AngularVelocity {
+  google.protobuf.DoubleValue azimuthVelocity = 1; // positive for clockwise, negative for counter-clockwise
+  google.protobuf.DoubleValue elevationVelocity = 2; // positive for "above," negative for "below"
+}
+
+//
+// TransportProtocol
+// available transport protocols
+//
+enum TransportProtocol {
+    TRANSPORT_PROTOCOL_UNKNOWN = 0;
+    TRANSPORT_PROTOCOL_UDP = 1;
+    TRANSPORT_PROTOCOL_TCP = 2;
+    TRANSPORT_PROTOCOL_RPC = 3;
+    TRANSPORT_PROTOCOL_HTTP = 4;
+    TRANSPORT_PROTOCOL_RTSP = 5;
+}
+
+//
+// ARGBColor
+// Color is encoded such that
+// int color = (alpha & 0xff) << 24 | (red & 0xff) << 16 | (green & 0xff) << 8 | (blue & 0xff);
+//
+message ARGBColor {
+    uint32 a = 1; // alpha, 0-255
+    uint32 r = 2; // red, 0-255
+    uint32 g = 3; // green, 0-255
+    uint32 b = 4; // blue, 0-255
+}
+
+//
+// SystemChangeType
+// This type defines the available change types that can occur on a set of monitored
+// data objects
+//
+enum SystemChangeType {
+    CHANGE_TYPE_UNKNOWN = 0; // unknown / error
+    CHANGE_TYPE_INITIAL = 1; // first-time transmission or request for items; no change in status
+    CHANGE_TYPE_ADDED = 2; // a data object has been added to a collection
+    CHANGE_TYPE_MODIFIED = 3; // an existing data object has been modified
+    CHANGE_TYPE_UNSHARED = 4; // an existing data object has changed its group membership and has become unshared
+    CHANGE_TYPE_DELETED = 5; // an existing data object has been deleted
+}
+
+extend google.protobuf.EnumValueOptions{
+  string description = 55225;
+}
+
+//
+// TargetAffiliation
+// The 2525-C standard affiliation associated with a threat/track/target.
+//
+enum TargetAffiliation {
+    AFF_PENDING = 0[(description)="Pending"];
+    AFF_UNKNOWN = 1[(description)="Unknown"];
+    AFF_ASSUMED_FRIEND = 2[(description)="Assumed Friend"];
+    AFF_FRIEND = 3[(description)="Friend"];
+    AFF_NEUTRAL = 4[(description)="Neutral"];
+    AFF_SUSPECT = 5[(description)="Suspect"];
+    AFF_HOSTILE = 6[(description)="Hostile"];
+    // BOUNDARY - above match order for TCUT3 mil.boss.protocols.tcut.jaxb.V3_0.Affiliation
+    AFF_EXERCISE_PENDING = 7[(description)="Exercise Pending"];
+    AFF_EXERCISE_UNKNOWN = 8[(description)="Exercise Unknown"];
+    AFF_EXERCISE_ASSUMED_FRIEND = 9[(description)="Exercise Assumed Friend"];
+    AFF_EXERCISE_FRIEND = 10[(description)="Exercise Friend"];
+    AFF_EXERCISE_NEUTRAL = 11[(description)="Exercise Neutral"];
+    AFF_JOKER = 12[(description)="Joker"];
+    AFF_FAKER = 13[(description)="Faker"];
+    // BOUNDARY - matches order for mil.boss.infrastructure.marc.Affiliation
+}
+
+//
+// Priority
+// Priority details for a threat
+//
+enum Priority {
+  PRIORITY_NONE = 0[(description) = "None"];
+  PRIORITY_LOW = 1[(description) = "Low"];
+  PRIORITY_MEDIUM = 2[(description) = "Medium"];
+  PRIORITY_HIGH = 3[(description) = "High"];
+}
+
+//
+// OperationalStatus
+// The operational status for one device/service/client
+//
+enum OperationalStatus {
+    STATUS_UNKNOWN = 0; // Unknown / not set
+    STATUS_OPERATIONAL = 1; // Connected and Operational
+    STATUS_NONOPERATIONAL = 2; // Connected and Nonoperational
+    STATUS_DISCONNECTED = 3; // Disconnected, not communicating
+    STATUS_DEGRADED = 4; // Operational but in a degraded state
+}
+
+//
+// FPCONLevel
+// Enumeration of available FPCON (Force Protection Condition) levels
+//
+enum FPCONLevel {
+  FPCON_LEVEL_UNKNOWN = 0;
+  FPCON_LEVEL_NORMAL = 1;
+  FPCON_LEVEL_ALPHA = 2;
+  FPCON_LEVEL_BRAVO = 3;
+  FPCON_LEVEL_CHARLIE = 4;
+  FPCON_LEVEL_DELTA = 5;
+}
+
+//
+// ShapeFillAttributes
+// Details on how to draw a closed shape
+//
+message ShapeFillAttributes {
+  ARGBColor fillColor = 1; // fill color
+  ARGBColor lineColor = 2; // line color
+  uint32 lineWidth = 3; // line width
+}
+
+//
+// LineAttributes
+// Details on how to draw a line
+//
+message LineAttributes {
+  ARGBColor lineColor = 1; // line color
+  uint32 lineWidth = 2; // line width
+}
+
+//
+// TextAttributes
+// Details on how to draw text
+//
+message TextAttributes {
+  ARGBColor textColor = 1; // text color
+  string fontFamily = 2; // font to use
+  uint32 fontSize = 3; // font size, in points
+}
+
+//
+// PolygonShape
+// A basic generic closed polygon shape.
+//
+message PolygonShape {
+  ShapeFillAttributes fill = 1; // drawing attributes
+  repeated CoordinateLla coordinates = 2; // vertex points. do not repeat first point - this will happen automatically
+}
+
+//
+// PolyLineShape
+// A basic generic multi-segmented line shape.
+//
+message PolyLineShape {
+  LineAttributes fill = 1; // drawing attributes
+  repeated CoordinateLla coordinates = 2; // vertex points
+}
+
+//
+// TextShape
+// A basic generic text shape.
+//
+message TextShape {
+  TextAttributes fill = 1; // drawing attributes
+  string text = 2; // the text to draw
+  CoordinateLla origin = 3; // bottom-left for text positioning
+}
+
+//
+// CircleShape
+// A basic generic circle.
+//
+message CircleShape {
+  ShapeFillAttributes fill = 1; // drawing attributes
+  CoordinateLla origin = 2; // center point for circle
+  double radius = 3; // radius of the circle, in meters
+}
+
+//
+// SectorShape
+// This is officially known as an Annulus Sector.
+// An annulus is made of two concentric (same center) circles of different size.
+// An annulus sector is a cut from an annulus, which is bordered by two straight lines from its center.
+// Think of a donut with a bite out of it.
+//
+message SectorShape {
+  ShapeFillAttributes fill = 1; // drawing attributes
+  CoordinateLla origin = 2; // center point for donut
+  double innerRadius = 3; // inner radius of the circle, in meters
+  double outerRadius = 4; // outer radius of the circle, in meters
+  Orientation startingAngle = 5; // starting az/el in degrees  [0, 360] for AZ, [-90, 90] for EL
+  Orientation endingAngle = 6; // ending az/el in degrees [0, 360] for AZ, [startElevation, 90] for EL
+}
+
+//
+// PointMarkerShape
+// A basic generic marker.
+//
+message PointMarkerShape {
+  ARGBColor fillColor = 1; // fill color
+  CoordinateLla origin = 2; // center point for a point marker shape
+  double scalingFactor = 3; // scalingFactor of the point
+}
+
+//
+// ShapeType enumeration
+// Enumeration of available drawing shapes
+//
+enum ShapeType {
+  SHAPE_UNKNOWN = 0 [(description) = "Unknown"]; // not set / error
+  SHAPE_CIRCLE = 1 [(description) = "Circle"]; // circle shape
+  SHAPE_POLYGON = 2 [(description) = "Polygon"]; // polygon shape
+  SHAPE_POLYLINE = 3 [(description) = "Poly-line"]; // polyline shape
+  SHAPE_TEXT = 4 [(description) = "Text"]; // text shape
+  SHAPE_POINT_MARKER = 5 [(description) = "Single point"]; // point shape
+  SHAPE_SECTOR = 6 [(description) = "Donut"]; // Annulus Sector shape
+}
+
+//
+// TransportConfiguration
+// Transport details for connecting to another system over a network
+//
+message TransportConfiguration {
+  TransportProtocol protocol = 1; // network protocol being used
+  string address = 2; // ip address
+  int32 port = 3; // network port
+  google.protobuf.StringValue path = 4; // for HTTP requests; the REST path (example: api/v1/devices)
+  google.protobuf.StringValue credentials = 5; // as required, generally for HTTPS
+  google.protobuf.StringValue credentialsSeed = 6; // to encrypt credentials information
+  google.protobuf.Int32Value pollInterval = 7; // polling interval in milliseconds (if needed)
+}

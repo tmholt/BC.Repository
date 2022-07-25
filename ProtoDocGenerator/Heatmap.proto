@@ -1,0 +1,74 @@
+
+syntax = "proto3";
+
+import "Common.proto";
+
+package saic.valkyrie.sdk.generated;
+option java_package = "saic.valkyrie.sdk.generated";
+option java_outer_classname = "HeatmapProto";
+option csharp_namespace = "SAIC.Valkyrie.Api.V1";
+
+//
+// HeatmapRequest
+// Details for a request to receive heatmap data for threats in the system
+//
+message HeatmapRequest {
+  // whether to include only threats classified as drones or all threats in the resultant data
+  bool droneClassificationOnly = 1;
+  // heatmap resolution (in meters/cell)
+  double cellResolutionMeters = 2;
+
+  oneof data {
+    // request for historical data. OnComplete will be called once all data is transferred
+    HeatmapHistoricalRequest historical = 3;
+    // request for live heatmap data. results will be updated over time
+    HeatmapLiveRequest live = 4;
+  }
+
+}
+
+//
+// HeatmapHistoricalRequest
+// Details for a historical report - what data to send
+//
+message HeatmapHistoricalRequest {
+  int64 startDate = 1; // start of historical data to be returned
+  int64 endDate = 2; // end of historical data to be returned
+}
+
+//
+// HeatmapLiveRequest
+// Details for a live report - what data to send
+//
+message HeatmapLiveRequest {
+  // how far back (in seconds) to include in the initial response to this request
+  int64 initialHistorySeconds = 1;
+  // if threats should be timed out of the report data. if so, how old the data should
+  // be in order to be timed out (in seconds)
+  // NOTE: if timeoutPeriod >= initialHistory then all initialHistory will immediately
+  //       be timed out
+  // NOTE: setting this value to 0 means do not time out threats from the heatmap data
+  int64 timeoutPeriodSeconds = 2;
+
+  // how often to send updates
+  int32 updatePeriodSeconds = 3;
+}
+
+//
+// HeatmapResponse
+// Heatmap data returned from the server based on a call to ThreatsManager.getHeatmap
+//
+message HeatmapResponse {
+  int64 cellId = 1; // a unique identifier for this heatmap cell. Used for updating existing data for live heatmaps
+  CoordinateLla position = 2; // heatmap cell location
+
+  // 2 choices here
+  // 1. A total hit count, and let the client figure out the scaling for the data
+  //      NOTE: The MapLibre example does its own scaling
+  // 2. Calculate a relative intensity in the service and return it
+
+  int64 hits = 3; // the raw data of how many hits have been in this cell
+  double intensity = 4; // calculated relative intensity compared to other cells (0-1)
+}
+
+
