@@ -1,8 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="mil.don.common:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/mil_don_common_jar</output-path>
-    <root id="archive" name="mil.don.common.jar">
-      <element id="module-output" name="common_main" />
-    </root>
-  </artifact>
-</component>

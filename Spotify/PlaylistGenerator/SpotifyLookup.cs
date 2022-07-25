@@ -25,7 +25,8 @@ namespace PlaylistGenerator {
 		// http://lab.possan.se/playlistcreator-example/
 
 		//const string APP_AUTH_CODE = "AQB3_lcENlV1FuIAv-z-SQUIgZq-BklcqlZwQL1Dn03p4fSu4GEx8QA8ZWrZ3ZNXUvuihcPO1A7Zp2BG1AzPcGXAQaCxdNL87YirPZH-oW5qoC3OztJP9_UZrP1W37Zad3I6RWos90ACxg_gfc96crGLGP0V7wldEJccmfBqq9aMo66R4mPmyh-FTICzYSuRpKxCaqjiH-6KM-FqTKmwoBjPFA";
-		const string STATIC_TOKEN = "BQB_e1GLVwbhnfcwjBnEssWvG_C3Xd58fp0bSK_8Td4W61yJ90KlHvdrdiNGmP4YSP91057pkOcTqZWAYV4qeTG3enozeTWFuzDwZGeL6zNItlxEd70gCRJhxKWOdLYO--j3TQtSccZ7jXz9Dk8tZ10glc8_6-HV76Iww6ebEh1Q3JlKGXF_gL6bEifpLq5x5Kor2pyWjcRiS3N4rDr3";
+		
+		const string STATIC_TOKEN = "BQDyOuOiof79u0O47nnMbvvdGZcADcitWzNeVds-oN6zydd-EVoFTR3o5fn6zSP51RCcz4WVACWt_fzg-aqU2__MwrkTs4bcUZeEsRU2mFA7XAFr3aNpzzszIR7m_WYBTn0HxMEgstBpLA0OKZvI06Akkg3nGicTVdKa39Vg7w5bWSE7CO7TB80psEaO-f_XWDVd57g2i3Efhv8LzWrSATU";
 
         private Spotify.TokenReposnse mToken = null;
 
